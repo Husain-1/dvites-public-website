@@ -26976,5 +26976,119 @@
     <!-- Start of bodyEnd -->
 
     <!-- End of bodyEnd -->
+    <!-- Dvites Sticky Bar -->
+<div class="dvites-buy-bar">
+
+  <div class="dvites-brand">
+    <img src="assets/images/dvites-logo.png" alt="Dvites">
+  </div>
+
+  <span class="dvites-text">
+    Personalize this invitation in minutes.
+  </span>
+
+  <a href="#" id="buyNowBtn">
+    Buy Now
+  </a>
+
+</div>
+
+<style>
+
+.dvites-buy-bar{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:68px;
+    background:rgba(35,20,26,.88);
+    backdrop-filter:blur(18px);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 32px;
+    z-index:999999;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+body{
+    padding-top:68px;
+}
+
+.dvites-brand{
+    display:flex;
+    align-items:center;
+}
+
+.dvites-brand img{
+    height:40px;
+    width:auto;
+    display:block;
+}
+
+.dvites-text{
+    flex:1;
+    text-align:center;
+    color:#fff;
+    font-size:16px;
+    font-weight:500;
+    font-family:Inter,sans-serif;
+    padding:0 24px;
+}
+
+.dvites-buy-bar a{
+    text-decoration:none;
+    background:#EF6B96;
+    color:#fff;
+    padding:12px 28px;
+    border-radius:999px;
+    font-weight:700;
+    transition:.25s;
+    white-space:nowrap;
+}
+
+.dvites-buy-bar a:hover{
+    transform:translateY(-2px);
+    background:#F57EA5;
+}
+
+@media(max-width:768px){
+
+    .dvites-buy-bar{
+        padding:10px 16px;
+        height:auto;
+        flex-wrap:wrap;
+        justify-content:center;
+        gap:10px;
+    }
+
+    body{
+        padding-top:100px;
+    }
+
+    .dvites-brand{
+        width:100%;
+        justify-content:center;
+    }
+
+    .dvites-brand img{
+        height:34px;
+    }
+
+    .dvites-text{
+        width:100%;
+        text-align:center;
+        font-size:14px;
+        padding:0;
+    }
+
+    .dvites-buy-bar a{
+        width:100%;
+        text-align:center;
+    }
+
+}
+
+</style>
   </body>
 </html>
