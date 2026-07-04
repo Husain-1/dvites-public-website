@@ -5,16 +5,17 @@
   const TEMPLATE_INDEX = "/templates/curtains/index.html";
   let invitePayload = null;
 
-  // Static servers cannot serve /invite/:slug without a real file. Navigate to the
-  // reloadable stub at /invite/:slug/ (invite/:slug/index.html) instead of replaceState.
+  // Serve from /templates/curtains/ on Cloudflare; rewrite URL for SPA router without reload.
+  const TEMPLATE_PREFIX = "/templates/curtains/";
   const path = location.pathname;
   if (path === INVITE_PATH) {
     location.replace(INVITE_SERVE_URL + location.search + location.hash);
-  } else if (path.includes("/templates/curtains/") && path.endsWith(".html")) {
-    location.replace(INVITE_SERVE_URL + location.search + location.hash);
-  } else if (!path.startsWith(INVITE_PATH)) {
-    location.replace(INVITE_SERVE_URL + location.search + location.hash);
-  } else if (path.endsWith("/index.html")) {
+  } else if (
+    path.startsWith(TEMPLATE_PREFIX) ||
+    path === "/templates/curtains"
+  ) {
+    history.replaceState(null, "", INVITE_SERVE_URL + location.search + location.hash);
+  } else if (path.startsWith(INVITE_PATH) && path.endsWith("/index.html")) {
     history.replaceState(null, "", INVITE_SERVE_URL + location.search + location.hash);
   }
 

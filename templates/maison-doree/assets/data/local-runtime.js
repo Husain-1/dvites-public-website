@@ -1,5 +1,7 @@
 (() => {
-  if (location.pathname !== "/") {
+  const TEMPLATE_PREFIX = "/templates/maison-doree/";
+  const path = location.pathname;
+  if (path.startsWith(TEMPLATE_PREFIX) || path === "/templates/maison-doree") {
     history.replaceState(null, "", "/" + location.search + location.hash);
   }
 
