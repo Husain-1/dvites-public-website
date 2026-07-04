@@ -1,0 +1,1 @@
+import{j as e}from"/templates/balcony-seaview/assets/index-Cfoc4NWM.js";const E=()=>e.jsx("div",{className:"p-8 max-w-3xl mx-auto",children:e.jsx("p",{className:"text-muted-foreground",children:"Terms of service are unavailable in this demo template."})});export{E as default};

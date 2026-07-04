@@ -1,0 +1,1 @@
+const noop=()=>{};const noopAsync=async()=>{};const ret=()=>undefined;const id=()=>"stub_"+Date.now();export{noop as a,noop as b,ret as c,ret as d,ret as e,noop as f,ret as g,noop as h,noop as i,noop as j,noop as k,noop as l,id as m,noopAsync as n,noop as s,noop as t};

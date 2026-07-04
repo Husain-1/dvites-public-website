@@ -1,0 +1,333 @@
+{
+  "slug": "demo-39e188",
+  "rpc": "get_demo_invitation",
+  "capturedAt": "2026-07-02T20:01:57.869Z",
+  "row": {
+    "blocks": [
+      "countdown",
+      "drawing-1",
+      "our-story",
+      "destination",
+      "venue",
+      "drawing-3",
+      "timeline",
+      "accommodation",
+      "activities",
+      "dress-code",
+      "gallery",
+      "gift-list",
+      "faq",
+      "drawing-2",
+      "boarding-pass"
+    ],
+    "message": "\n\n\nYou are invited for our special day\n\n",
+    "event_id": "98032531-8029-42fd-8ba2-3f50d3ab7f3a",
+    "headline": "\n\n\n\n\nGreg\n& \nLisa\n\nWedding \n\n",
+    "initials": "J&M",
+    "style_id": "curtains",
+    "music_url": "/templates/curtains/assets/audio/marry-you.mp3",
+    "dress_code": "black tie",
+    "event_date": "2026-03-31",
+    "event_type": "Wedding",
+    "style_name": "Grand Curtains",
+    "text_color": "#1a1a1a",
+    "venue_name": "the grand room",
+    "event_title": "Gregory drex I Boschman's Wedding",
+    "font_family": "Cinzel Decorative",
+    "rsvp_config": {
+      "replyByDate": "2026-03-30",
+      "showMessage": true,
+      "dietaryOptions": [
+        {
+          "id": "gluten-free",
+          "enabled": true
+        },
+        {
+          "id": "lactose-free",
+          "enabled": true
+        },
+        {
+          "id": "vegetarian",
+          "enabled": true
+        },
+        {
+          "id": "vegan",
+          "enabled": true
+        },
+        {
+          "id": "nut-allergy",
+          "enabled": true
+        },
+        {
+          "id": "seafood-allergy",
+          "enabled": true
+        }
+      ],
+      "showGuestCount": true,
+      "customQuestions": [],
+      "showSongRequest": true,
+      "showOtherDietary": true,
+      "showDietaryOptions": true
+    },
+    "event_status": "active",
+    "block_content": {
+      "faq": [
+        {
+          "answer": "Hell Nooo",
+          "question": "Can I bring my Children ?"
+        },
+        {
+          "answer": "By airplane",
+          "question": "What's the best way to get there?"
+        },
+        {
+          "answer": "By pressing your name in the rsvp, this will show if you can bring a plus one or not.",
+          "question": "Can I bring a plus one?"
+        },
+        {
+          "answer": "Yes, the venue offers a parking next door",
+          "question": "Is there parking nearby?"
+        }
+      ],
+      "menu": {
+        "categories": [
+          {
+            "items": [
+              {
+                "name": "Caviar",
+                "description": ""
+              }
+            ],
+            "title": "Starter"
+          },
+          {
+            "items": [
+              {
+                "name": "Steak friete",
+                "description": ""
+              }
+            ],
+            "title": "Main"
+          },
+          {
+            "items": [
+              {
+                "name": "dame blanche",
+                "description": ""
+              }
+            ],
+            "title": "dessert"
+          }
+        ]
+      },
+      "gallery": {
+        "images": [
+          "/templates/curtains/assets/images/gallery-1773226245564-bvc8ulg.jpg",
+          "/templates/curtains/assets/images/gallery-1773226247818-g3q60m.jpg"
+        ]
+      },
+      "drawings": {
+        "drawing-1": "line-art-couple",
+        "drawing-2": "line-art-champagne",
+        "drawing-3": "line-art-cake"
+      },
+      "giftList": {
+        "message": "Your presence is your gift, but all contributions can go to the bank details below",
+        "bankDetails": {
+          "iban": "BE89 565 52 24 55",
+          "bankName": "KBC",
+          "accountHolder": "Greg"
+        },
+        "showBankDetails": true
+      },
+      "ourStory": {
+        "title": "Our Story",
+        "format": "narrative",
+        "milestones": [
+          {
+            "date": "June 2021",
+            "title": "Our First Kiss",
+            "description": ""
+          },
+          {
+            "date": "June 2022",
+            "title": "Our Engagement Day",
+            "description": ""
+          },
+          {
+            "date": " January 2023",
+            "title": "Arthur was Born",
+            "description": ""
+          }
+        ],
+        "description": "In the city of Oakhaven, where the rain always seemed to smell like cedar and wet pavement, Elias ran a shop that sold \"nearly-dead\" clocks. He didn’t fix them to be perfect; he fixed them to keep their character. Some ticked with a slight limp, others chimed a note too flat, but Elias loved them for their stubbornness"
+      },
+      "timeline": [
+        {
+          "time": "14:00",
+          "title": "ceremony",
+          "description": ""
+        },
+        {
+          "time": "15:00",
+          "title": "wedding",
+          "description": ""
+        },
+        {
+          "time": "18:00",
+          "title": "dinner",
+          "description": ""
+        }
+      ],
+      "countdown": {
+        "message": "we can't wait to celebrate with you",
+        "showEmbroidery": true,
+        "backgroundColor": "hsl(0 0% 98%)"
+      },
+      "dressCode": {
+        "code": "Semi-Formal",
+        "colors": [
+          "green",
+          "champagne",
+          "pink"
+        ],
+        "codeMen": "Suit & Tie",
+        "codeWomen": "Cocktail dress",
+        "description": ""
+      },
+      "textBlock": {
+        "text": "test test",
+        "title": "We would like to invite you for our wedding",
+        "alignment": "left"
+      },
+      "transport": {
+        "options": [
+          {
+            "type": "plane",
+            "title": "Ryain air",
+            "details": ""
+          }
+        ]
+      },
+      "venueDays": [
+        {
+          "name": "Occean front beach House",
+          "label": "Day 1",
+          "address": "South Dixie Highway, Homestead, Miami-Dade County, Florida, 33030, United States",
+          "mapsUrl": "https://maps.google.com/?q=South%20Dixie%20Highway%2C%20Homestead%2C%20Miami-Dade%20County%2C%20Florida%2C%2033030%2C%20United%20States",
+          "imageUrl": "/templates/curtains/assets/images/venue-day0-1773765597616.jfif"
+        }
+      ],
+      "thingsToDo": {
+        "items": [
+          {
+            "name": ""
+          }
+        ]
+      },
+      "destination": {
+        "city": "Miami"
+      },
+      "boardingPass": {
+        "destinationCity": "Miami"
+      },
+      "timelineDays": [
+        {
+          "items": [
+            {
+              "time": "14:00",
+              "title": "Lunch",
+              "description": ""
+            },
+            {
+              "time": "18:00",
+              "title": "Ceremony",
+              "description": ""
+            },
+            {
+              "time": "20:00",
+              "title": "Dinner",
+              "description": ""
+            },
+            {
+              "time": "22:00",
+              "title": "Party",
+              "description": ""
+            },
+            {
+              "time": "04:00",
+              "title": "End",
+              "description": ""
+            }
+          ],
+          "label": "Day 1"
+        }
+      ],
+      "accommodation": {
+        "note": "we have arranged these hotels for you",
+        "hotels": [
+          {
+            "url": "https://www.booking.com/hotel/it/villa-agostina.nl.html?label=nl-be-booking-desktop-6g7wH5qxI5WPMW2tfThAegS652796017152%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-334108049%3Alp9195968%3Ali%3Adec%3Adm&aid=2311236&ucfs=1&arphpl=1&dest_id=104&dest_type=country&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=5&hapos=5&sr_order=popularity&srpvid=26dd6bfb395d00f6&srepoch=1773674499&from=searchresults",
+            "name": "Hotel Costa",
+            "priceRange": "4100",
+            "description": ""
+          },
+          {
+            "url": "",
+            "name": "Hotal Love",
+            "priceRange": "120€",
+            "description": "",
+            "discountCode": ""
+          }
+        ]
+      },
+      "dressCodeDays": [
+        {
+          "code": "Semi-Formal",
+          "label": "Day 1",
+          "colors": [
+            "green",
+            "champagne",
+            "pink"
+          ],
+          "codeMen": "Suit & Tie",
+          "codeWomen": "Cocktail dress"
+        }
+      ],
+      "flowerBorders": true,
+      "timelineStyle": "classic",
+      "scratchTheDate": {
+        "message": "SCRATCH TO DISCOVER THE DATE",
+        "revealedMessage": "We are getting married"
+      },
+      "travelDestination": {
+        "city": "Ibiza",
+        "country": "Spain"
+      }
+    },
+    "ceremony_time": "14:08:00",
+    "date_position": "below",
+    "event_user_id": "1bf1ec45-924c-491b-9839-2dc8e3d71cdf",
+    "invitation_id": "7306e349-b668-41e9-bb2d-46bb92a1090a",
+    "venue_address": "schijnpoortweg 137 ",
+    "date_font_size": 22,
+    "envelope_image": "/templates/curtains/assets/images/envelope-DxZBsIH2.png",
+    "event_end_date": null,
+    "language_slugs": {
+      "en": "82d109d6-en"
+    },
+    "reception_time": "13:11:00",
+    "event_languages": [
+      "en"
+    ],
+    "background_image": "/templates/curtains/assets/images/curtains-theme-BiJZdLpp.mp4",
+    "block_text_color": "#1a1a1a",
+    "custom_video_url": "/templates/curtains/assets/images/opening-animation-1774273219231.mp4",
+    "default_max_guests": 1,
+    "envelope_font_size": 13,
+    "headline_font_size": 26,
+    "envelope_font_style": "Cinzel",
+    "envelope_text_color": "#1a1a1a",
+    "headline_font_style": "default"
+  }
+}

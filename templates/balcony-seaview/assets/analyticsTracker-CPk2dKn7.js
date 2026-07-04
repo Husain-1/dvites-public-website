@@ -1,0 +1,1 @@
+const noop=()=>{};export{noop as a,noop as b,noop as c,noop as d,noop as e,noop as f,noop as t};

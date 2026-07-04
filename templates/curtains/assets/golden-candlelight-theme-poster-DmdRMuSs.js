@@ -1,0 +1,1 @@
+const e="/templates/curtains/assets/images/honey-garden-theme-poster-lpF0dYip.jpg",s="/templates/curtains/assets/images/golden-candlelight-theme-poster-CZZl4_QF.jpg";export{s as g,e as h};

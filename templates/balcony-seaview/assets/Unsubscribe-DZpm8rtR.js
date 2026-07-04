@@ -1,0 +1,1 @@
+import{j as s}from"/templates/balcony-seaview/assets/index-Cfoc4NWM.js";const E=()=>s.jsx("div",{className:"p-8 text-center text-muted-foreground",children:"Email preferences are unavailable in this demo."});export{E as default};
