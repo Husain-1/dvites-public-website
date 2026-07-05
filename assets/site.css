@@ -957,7 +957,90 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 @media (min-width: 768px) {
-  .footer-grid { grid-template-columns: 1.4fr 1fr 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 1024px) {
+  .footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1fr; }
+}
+
+/* Legal pages */
+.legal-page {
+  padding-bottom: 48px;
+}
+
+.legal-content {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 0 56px;
+}
+
+.legal-updated {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.legal-meta {
+  background: var(--ivory-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 36px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+.legal-meta p {
+  margin: 0 0 4px;
+}
+
+.legal-meta p:last-child {
+  margin-bottom: 0;
+}
+
+.legal-content h2 {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.5rem;
+  color: var(--maroon-deep);
+  margin: 36px 0 12px;
+}
+
+.legal-content h2:first-of-type {
+  margin-top: 0;
+}
+
+.legal-content p {
+  color: var(--text);
+  line-height: 1.75;
+  margin-bottom: 16px;
+}
+
+.legal-content ul {
+  margin: 0 0 16px 1.25rem;
+  line-height: 1.75;
+}
+
+.legal-content li {
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.legal-intro {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  margin-bottom: 24px;
+}
+
+.legal-content a {
+  color: var(--maroon);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.legal-content a:hover {
+  color: var(--maroon-deep);
 }
 
 /* Modal */
@@ -1051,6 +1134,8 @@ body.modal-open { overflow: hidden; }
   min-height: 52px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .urgency-track {
@@ -1335,6 +1420,11 @@ body.modal-open { overflow: hidden; }
 }
 
 .partner-item:hover { border-color: rgba(92, 26, 40, 0.25); }
+
+.partner-item.is-at-limit {
+  opacity: 0.55;
+  pointer-events: none;
+}
 
 .partner-item.is-selected {
   border-color: var(--maroon);

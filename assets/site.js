@@ -4,7 +4,8 @@
   var EMAIL = "infodvites@gmail.com";
   var PRICE = 1499;
   var OLD_PRICE = 2499;
-  var PARTNER_MIN = 5;
+  var PARTNER_MIN = 3;
+  var PARTNER_MAX = 5;
   var PARTNER_DISCOUNT = 0.05;
 
   var TEMPLATES = [
@@ -392,30 +393,58 @@
     var totalEl = document.getElementById("cart-total");
     var badge = document.getElementById("discount-badge");
     var orderBtn = document.getElementById("partner-order-btn");
+    var hintEl = document.getElementById("cart-hint");
+
+    function updateCartHint(count) {
+      if (!hintEl) return;
+      if (count < PARTNER_MIN) {
+        hintEl.textContent = "Select at least 3 templates to continue.";
+      } else if (count >= PARTNER_MAX) {
+        hintEl.textContent = "Maximum 5 templates allowed per partner order.";
+      } else {
+        hintEl.textContent = "Select 3 to 5 templates to unlock your 5% partner discount and send your bulk order.";
+      }
+    }
 
     function updateCart() {
       var checked = grid.querySelectorAll('input:checked');
       var count = checked.length;
       var subtotal = count * PRICE;
-      var discount = count >= PARTNER_MIN ? Math.round(subtotal * PARTNER_DISCOUNT) : 0;
+      var qualifies = count >= PARTNER_MIN && count <= PARTNER_MAX;
+      var discount = qualifies ? Math.round(subtotal * PARTNER_DISCOUNT) : 0;
       var total = subtotal - discount;
 
       countEl.textContent = count;
       subtotalEl.textContent = formatRupee(subtotal);
       discountEl.textContent = discount ? "−" + formatRupee(discount) : formatRupee(0);
       totalEl.textContent = formatRupee(total);
-      badge.classList.toggle("is-visible", count >= PARTNER_MIN);
+      badge.classList.toggle("is-visible", qualifies);
+      updateCartHint(count);
 
       grid.querySelectorAll(".partner-item").forEach(function (item) {
         var input = item.querySelector("input");
+        var atMax = count >= PARTNER_MAX;
         item.classList.toggle("is-selected", input.checked);
+        if (!input.checked && atMax) {
+          input.disabled = true;
+          item.classList.add("is-at-limit");
+        } else {
+          input.disabled = false;
+          item.classList.remove("is-at-limit");
+        }
       });
 
-      orderBtn.disabled = count < PARTNER_MIN;
-      orderBtn.style.opacity = count < PARTNER_MIN ? "0.55" : "1";
+      orderBtn.disabled = !qualifies;
+      orderBtn.style.opacity = qualifies ? "1" : "0.55";
     }
 
-    grid.addEventListener("change", updateCart);
+    grid.addEventListener("change", function (e) {
+      var checked = grid.querySelectorAll("input:checked");
+      if (checked.length > PARTNER_MAX && e.target.checked) {
+        e.target.checked = false;
+      }
+      updateCart();
+    });
     updateCart();
 
     orderBtn.addEventListener("click", function () {
@@ -424,7 +453,7 @@
         var tpl = TEMPLATES.find(function (t) { return t.id === input.value; });
         if (tpl) selected.push(tpl.title);
       });
-      if (selected.length < PARTNER_MIN) return;
+      if (selected.length < PARTNER_MIN || selected.length > PARTNER_MAX) return;
 
       var subtotal = selected.length * PRICE;
       var discount = Math.round(subtotal * PARTNER_DISCOUNT);
