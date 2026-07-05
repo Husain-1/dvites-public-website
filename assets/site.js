@@ -185,7 +185,6 @@
     var modalTitle = document.getElementById("modal-title");
     var modalCategory = document.getElementById("modal-category");
     var modalDesc = document.getElementById("modal-desc");
-    var modalBuy = document.getElementById("modal-buy");
     var lastFocused = null;
 
     if (iframe && global.DvitesPhonePreview) {
@@ -199,7 +198,8 @@
         card.setAttribute("role", "button");
         card.setAttribute("tabindex", "0");
 
-        card.addEventListener("click", function () {
+        card.addEventListener("click", function (event) {
+          if (event.target.closest(".btn-customize, .btn-watch, .demo-btn")) return;
           openModal(card);
         });
 
@@ -210,7 +210,7 @@
           }
         });
 
-        card.querySelectorAll(".btn-customize, .btn-watch, .demo-btn").forEach(function (btn) {
+        card.querySelectorAll(".btn-watch, .demo-btn").forEach(function (btn) {
           btn.addEventListener("click", function (event) {
             event.stopPropagation();
             openModal(card);
@@ -226,7 +226,6 @@
       modalCategory.textContent = tpl.category || "";
       modalDesc.textContent = tpl.description || "";
       iframe.src = tpl.url;
-      if (modalBuy) modalBuy.href = buyMail(tpl.title || "Template");
       modal.classList.add("is-open");
       modal.setAttribute("aria-hidden", "false");
       document.body.classList.add("modal-open");
@@ -245,8 +244,6 @@
       modalCategory.textContent = category || "";
       modalDesc.textContent = desc;
       iframe.src = url;
-      if (modalBuy) modalBuy.href = buyMail(title || "Template");
-
       modal.classList.add("is-open");
       modal.setAttribute("aria-hidden", "false");
       document.body.classList.add("modal-open");
@@ -454,22 +451,15 @@
         if (tpl) selected.push(tpl.title);
       });
       if (selected.length < PARTNER_MIN || selected.length > PARTNER_MAX) return;
+      if (!global.DvitesPayment) return;
 
-      var subtotal = selected.length * PRICE;
-      var discount = Math.round(subtotal * PARTNER_DISCOUNT);
-      var total = subtotal - discount;
+      var templateName = "Partner Studio (" + selected.length + " templates): " + selected.join(", ");
+      var amountPaise = global.DvitesPayment.calculatePartnerTotalPaise(selected.length);
 
-      var body =
-        "Hi Dvites,\n\nI'd like to place a Partner Studio bulk order.\n\n" +
-        "Selected templates (" + selected.length + "):\n" +
-        selected.map(function (n, i) { return (i + 1) + ". " + n; }).join("\n") +
-        "\n\nQuantity: " + selected.length +
-        "\nOriginal total: " + formatRupee(subtotal) +
-        "\nPartner discount (5%): −" + formatRupee(discount) +
-        "\nFinal total: " + formatRupee(total) +
-        "\n\nPlease confirm next steps.\n\nThank you.";
-
-      window.location.href = mailto("Partner Studio Order — " + selected.length + " Templates", body);
+      global.DvitesPayment.startCheckout({
+        templateName: templateName,
+        amountPaise: amountPaise,
+      });
     });
   }
 
