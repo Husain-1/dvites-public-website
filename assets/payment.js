@@ -4,6 +4,7 @@
   /* PAYMENT CONFIG */
   var API_CREATE_ORDER = "/api/create-order";
   var API_VERIFY_PAYMENT = "/api/verify-payment";
+  var TEST_PRICE_PAISE = 500;
   var PRICE_PAISE = 149900;
   var PARTNER_MIN = 3;
   var PARTNER_MAX = 5;
@@ -156,9 +157,10 @@
   function initPayment() {
     bindPaymentElement(document.getElementById("modal-buy"), function () {
       var titleEl = document.getElementById("modal-title");
+      var buyBtn = document.getElementById("modal-buy");
       return {
         templateName: (titleEl && titleEl.textContent.trim()) || "Dvites Wedding Invitation",
-        amountPaise: PRICE_PAISE,
+        amountPaise: Number(buyBtn && buyBtn.dataset.amountPaise) || PRICE_PAISE,
       };
     });
 
@@ -179,7 +181,7 @@
       var card = button.closest(".card[data-title]");
       startCheckout({
         templateName: (card && card.getAttribute("data-title")) || "Dvites Wedding Invitation",
-        amountPaise: PRICE_PAISE,
+        amountPaise: Number(card && card.getAttribute("data-amount-paise")) || PRICE_PAISE,
       });
     });
   }
@@ -188,6 +190,7 @@
     PRICE_PAISE: PRICE_PAISE,
     PARTNER_MIN: PARTNER_MIN,
     PARTNER_MAX: PARTNER_MAX,
+    TEST_PRICE_PAISE: TEST_PRICE_PAISE,
     calculatePartnerTotalPaise: calculatePartnerTotalPaise,
     startCheckout: startCheckout,
     init: initPayment,
