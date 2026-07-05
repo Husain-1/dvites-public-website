@@ -3,7 +3,60 @@
   const INVITE_PATH = "/invite/" + INVITE_SLUG;
   const INVITE_SERVE_URL = INVITE_PATH + "/";
   const TEMPLATE_INDEX = "/templates/curtains/index.html";
+  const isPreview = new URLSearchParams(location.search).get("preview") === "1";
   let invitePayload = null;
+
+  if (isPreview) {
+    window.__DVITES_PREVIEW__ = true;
+    document.documentElement.classList.add("dvites-preview-mode");
+
+    const previewStyle = document.createElement("style");
+    previewStyle.textContent =
+      "html.dvites-preview-mode .dvites-buy-bar{display:none!important}" +
+      "html.dvites-preview-mode .fixed.inset-0.z-50{display:none!important}";
+    (document.head || document.documentElement).appendChild(previewStyle);
+
+    function autoSkipOpening() {
+      function tryOpen() {
+        document.querySelectorAll("div.cursor-pointer,[class*='cursor-pointer']").forEach(function (el) {
+          const cls = String(el.className || "");
+          if (cls.indexOf("inset-0") >= 0 || (cls.indexOf("absolute") >= 0 && cls.indexOf("items-center") >= 0)) {
+            el.click();
+          }
+        });
+
+        document.querySelectorAll("p,span,button,div").forEach(function (el) {
+          const text = (el.textContent || "").trim();
+          if (!/^tap to open$/i.test(text) && !/^toca para abrir$/i.test(text)) return;
+          let node = el;
+          for (let i = 0; i < 8 && node; i++) {
+            if (node.onclick || String(node.className || "").indexOf("cursor-pointer") >= 0) {
+              node.click();
+              return;
+            }
+            node = node.parentElement;
+          }
+        });
+      }
+
+      tryOpen();
+      [300, 900, 1800, 3000, 5000].forEach(function (delay) {
+        setTimeout(tryOpen, delay);
+      });
+
+      function watch() {
+        if (!document.body) return;
+        const observer = new MutationObserver(tryOpen);
+        observer.observe(document.body, { childList: true, subtree: true });
+        setTimeout(function () { observer.disconnect(); }, 12000);
+      }
+
+      if (document.body) watch();
+      else document.addEventListener("DOMContentLoaded", watch);
+    }
+
+    autoSkipOpening();
+  }
 
   // Serve from /templates/curtains/ on Cloudflare; rewrite URL for SPA router without reload.
   const TEMPLATE_PREFIX = "/templates/curtains/";
