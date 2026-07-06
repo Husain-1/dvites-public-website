@@ -277,6 +277,9 @@
       livePreviewBtn.addEventListener("click", function (event) {
         event.preventDefault();
         event.stopPropagation();
+        if (typeof global.dvitesTrackViewDemo === "function" && modalTitle) {
+          global.dvitesTrackViewDemo(modalTitle.textContent.trim() || "Dvites Template");
+        }
         loadModalLivePreview();
       });
     }
@@ -323,6 +326,15 @@
       }
     }
 
+    function trackModalViewContent(title, category, pricePaise) {
+      if (typeof global.dvitesTrackViewContent !== "function") return;
+      global.dvitesTrackViewContent(
+        title || "Dvites Template",
+        category || "Wedding Invitation",
+        (Number(pricePaise) || PRICE * 100) / 100
+      );
+    }
+
     function openModalFromTemplate(tpl) {
       if (!tpl) return;
       lastFocused = document.activeElement;
@@ -330,6 +342,11 @@
       modalCategory.textContent = tpl.category || "";
       modalDesc.textContent = tpl.description || "";
       openModalPreview(tpl.preview, tpl.url);
+      trackModalViewContent(
+        tpl.title,
+        tpl.category,
+        tpl.pricePaise != null ? tpl.pricePaise : PRICE * 100
+      );
       if (modalBuy) modalBuy.dataset.amountPaise = String(tpl.pricePaise != null ? tpl.pricePaise : PRICE * 100);
       var modalPricing = document.querySelector("#demo-modal .modal-pricing");
       if (modalPricing) {
@@ -358,6 +375,7 @@
       modalCategory.textContent = category || "";
       modalDesc.textContent = desc;
       openModalPreview(preview, url);
+      trackModalViewContent(title, category, card.getAttribute("data-amount-paise"));
       setModalPricing(card);
       modal.classList.add("is-open");
       modal.setAttribute("aria-hidden", "false");

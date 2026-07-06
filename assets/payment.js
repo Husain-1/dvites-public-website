@@ -80,7 +80,7 @@
   /* END VERIFY PAYMENT CALL */
 
   /* RAZORPAY CHECKOUT */
-  function openRazorpayCheckout(orderData, templateName) {
+  function openRazorpayCheckout(orderData, templateName, priceInRupees) {
     return new Promise(function (resolve, reject) {
       var options = {
         key: orderData.key_id,
@@ -99,6 +99,13 @@
             razorpay_signature: response.razorpay_signature,
           }).then(function (result) {
             if (result.success) {
+              if (typeof global.dvitesTrackPurchase === "function") {
+                global.dvitesTrackPurchase(
+                  templateName,
+                  priceInRupees,
+                  response.razorpay_payment_id
+                );
+              }
               window.alert(SUCCESS_MESSAGE);
               resolve(result);
             } else {
@@ -130,13 +137,18 @@
   function startCheckout(options) {
     var templateName = (options && options.templateName) || "Dvites Wedding Invitation";
     var amountPaise = (options && options.amountPaise) || PRICE_PAISE;
+    var priceInRupees = amountPaise / 100;
+
+    if (typeof global.dvitesTrackInitiateCheckout === "function") {
+      global.dvitesTrackInitiateCheckout(templateName, priceInRupees);
+    }
 
     return createOrder({
       templateName: templateName,
       amount: amountPaise,
     }).then(function (orderData) {
       return ensureRazorpayLoaded().then(function () {
-        return openRazorpayCheckout(orderData, templateName);
+        return openRazorpayCheckout(orderData, templateName, priceInRupees);
       });
     }).catch(function (error) {
       if (error && error.message === "Payment cancelled") return;
