@@ -197,7 +197,21 @@
         <div class="modal-phone">
           <div class="phone-frame modal-phone-frame">
             <div class="phone-screen modal-phone-screen">
-              <div class="phone-iframe-scaler">
+              <div class="modal-preview-stage" id="modal-preview-stage">
+                <img id="modal-preview-image" class="modal-preview-image" alt="" width="390" height="844" decoding="async" />
+                <div class="modal-preview-actions" id="modal-preview-actions">
+                  <button type="button" class="modal-live-preview-btn" id="modal-live-preview">
+                    <svg class="modal-live-preview-icon" aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path>
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    </svg>
+                    <span class="modal-live-preview-label">View Demo</span>
+                  </button>
+                </div>
+                <p class="modal-preview-loading is-hidden" id="modal-preview-loading" aria-live="polite">Loading full invitation…</p>
+              </div>
+              <div class="phone-iframe-scaler is-hidden" id="modal-iframe-wrap">
                 <iframe id="demo-iframe" title="Template preview" loading="lazy"></iframe>
               </div>
             </div>

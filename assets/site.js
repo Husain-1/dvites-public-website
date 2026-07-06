@@ -149,7 +149,7 @@
       : '<div class="tpl-pricing"><span class="old-price">' + formatRupee(OLD_PRICE) + '</span><span class="current-price">' + formatRupee(price) + '</span></div>';
 
     return (
-      '<article class="tpl-card card' + (tpl.testProduct ? ' is-test-product' : '') + '" data-id="' + tpl.id + '" data-demo-url="' + tpl.url + '" data-title="' + tpl.title + '" data-category="' + tpl.category + '" data-tags="' + tpl.tags.join(" ") + '" data-description="' + tpl.description.replace(/"/g, "&quot;") + '" data-amount-paise="' + pricePaise + '">' +
+      '<article class="tpl-card card' + (tpl.testProduct ? ' is-test-product' : '') + '" data-id="' + tpl.id + '" data-demo-url="' + tpl.url + '" data-preview="' + tpl.preview + '" data-title="' + tpl.title + '" data-category="' + tpl.category + '" data-tags="' + tpl.tags.join(" ") + '" data-description="' + tpl.description.replace(/"/g, "&quot;") + '" data-amount-paise="' + pricePaise + '">' +
         '<div class="tpl-card-inner">' +
           '<div class="tpl-preview-wrap">' +
             '<div class="tpl-phone"><div class="tpl-phone-screen" style="background-image:url(\'' + tpl.preview + '\')"></div></div>' +
@@ -211,15 +211,77 @@
     if (!modal) return;
 
     var iframe = document.getElementById("demo-iframe");
+    var previewStage = document.getElementById("modal-preview-stage");
+    var previewImage = document.getElementById("modal-preview-image");
+    var previewActions = document.getElementById("modal-preview-actions");
+    var previewLoading = document.getElementById("modal-preview-loading");
+    var iframeWrap = document.getElementById("modal-iframe-wrap");
+    var livePreviewBtn = document.getElementById("modal-live-preview");
     var modalTitle = document.getElementById("modal-title");
     var modalCategory = document.getElementById("modal-category");
     var modalDesc = document.getElementById("modal-desc");
     var modalBuy = document.getElementById("modal-buy");
+    var pendingDemoUrl = null;
+    var modalIframeReady = false;
     var lastFocused = null;
 
-    if (iframe && global.DvitesPhonePreview) {
-      global.DvitesPhonePreview.setup(iframe, { mode: "modal", autoScroll: false });
+    function resetModalPreview() {
+      pendingDemoUrl = null;
+      modalIframeReady = false;
+      if (iframe) {
+        iframe.src = "about:blank";
+        iframe.removeAttribute("src");
+      }
+      if (previewStage) previewStage.classList.remove("is-hidden", "is-loading");
+      if (iframeWrap) iframeWrap.classList.add("is-hidden");
+      if (previewLoading) previewLoading.classList.add("is-hidden");
+      if (previewActions) previewActions.classList.remove("is-hidden");
+      if (livePreviewBtn) livePreviewBtn.disabled = false;
+      if (previewImage) {
+        previewImage.removeAttribute("src");
+        previewImage.alt = "";
+      }
     }
+
+    function openModalPreview(previewUrl, demoUrl) {
+      resetModalPreview();
+      pendingDemoUrl = demoUrl;
+      if (previewImage && previewUrl) {
+        previewImage.src = previewUrl;
+        previewImage.alt = "Invitation preview";
+      }
+    }
+
+    function loadModalLivePreview() {
+      if (!pendingDemoUrl || !iframe || modalIframeReady) return;
+
+      if (previewStage) previewStage.classList.add("is-loading");
+      if (previewLoading) previewLoading.classList.remove("is-hidden");
+      if (iframeWrap) iframeWrap.classList.remove("is-hidden");
+      if (livePreviewBtn) livePreviewBtn.disabled = true;
+
+      if (!iframe._dvitesPreviewBound && global.DvitesPhonePreview) {
+        global.DvitesPhonePreview.setup(iframe, { mode: "modal", autoScroll: false });
+      }
+
+      iframe.addEventListener("load", function () {
+        modalIframeReady = true;
+        if (previewStage) previewStage.classList.add("is-hidden");
+        if (previewLoading) previewLoading.classList.add("is-hidden");
+      }, { once: true });
+
+      iframe.src = pendingDemoUrl;
+    }
+
+    if (livePreviewBtn) {
+      livePreviewBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        loadModalLivePreview();
+      });
+    }
+
+    global.DvitesResetModalPreview = resetModalPreview;
 
     function bindCards() {
       document.querySelectorAll(".card[data-demo-url]").forEach(function (card) {
@@ -267,7 +329,7 @@
       modalTitle.textContent = tpl.title || "";
       modalCategory.textContent = tpl.category || "";
       modalDesc.textContent = tpl.description || "";
-      iframe.src = tpl.url;
+      openModalPreview(tpl.preview, tpl.url);
       if (modalBuy) modalBuy.dataset.amountPaise = String(tpl.pricePaise != null ? tpl.pricePaise : PRICE * 100);
       var modalPricing = document.querySelector("#demo-modal .modal-pricing");
       if (modalPricing) {
@@ -285,6 +347,7 @@
 
     function openModal(card) {
       var url = card.getAttribute("data-demo-url");
+      var preview = card.getAttribute("data-preview");
       var title = card.getAttribute("data-title");
       var category = card.getAttribute("data-category");
       var desc = card.getAttribute("data-description") || "";
@@ -294,7 +357,7 @@
       modalTitle.textContent = title || "";
       modalCategory.textContent = category || "";
       modalDesc.textContent = desc;
-      iframe.src = url;
+      openModalPreview(preview, url);
       setModalPricing(card);
       modal.classList.add("is-open");
       modal.setAttribute("aria-hidden", "false");
@@ -306,7 +369,7 @@
       modal.classList.remove("is-open");
       modal.setAttribute("aria-hidden", "true");
       document.body.classList.remove("modal-open");
-      iframe.src = "about:blank";
+      resetModalPreview();
       if (lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
     }
 
@@ -530,6 +593,9 @@
       if (modal) {
         modal.classList.remove("is-open");
         modal.setAttribute("aria-hidden", "true");
+      }
+      if (typeof global.DvitesResetModalPreview === "function") {
+        global.DvitesResetModalPreview();
       }
       var hero = document.getElementById("hero-iframe");
       if (hero && hero.src && hero.src.indexOf("about:blank") < 0) {
