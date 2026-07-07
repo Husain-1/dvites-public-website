@@ -1,153 +1,3 @@
-var ADMIN_CACHE = "dvites-admin-v5";
-
-var ADMIN_PAGE_TARGETS = {
-  "/admin": "/admin/orders.html",
-  "/admin/orders": "/admin/orders.html",
-  "/admin/orders/": "/admin/orders.html",
-  "/admin/analytics": "/admin/analytics.html",
-  "/admin/analytics/": "/admin/analytics.html",
-};
-
-var OFFLINE_HTML =
-  "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\" />" +
-  "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />" +
-  "<title>Dvites Admin — Offline</title>" +
-  "<style>body{font-family:system-ui,sans-serif;background:#12090d;color:#f7eef1;padding:24px}" +
-  "button{padding:12px 16px;border-radius:10px;border:0;background:#8f1f3f;color:#fff;font-weight:600}</style>" +
-  "</head><body><h1>Unable to load page</h1>" +
-  "<p>Check your connection, then reload the admin app.</p>" +
-  "<button type=\"button\" onclick=\"location.reload()\">Reload App</button></body></html>";
-
-function normalizePath(pathname) {
-  if (!pathname) return "/admin";
-  if (pathname.length > 1 && pathname.charAt(pathname.length - 1) === "/") {
-    return pathname.replace(/\/+$/, "") || "/admin";
-  }
-  return pathname;
-}
-
-function resolveAdminPageTarget(pathname) {
-  if (ADMIN_PAGE_TARGETS[pathname]) return ADMIN_PAGE_TARGETS[pathname];
-  var normalized = normalizePath(pathname);
-  if (ADMIN_PAGE_TARGETS[normalized]) return ADMIN_PAGE_TARGETS[normalized];
-  if (pathname === "/admin/orders.html" || pathname === "/admin/analytics.html") return pathname;
-  if (pathname === "/admin/orders/index.html") return "/admin/orders.html";
-  if (pathname === "/admin/analytics/index.html") return "/admin/analytics.html";
-  return null;
-}
-
-function isApiRequest(url) {
-  return url.pathname.indexOf("/api/") === 0;
-}
-
-function isAdminScope(url) {
-  return url.pathname === "/admin" || url.pathname.indexOf("/admin/") === 0;
-}
-
-function isAdminNavigationRequest(request, url) {
-  if (request.mode === "navigate") return true;
-  if (request.destination === "document") return true;
-  return !!resolveAdminPageTarget(url.pathname);
-}
-
-function isCacheableAdminAsset(pathname) {
-  return /\.(css|js|json|png|jpe?g|webp|ico|svg|woff2?)$/i.test(pathname);
-}
-
-function isRedirectResponse(response) {
-  return !response || response.type === "opaqueredirect" || (response.status >= 300 && response.status < 400);
-}
-
-function cacheOnSuccess(request, response) {
-  if (!response || !response.ok || response.type !== "basic") return;
-  var copy = response.clone();
-  caches.open(ADMIN_CACHE).then(function (cache) {
-    cache.put(request, copy);
-  });
-}
-
-function offlinePageResponse() {
-  return new Response(OFFLINE_HTML, {
-    status: 200,
-    headers: { "Content-Type": "text/html; charset=utf-8" },
-  });
-}
-
-function readCachedPage(urls) {
-  return caches.open(ADMIN_CACHE).then(function (cache) {
-    var chain = Promise.resolve(null);
-    urls.forEach(function (url) {
-      chain = chain.then(function (found) {
-        if (found) return found;
-        return cache.match(url).then(function (cached) {
-          return cached && cached.ok ? cached : null;
-        });
-      });
-    });
-    return chain.then(function (found) {
-      return found || offlinePageResponse();
-    });
-  });
-}
-
-function fetchAdminDocument(targetUrl, fallbackUrls) {
-  var request = new Request(targetUrl, { credentials: "same-origin", redirect: "manual" });
-  return fetch(request).then(function (response) {
-    if (!isRedirectResponse(response) && response && response.ok) {
-      cacheOnSuccess(request, response);
-      return response;
-    }
-    var next = fallbackUrls.shift();
-    if (!next) return readCachedPage([targetUrl]);
-    return fetchAdminDocument(next, fallbackUrls);
-  }).catch(function () {
-    return readCachedPage([targetUrl].concat(fallbackUrls));
-  });
-}
-
-function networkFirstPage(request) {
-  var url = new URL(request.url);
-  var target = resolveAdminPageTarget(url.pathname);
-  if (!target) {
-    return fetch(request, { redirect: "manual" }).catch(function () {
-      return offlinePageResponse();
-    });
-  }
-
-  var fallbacks = [];
-  if (target === "/admin/orders.html") {
-    fallbacks = ["/admin/orders/index.html"];
-  } else if (target === "/admin/analytics.html") {
-    fallbacks = ["/admin/analytics/index.html"];
-  }
-
-  return fetchAdminDocument(target, fallbacks);
-}
-
-function networkFirstAsset(request) {
-  return fetch(request).then(function (response) {
-    if (response && response.ok) cacheOnSuccess(request, response);
-    return response;
-  }).catch(function () {
-    return caches.match(request).then(function (cached) {
-      if (cached && cached.ok) return cached;
-      return Response.error();
-    });
-  });
-}
-
-function purgeBrokenCacheEntries() {
-  return caches.open(ADMIN_CACHE).then(function (cache) {
-    return cache.keys().then(function (keys) {
-      return Promise.all(keys.map(function (key) {
-        return cache.match(key).then(function (response) {
-          if (!response || !response.ok) return cache.delete(key);
-        });
-      }));
-    });
-  });
-}
-
 self.addEventListener("install", function () {
   self.skipWaiting();
 });
@@ -155,12 +5,10 @@ self.addEventListener("install", function () {
 self.addEventListener("activate", function (event) {
   event.waitUntil(
     caches.keys().then(function (keys) {
-      return Promise.all(
-        keys
-          .filter(function (key) { return key !== ADMIN_CACHE; })
-          .map(function (key) { return caches.delete(key); })
-      );
-    }).then(purgeBrokenCacheEntries).then(function () {
+      return Promise.all(keys.map(function (key) {
+        return caches.delete(key);
+      }));
+    }).then(function () {
       return self.clients.claim();
     })
   );
@@ -169,23 +17,6 @@ self.addEventListener("activate", function (event) {
 self.addEventListener("message", function (event) {
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
-  }
-});
-
-self.addEventListener("fetch", function (event) {
-  if (event.request.method !== "GET") return;
-
-  var url = new URL(event.request.url);
-  if (!isAdminScope(url)) return;
-  if (isApiRequest(url)) return;
-
-  if (isAdminNavigationRequest(event.request, url)) {
-    event.respondWith(networkFirstPage(event.request));
-    return;
-  }
-
-  if (isCacheableAdminAsset(url.pathname)) {
-    event.respondWith(networkFirstAsset(event.request));
   }
 });
 
