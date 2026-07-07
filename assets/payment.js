@@ -4,7 +4,6 @@
   /* PAYMENT CONFIG */
   var API_CREATE_ORDER = "/api/create-order";
   var API_VERIFY_PAYMENT = "/api/verify-payment";
-  var TEST_PRICE_PAISE = 500;
   var PRICE_PAISE = 149900;
   var PARTNER_MIN = 3;
   var PARTNER_MAX = 5;
@@ -202,7 +201,6 @@
     PRICE_PAISE: PRICE_PAISE,
     PARTNER_MIN: PARTNER_MIN,
     PARTNER_MAX: PARTNER_MAX,
-    TEST_PRICE_PAISE: TEST_PRICE_PAISE,
     calculatePartnerTotalPaise: calculatePartnerTotalPaise,
     startCheckout: startCheckout,
     init: initPayment,

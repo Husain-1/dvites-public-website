@@ -14,6 +14,20 @@
   <script src="/assets/meta-pixel.js"></script>
 </head>
 <body>
+  <div class="announce-bar" id="announce-bar" role="region" aria-label="Limited time offer">
+    <div class="container announce-bar-inner">
+      <p class="announce-bar-copy">
+        <span class="announce-bar-badge">Save 40%</span>
+        <span>Premium invites at <strong>₹1,499</strong> <s class="announce-bar-was">₹2,499</s></span>
+      </p>
+      <div class="announce-bar-timer" aria-live="polite">
+        <span class="announce-timer-label">Ends in</span>
+        <time class="announce-timer-value" id="announce-countdown">00:00:00</time>
+      </div>
+      <a href="#" class="announce-bar-cta" data-buy-now>Buy Now</a>
+    </div>
+  </div>
+
   <header class="header">
     <div class="container header-inner">
       <a class="brand" href="/">
@@ -51,6 +65,7 @@
           <a class="btn btn-primary" href="/templates.html">Explore Templates</a>
           <button class="btn btn-outline" type="button" id="hero-watch-demo">Watch Demo</button>
         </div>
+        <p class="hero-reassurance">From ₹1,499 · Secure checkout · Delivered in 24 hours</p>
       </div>
       <div class="hero-visual">
         <div class="hero-phone" aria-hidden="true">
@@ -75,6 +90,16 @@
     </div>
   </section>
 
+  <div class="trust-strip" aria-label="Why couples choose Dvites">
+    <div class="container trust-strip-inner">
+      <span>Secure Razorpay checkout</span>
+      <span class="trust-strip-dot" aria-hidden="true"></span>
+      <span>Professionally customized</span>
+      <span class="trust-strip-dot" aria-hidden="true"></span>
+      <span>Lifetime hosting included</span>
+    </div>
+  </div>
+
   <section class="section" id="templates">
     <div class="container">
       <div class="section-head">
@@ -97,7 +122,7 @@
       </div>
       <div class="steps">
         <div class="step"><div class="step-num">1</div><h3>Choose a Template</h3><p>Browse our collection and pick the design that matches your wedding style.</p></div>
-        <div class="step"><div class="step-num">2</div><h3>Send Your Details</h3><p>Share names, dates, events, photos, and any special requests by email.</p></div>
+        <div class="step"><div class="step-num">2</div><h3>Complete Your Order</h3><p>Pay securely online, then share names, dates, events, and photos with us on WhatsApp.</p></div>
         <div class="step"><div class="step-num">3</div><h3>We Customize in 24 Hours</h3><p>Our team personalizes your invite and sends you a preview to approve.</p></div>
         <div class="step"><div class="step-num">4</div><h3>Share with Guests</h3><p>Send one beautiful link — guests open it instantly on any phone.</p></div>
       </div>
@@ -142,6 +167,8 @@
         <h2 class="section-title">Frequently Asked Questions</h2>
       </div>
       <div class="faq-list">
+        <div class="faq-item"><button class="faq-q" type="button"><span>Is payment secure?</span><span>+</span></button><div class="faq-a"><div class="faq-a-inner">Yes. Payments are processed securely through Razorpay. We never store your card, UPI PIN, or banking credentials on our website.</div></div></div>
+        <div class="faq-item"><button class="faq-q" type="button"><span>What is included in ₹1,499?</span><span>+</span></button><div class="faq-a"><div class="faq-a-inner">Full professional customization, your personalized invitation link, music, RSVP, maps, gallery, countdown, unlimited guest sharing, and lifetime hosting — with no hidden charges.</div></div></div>
         <div class="faq-item"><button class="faq-q" type="button"><span>How long does customization take?</span><span>+</span></button><div class="faq-a"><div class="faq-a-inner">Most invitations are customized and delivered within 24 hours after we receive your details. Complex requests may take slightly longer — we'll always confirm the timeline upfront.</div></div></div>
         <div class="faq-item"><button class="faq-q" type="button"><span>Can I edit after delivery?</span><span>+</span></button><div class="faq-a"><div class="faq-a-inner">Yes. We offer revisions for text, dates, and event details. Email us at infodvites@gmail.com and we'll update your invite promptly.</div></div></div>
         <div class="faq-item"><button class="faq-q" type="button"><span>Do guests need to install an app?</span><span>+</span></button><div class="faq-a"><div class="faq-a-inner">No app needed. Your invitation opens as a beautiful website in any mobile browser — Safari, Chrome, and more.</div></div></div>
@@ -155,7 +182,7 @@
   <section class="section" style="padding-bottom: 0;">
     <div class="cta">
       <h2>Ready to create your wedding invitation?</h2>
-      <p>Get your template customized within 24 hours. Fill the form and WhatsApp us your details — we'll take care of everything.</p>
+      <p>Choose a template, complete secure checkout, and share your wedding details — we'll deliver your personalized invite within 24 hours.</p>
       <div class="cta-actions">
         <a class="btn btn-pink" href="/templates.html">Explore Templates</a>
       </div>
@@ -239,6 +266,7 @@
         </ul>
         <div class="modal-actions">
           <button type="button" class="btn btn-primary" id="modal-buy">Buy Now</button>
+          <p class="modal-buy-reassurance">Secure checkout · Share details on WhatsApp after payment · No hidden fees</p>
         </div>
         <div class="modal-urgency" aria-live="polite">
           <div class="urgency-track">

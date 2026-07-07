@@ -14,6 +14,20 @@
   <script src="/assets/meta-pixel.js"></script>
 </head>
 <body>
+  <div class="announce-bar" id="announce-bar" role="region" aria-label="Limited time offer">
+    <div class="container announce-bar-inner">
+      <p class="announce-bar-copy">
+        <span class="announce-bar-badge">Save 40%</span>
+        <span>Premium invites at <strong>₹1,499</strong> <s class="announce-bar-was">₹2,499</s></span>
+      </p>
+      <div class="announce-bar-timer" aria-live="polite">
+        <span class="announce-timer-label">Ends in</span>
+        <time class="announce-timer-value" id="announce-countdown">00:00:00</time>
+      </div>
+      <a href="#" class="announce-bar-cta" data-buy-now>Buy Now</a>
+    </div>
+  </div>
+
   <header class="header">
     <div class="container header-inner">
       <a class="brand" href="/">
@@ -161,6 +175,7 @@
     <div class="container footer-bottom">© 2026 Dvites · Crafted with love for unforgettable weddings</div>
   </footer>
 
+  <script src="/assets/payment.js"></script>
   <script src="/assets/site.js"></script>
 </body>
 </html>
