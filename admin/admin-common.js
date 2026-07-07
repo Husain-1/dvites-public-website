@@ -182,7 +182,7 @@
 
     initMobileNav();
     initPushNotifications();
-    registerAdminServiceWorker();
+    initServiceWorkerUpdates();
     if (global.DvitesAdminSound) {
       global.DvitesAdminSound.init(adminFetch);
     }
@@ -232,9 +232,59 @@
     });
   }
 
-  function registerAdminServiceWorker() {
+  function initServiceWorkerUpdates() {
     if (!("serviceWorker" in navigator)) return;
-    navigator.serviceWorker.register("/admin/service-worker.js", { scope: "/admin/" }).catch(function () {});
+
+    var reloadBanner = null;
+    var refreshing = false;
+
+    function showReloadBanner() {
+      if (reloadBanner || !navigator.serviceWorker.controller) return;
+      reloadBanner = document.createElement("div");
+      reloadBanner.className = "admin-sw-reload";
+      reloadBanner.innerHTML =
+        '<p>A new version of the admin app is ready.</p>' +
+        '<button class="admin-btn admin-btn-primary" type="button" id="admin-sw-reload-btn">Reload App</button>';
+      document.body.appendChild(reloadBanner);
+      document.getElementById("admin-sw-reload-btn").addEventListener("click", function () {
+        navigator.serviceWorker.getRegistration().then(function (registration) {
+          if (registration && registration.waiting) {
+            registration.waiting.postMessage({ type: "SKIP_WAITING" });
+            return;
+          }
+          global.location.reload();
+        });
+      });
+    }
+
+    navigator.serviceWorker.addEventListener("controllerchange", function () {
+      if (refreshing) return;
+      refreshing = true;
+      global.location.reload();
+    });
+
+    navigator.serviceWorker.register("/admin/service-worker.js", { scope: "/admin/" }).then(function (registration) {
+      if (registration.waiting) showReloadBanner();
+
+      registration.addEventListener("updatefound", function () {
+        var worker = registration.installing;
+        if (!worker) return;
+        worker.addEventListener("statechange", function () {
+          if (worker.state === "installed" && navigator.serviceWorker.controller) {
+            showReloadBanner();
+          }
+        });
+      });
+
+      registration.update();
+      global.setInterval(function () {
+        registration.update();
+      }, 60 * 60 * 1000);
+    }).catch(function () {});
+  }
+
+  function registerAdminServiceWorker() {
+    initServiceWorkerUpdates();
   }
 
   function urlBase64ToUint8Array(base64String) {
