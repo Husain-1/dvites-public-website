@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thank You — Dvites</title>
+  <meta name="description" content="Your Dvites payment was successful. Share your wedding details to begin customization within 24 hours." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="/assets/favicon.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/site.css" />
+  <script src="/assets/meta-pixel.js"></script>
+</head>
+<body>
+  <div class="announce-bar" id="announce-bar" role="region" aria-label="Limited time offer">
+    <div class="container announce-bar-inner">
+      <p class="announce-bar-copy">
+        <span class="announce-bar-badge">Save 40%</span>
+        <span>Premium invites at <strong>₹1,499</strong> <s class="announce-bar-was">₹2,499</s></span>
+      </p>
+      <div class="announce-bar-timer" aria-live="polite">
+        <span class="announce-timer-label">Ends in</span>
+        <time class="announce-timer-value" id="announce-countdown">00:00:00</time>
+      </div>
+      <a href="/templates.html" class="announce-bar-cta">Browse Templates</a>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a class="brand" href="/">
+        <img src="/templates/curtains/assets/images/dvites-logo.png" alt="Dvites" />
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="/">Home</a>
+        <a href="/templates.html">Templates</a>
+        <a href="/#how-it-works">How It Works</a>
+        <a href="/partner-studio.html">Partner Studio</a>
+        <a href="/#faq">FAQ</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn-primary btn-sm" href="/templates.html">Explore</a>
+        <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <nav class="mobile-nav container" id="mobile-nav" aria-label="Mobile">
+      <a href="/">Home</a>
+      <a href="/templates.html">Templates</a>
+      <a href="/#how-it-works">How It Works</a>
+      <a href="/partner-studio.html">Partner Studio</a>
+      <a href="/#faq">FAQ</a>
+    </nav>
+  </header>
+
+  <main class="thank-you-page">
+    <section class="thank-you-hero">
+      <div class="container thank-you-hero-inner">
+        <div class="thank-you-icon" aria-hidden="true">✓</div>
+        <span class="section-eyebrow">Payment Successful</span>
+        <h1>Thank You for Choosing Dvites</h1>
+        <p class="thank-you-lead">Your payment is confirmed. Share your wedding details next and we will personalize your invitation within 24 hours.</p>
+        <p class="thank-you-note is-hidden" id="thank-you-save-note"></p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 0;">
+      <div class="container">
+        <div class="thank-you-card">
+          <h2 class="thank-you-card-title">Your Order</h2>
+          <dl class="thank-you-details">
+            <div class="thank-you-detail" id="thank-you-template-row">
+              <dt>Template</dt>
+              <dd id="thank-you-template">—</dd>
+            </div>
+            <div class="thank-you-detail is-hidden" id="thank-you-order-row">
+              <dt>Order ID</dt>
+              <dd id="thank-you-order-id">—</dd>
+            </div>
+            <div class="thank-you-detail is-hidden" id="thank-you-payment-row">
+              <dt>Payment ID</dt>
+              <dd id="thank-you-payment-id">—</dd>
+            </div>
+            <div class="thank-you-detail is-hidden" id="thank-you-name-row">
+              <dt>Name</dt>
+              <dd id="thank-you-name">—</dd>
+            </div>
+            <div class="thank-you-detail is-hidden" id="thank-you-email-row">
+              <dt>Email</dt>
+              <dd id="thank-you-email">—</dd>
+            </div>
+            <div class="thank-you-detail is-hidden" id="thank-you-phone-row">
+              <dt>Phone</dt>
+              <dd id="thank-you-phone">—</dd>
+            </div>
+          </dl>
+
+          <div class="thank-you-steps">
+            <h3>What happens next?</h3>
+            <ol>
+              <li>Send us your names, wedding dates, events, venue details, and photos.</li>
+              <li>Our team begins professional customization immediately.</li>
+              <li>Receive your preview within 24 hours on WhatsApp or email.</li>
+            </ol>
+          </div>
+
+          <div class="thank-you-actions">
+            <a class="btn btn-primary" id="thank-you-whatsapp" href="#" target="_blank" rel="noopener noreferrer">Share Details on WhatsApp</a>
+            <a class="btn btn-outline" id="thank-you-email" href="#">Send Details by Email</a>
+            <a class="btn btn-ghost" href="/templates.html">Back to Templates</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="background: var(--ivory-soft);">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-eyebrow">You May Also Love</span>
+          <h2 class="section-title">Explore More Invitations</h2>
+          <p class="section-sub">Planning another celebration or gifting an invite? Browse more premium designs.</p>
+        </div>
+        <div class="catalog" id="thank-you-catalog" aria-label="More wedding invitation templates"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <img src="/templates/curtains/assets/images/dvites-logo.png" alt="Dvites" />
+        <p>Premium digital wedding invitations — customized in 24 hours.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Explore</h4>
+        <a href="/">Home</a>
+        <a href="/templates.html">Templates</a>
+        <a href="/partner-studio.html">Partner Studio</a>
+      </div>
+      <div class="footer-links">
+        <h4>Information</h4>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+        <a href="/terms-of-service.html">Terms of Service</a>
+        <a href="/refund-cancellation-policy.html">Refund &amp; Cancellation Policy</a>
+      </div>
+      <div class="footer-links">
+        <h4>Contact</h4>
+        <a href="mailto:infodvites@gmail.com">infodvites@gmail.com</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">© 2026 Dvites · Crafted with love for unforgettable weddings</div>
+  </footer>
+
+  <div id="demo-modal" class="modal" aria-hidden="true">
+    <div class="modal-overlay" data-close-modal></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button type="button" class="modal-close" aria-label="Close preview" data-close-modal>&times;</button>
+      <div class="modal-preview">
+        <div class="modal-phone">
+          <div class="phone-frame modal-phone-frame">
+            <div class="phone-screen modal-phone-screen">
+              <div class="modal-preview-stage" id="modal-preview-stage">
+                <img id="modal-preview-image" class="modal-preview-image" alt="" width="390" height="844" decoding="async" />
+                <div class="modal-preview-actions" id="modal-preview-actions">
+                  <button type="button" class="modal-live-preview-btn" id="modal-live-preview">
+                    <svg class="modal-live-preview-icon" aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path>
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    </svg>
+                    <span class="modal-live-preview-label">View Demo</span>
+                  </button>
+                </div>
+                <p class="modal-preview-loading is-hidden" id="modal-preview-loading" aria-live="polite">Loading full invitation…</p>
+              </div>
+              <div class="phone-iframe-scaler is-hidden" id="modal-iframe-wrap">
+                <iframe id="demo-iframe" title="Template preview" loading="lazy"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-details">
+        <span class="save-badge">Save 40%</span>
+        <h2 class="modal-title" id="modal-title"></h2>
+        <p class="modal-category" id="modal-category"></p>
+        <div class="modal-pricing"><span class="old-price">₹2,499</span><span class="current-price">₹1,499</span></div>
+        <p class="modal-desc" id="modal-desc"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-primary" id="modal-buy">Buy Now</button>
+          <p class="modal-buy-reassurance">Secure checkout · Share details on WhatsApp after payment · No hidden fees</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/payment.js"></script>
+  <script src="/assets/phone-preview.js"></script>
+  <script src="/assets/site.js"></script>
+  <script src="/assets/thank-you.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      Dvites.renderCatalog(document.getElementById("thank-you-catalog"), true);
+      if (typeof DvitesRebindModal === "function") DvitesRebindModal();
+      if (typeof DvitesThankYouInit === "function") DvitesThankYouInit();
+    });
+  </script>
+</body>
+</html>

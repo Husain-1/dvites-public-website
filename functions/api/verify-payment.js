@@ -22,9 +22,83 @@ async function hmacSha256(secret, message) {
     .join("");
 }
 
+function cleanText(value, maxLength) {
+  return String(value || "")
+    .trim()
+    .slice(0, maxLength || 500);
+}
+
+async function fetchRazorpayPayment(paymentId, keyId, keySecret) {
+  const auth = btoa(keyId + ":" + keySecret);
+  const response = await fetch("https://api.razorpay.com/v1/payments/" + encodeURIComponent(paymentId), {
+    headers: { Authorization: "Basic " + auth },
+  });
+  if (!response.ok) return null;
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+async function fetchRazorpayOrder(orderId, keyId, keySecret) {
+  const auth = btoa(keyId + ":" + keySecret);
+  const response = await fetch("https://api.razorpay.com/v1/orders/" + encodeURIComponent(orderId), {
+    headers: { Authorization: "Basic " + auth },
+  });
+  if (!response.ok) return null;
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+async function saveOrderToSupabase(env, row) {
+  const supabaseUrl = String(env.SUPABASE_URL || "").replace(/\/$/, "");
+  const supabaseKey = env.SUPABASE_PUBLISHABLE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return { saved: false, error: "Order storage is not configured." };
+  }
+
+  try {
+    const response = await fetch(supabaseUrl + "/rest/v1/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: supabaseKey,
+        Authorization: "Bearer " + supabaseKey,
+        Prefer: "return=representation",
+      },
+      body: JSON.stringify(row),
+    });
+
+    const data = await response.json().catch(function () {
+      return null;
+    });
+
+    if (!response.ok) {
+      const message =
+        (data && (data.message || data.error || data.hint)) ||
+        "Unable to save order.";
+      return { saved: false, error: String(message).slice(0, 200) };
+    }
+
+    const savedRow = Array.isArray(data) ? data[0] : data;
+    return {
+      saved: true,
+      orderId: savedRow && savedRow.id ? String(savedRow.id) : null,
+    };
+  } catch {
+    return { saved: false, error: "Unable to save order." };
+  }
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const keySecret = env.RAZORPAY_KEY_SECRET;
+  const keyId = env.RAZORPAY_KEY_ID;
 
   if (!keySecret) {
     return jsonResponse({ success: false, error: "Payment is not configured." }, 500);
@@ -47,9 +121,82 @@ export async function onRequestPost(context) {
 
   const expectedSignature = await hmacSha256(keySecret, orderId + "|" + paymentId);
 
-  if (expectedSignature === signature) {
-    return jsonResponse({ success: true });
+  if (expectedSignature !== signature) {
+    return jsonResponse({ success: false });
   }
 
-  return jsonResponse({ success: false });
+  let templateSlug = cleanText(body.template_slug, 120);
+  let templateName = cleanText(body.template_name, 240);
+  const notes = cleanText(body.notes, 1000);
+  const currency = cleanText(body.currency || "INR", 8).toUpperCase() || "INR";
+
+  let customerName = cleanText(body.customer_name, 160);
+  let customerEmail = cleanText(body.customer_email, 200);
+  let customerPhone = cleanText(body.customer_phone, 40);
+  let amount = Number(body.amount);
+
+  if (keyId) {
+    const [payment, order] = await Promise.all([
+      fetchRazorpayPayment(paymentId, keyId, keySecret),
+      fetchRazorpayOrder(orderId, keyId, keySecret),
+    ]);
+
+    if (payment) {
+      if (!customerEmail && payment.email) customerEmail = cleanText(payment.email, 200);
+      if (!customerPhone && payment.contact) customerPhone = cleanText(payment.contact, 40);
+      if (!customerName && payment.notes && payment.notes.customer_name) {
+        customerName = cleanText(payment.notes.customer_name, 160);
+      }
+      if (!Number.isFinite(amount) || amount <= 0) {
+        amount = Number(payment.amount) / 100;
+      }
+    }
+
+    if (order) {
+      if (!templateName && order.notes && order.notes.templateName) {
+        templateName = cleanText(order.notes.templateName, 240);
+      }
+      if (!templateSlug && order.notes && order.notes.template_slug) {
+        templateSlug = cleanText(order.notes.template_slug, 120);
+      }
+      if (!Number.isFinite(amount) || amount <= 0) {
+        amount = Number(order.amount) / 100;
+      }
+    }
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    amount = 1499;
+  }
+
+  const orderRow = {
+    razorpay_order_id: orderId,
+    razorpay_payment_id: paymentId,
+    razorpay_signature: signature,
+    customer_name: customerName || null,
+    customer_email: customerEmail || null,
+    customer_phone: customerPhone || null,
+    template_slug: templateSlug || null,
+    template_name: templateName || "Dvites Wedding Invitation",
+    amount: amount,
+    currency: currency,
+    payment_status: "paid",
+    customization_status: "New",
+    notes: notes || null,
+  };
+
+  const saveResult = await saveOrderToSupabase(env, orderRow);
+
+  return jsonResponse({
+    success: true,
+    order_saved: saveResult.saved,
+    order_id: saveResult.orderId || null,
+    order_save_error: saveResult.saved ? null : saveResult.error || "Unable to save order.",
+    razorpay_payment_id: paymentId,
+    template_slug: templateSlug || null,
+    template_name: templateName || "Dvites Wedding Invitation",
+    customer_name: customerName || null,
+    customer_email: customerEmail || null,
+    customer_phone: customerPhone || null,
+  });
 }

@@ -7,6 +7,21 @@
   var PARTNER_MIN = 3;
   var PARTNER_MAX = 5;
   var PARTNER_DISCOUNT = 0.05;
+  var TEST_PRICE = 5;
+  var TEST_PRICE_PAISE = 500;
+
+  var TEST_PRODUCT = {
+    id: "payment-test-curtains",
+    url: "/templates/curtains/",
+    title: "Payment Test — Curtains",
+    category: "Razorpay Test",
+    tags: ["test", "luxury", "minimal"],
+    preview: "/templates/curtains/assets/images/curtains-theme-poster-BhK08iq7.jpg",
+    description: "Duplicate of the Curtains template priced at ₹5 for live Razorpay checkout testing only.",
+    price: TEST_PRICE,
+    pricePaise: TEST_PRICE_PAISE,
+    testProduct: true
+  };
 
   var TEMPLATES = [
     {
@@ -126,20 +141,26 @@
   function renderCard(tpl) {
     var price = tpl.price != null ? tpl.price : PRICE;
     var pricePaise = tpl.pricePaise != null ? tpl.pricePaise : PRICE * 100;
+    var badge = tpl.testProduct
+      ? '<span class="save-badge test-badge">Test ₹5</span>'
+      : '<span class="save-badge">Save 40%</span>';
+    var pricing = tpl.testProduct
+      ? '<div class="tpl-pricing"><span class="current-price">' + formatRupee(price) + '</span></div>'
+      : '<div class="tpl-pricing"><span class="old-price">' + formatRupee(OLD_PRICE) + '</span><span class="current-price">' + formatRupee(price) + '</span></div>';
 
     return (
-      '<article class="tpl-card card" data-id="' + tpl.id + '" data-demo-url="' + tpl.url + '" data-preview="' + tpl.preview + '" data-title="' + tpl.title + '" data-category="' + tpl.category + '" data-tags="' + tpl.tags.join(" ") + '" data-description="' + tpl.description.replace(/"/g, "&quot;") + '" data-amount-paise="' + pricePaise + '">' +
+      '<article class="tpl-card card' + (tpl.testProduct ? ' is-test-product' : '') + '" data-id="' + tpl.id + '" data-demo-url="' + tpl.url + '" data-preview="' + tpl.preview + '" data-title="' + tpl.title + '" data-category="' + tpl.category + '" data-tags="' + tpl.tags.join(" ") + '" data-description="' + tpl.description.replace(/"/g, "&quot;") + '" data-amount-paise="' + pricePaise + '">' +
         '<div class="tpl-card-inner">' +
           '<div class="tpl-preview-wrap">' +
             '<div class="tpl-phone"><div class="tpl-phone-screen" style="background-image:url(\'' + tpl.preview + '\')"></div></div>' +
           '</div>' +
           '<div class="tpl-body">' +
-            '<span class="save-badge">Save 40%</span>' +
+            badge +
             '<h3 class="tpl-name">' + tpl.title + '</h3>' +
             '<p class="tpl-category">' + tpl.category + '</p>' +
-            '<div class="tpl-pricing"><span class="old-price">' + formatRupee(OLD_PRICE) + '</span><span class="current-price">' + formatRupee(price) + '</span></div>' +
+            pricing +
             '<div class="tpl-actions card-actions">' +
-              '<button type="button" class="btn btn-primary btn-customize">Customize Design</button>' +
+              '<button type="button" class="btn btn-primary btn-customize">' + (tpl.testProduct ? 'Pay ₹5 Test' : 'Customize Design') + '</button>' +
               '<button type="button" class="btn btn-ghost btn-watch demo-btn">Watch Demo</button>' +
             '</div>' +
           '</div>' +
@@ -148,12 +169,17 @@
     );
   }
 
-  function renderCatalog(container, filterFeatured) {
+  function renderCatalog(container, filterFeatured, options) {
     if (!container) return;
+    options = options || {};
     var list = filterFeatured
       ? TEMPLATES.filter(function (t) { return t.featured; }).slice(0, 6)
       : TEMPLATES;
-    container.innerHTML = list.map(renderCard).join("");
+    var html = list.map(renderCard).join("");
+    if (options.prependTestProduct) {
+      html = renderCard(TEST_PRODUCT) + html;
+    }
+    container.innerHTML = html;
     equalizeCardHeights(container);
   }
 
@@ -290,7 +316,10 @@
 
     function setModalPricing(card) {
       var amountPaise = card.getAttribute("data-amount-paise") || String(PRICE * 100);
-      if (modalBuy) modalBuy.dataset.amountPaise = amountPaise;
+      if (modalBuy) {
+        modalBuy.dataset.amountPaise = amountPaise;
+        modalBuy.dataset.templateSlug = card.getAttribute("data-id") || "";
+      }
       var modalPricing = document.querySelector("#demo-modal .modal-pricing");
       if (!modalPricing) return;
       if (card.getAttribute("data-amount-paise") && Number(card.getAttribute("data-amount-paise")) !== PRICE * 100) {
@@ -321,7 +350,10 @@
         tpl.category,
         tpl.pricePaise != null ? tpl.pricePaise : PRICE * 100
       );
-      if (modalBuy) modalBuy.dataset.amountPaise = String(tpl.pricePaise != null ? tpl.pricePaise : PRICE * 100);
+      if (modalBuy) {
+        modalBuy.dataset.amountPaise = String(tpl.pricePaise != null ? tpl.pricePaise : PRICE * 100);
+        modalBuy.dataset.templateSlug = tpl.id || "";
+      }
       var modalPricing = document.querySelector("#demo-modal .modal-pricing");
       if (modalPricing) {
         if (tpl.pricePaise != null && tpl.pricePaise !== PRICE * 100) {
@@ -398,6 +430,11 @@
       var tpl = TEMPLATES.find(function (t) { return t.id === id; });
       if (tpl) {
         openModalFromTemplate(tpl);
+        return;
+      }
+      if (id === TEST_PRODUCT.id) {
+        var testCard = document.querySelector('.card[data-id="' + TEST_PRODUCT.id + '"]');
+        if (testCard) openModal(testCard);
       }
     };
   }
@@ -567,7 +604,9 @@
 
       global.DvitesPayment.startCheckout({
         templateName: templateName,
+        templateSlug: "partner-studio",
         amountPaise: amountPaise,
+        notes: "Partner Studio templates: " + selected.join(", "),
       });
     });
   }
@@ -632,6 +671,8 @@
 
   global.Dvites = {
     TEMPLATES: TEMPLATES,
+    TEST_PRODUCT: TEST_PRODUCT,
+    TEST_PRICE_PAISE: TEST_PRICE_PAISE,
     EMAIL: EMAIL,
     PRICE: PRICE,
     renderCatalog: renderCatalog,
