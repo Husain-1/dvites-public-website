@@ -2,6 +2,7 @@
   "use strict";
 
   var EMAIL = "infodvites@gmail.com";
+  var WHATSAPP_NUMBER = "917415301709";
 
   function getParam(params, key) {
     return (params.get(key) || "").trim();
@@ -79,7 +80,8 @@
     var emailBtn = document.getElementById("thank-you-email");
 
     if (whatsappBtn) {
-      whatsappBtn.href = "https://wa.me/?text=" + encodeURIComponent(message);
+      whatsappBtn.href =
+        "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
     }
 
     if (emailBtn) {
