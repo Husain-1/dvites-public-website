@@ -1,4 +1,4 @@
-var ADMIN_CACHE = "dvites-admin-v2";
+var ADMIN_CACHE = "dvites-admin-v3";
 var ADMIN_SHELL = [
   "/admin/orders.html",
   "/admin/analytics.html",

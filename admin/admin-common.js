@@ -139,25 +139,35 @@
 
     root.innerHTML =
       '<div class="admin-shell">' +
-        '<aside class="admin-sidebar">' +
+        '<div class="admin-drawer-overlay" id="admin-drawer-overlay" aria-hidden="true"></div>' +
+        '<aside class="admin-sidebar" id="admin-sidebar">' +
+          '<button class="admin-sidebar-close" id="admin-sidebar-close" type="button" aria-label="Close menu">×</button>' +
           '<div class="admin-brand">' +
             '<img src="/templates/curtains/assets/images/dvites-logo.png" alt="Dvites" />' +
             '<div><strong>Dvites Orders</strong><span>Admin dashboard</span><span class="admin-role-badge">' + ROLE_LABEL + '</span></div>' +
           '</div>' +
-          '<nav class="admin-nav">' +
+          '<nav class="admin-nav" id="admin-nav">' +
             '<a href="/admin/orders.html"' + (activeNav === "orders" ? ' class="is-active"' : "") + '>Orders</a>' +
             '<a href="/admin/analytics.html"' + (activeNav === "analytics" ? ' class="is-active"' : "") + '>Analytics</a>' +
             '<a href="/" target="_blank" rel="noopener">View Site</a>' +
           '</nav>' +
-          '<div style="margin-top:24px;">' +
+          '<div class="admin-sidebar-footer">' +
             '<button class="admin-btn" id="admin-logout" type="button">Sign out</button>' +
-            '<button class="admin-btn admin-btn-success" id="admin-enable-push" type="button" style="margin-top:10px;width:100%;">Enable Order Notifications</button>' +
+            '<button class="admin-btn admin-btn-success" id="admin-enable-push" type="button">Enable Order Notifications</button>' +
             '<p class="admin-status" id="admin-push-status"></p>' +
-            '<div id="admin-sound-mount" style="margin-top:18px;"></div>' +
+            '<div id="admin-sound-mount"></div>' +
           '</div>' +
         '</aside>' +
         '<main class="admin-main">' +
-          '<div class="admin-topbar">' +
+          '<header class="admin-mobile-header">' +
+            '<button class="admin-menu-toggle" id="admin-menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button>' +
+            '<div class="admin-mobile-title-wrap">' +
+              '<strong class="admin-mobile-title">' + pageTitle + '</strong>' +
+              '<span class="admin-mobile-subtitle">Dvites Admin</span>' +
+            '</div>' +
+            '<span class="admin-role-pill admin-role-pill-mobile">' + ROLE_LABEL + '</span>' +
+          '</header>' +
+          '<div class="admin-topbar admin-desktop-topbar">' +
             '<div><h1 class="admin-title">' + pageTitle + '</h1><p class="admin-subtitle">Signed in as <strong>' + ROLE_LABEL + '</strong> on this device</p></div>' +
             '<div class="admin-actions" id="admin-top-actions"><span class="admin-role-pill">' + ROLE_LABEL + '</span></div>' +
           '</div>' +
@@ -170,12 +180,56 @@
       global.location.reload();
     });
 
+    initMobileNav();
     initPushNotifications();
     registerAdminServiceWorker();
     if (global.DvitesAdminSound) {
       global.DvitesAdminSound.init(adminFetch);
     }
     return true;
+  }
+
+  function initMobileNav() {
+    var sidebar = document.getElementById("admin-sidebar");
+    var overlay = document.getElementById("admin-drawer-overlay");
+    var toggle = document.getElementById("admin-menu-toggle");
+    var closeBtn = document.getElementById("admin-sidebar-close");
+    if (!sidebar || !overlay || !toggle) return;
+
+    function setDrawerOpen(open) {
+      sidebar.classList.toggle("is-open", open);
+      overlay.classList.toggle("is-visible", open);
+      overlay.setAttribute("aria-hidden", open ? "false" : "true");
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      document.body.classList.toggle("admin-drawer-open", open);
+    }
+
+    function closeDrawer() {
+      setDrawerOpen(false);
+    }
+
+    toggle.addEventListener("click", function () {
+      setDrawerOpen(!sidebar.classList.contains("is-open"));
+    });
+    overlay.addEventListener("click", closeDrawer);
+    if (closeBtn) closeBtn.addEventListener("click", closeDrawer);
+
+    var nav = document.getElementById("admin-nav");
+    if (nav) {
+      nav.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", function () {
+          if (global.matchMedia("(max-width: 767px)").matches) closeDrawer();
+        });
+      });
+    }
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") closeDrawer();
+    });
+
+    global.addEventListener("resize", function () {
+      if (global.innerWidth >= 768) closeDrawer();
+    });
   }
 
   function registerAdminServiceWorker() {

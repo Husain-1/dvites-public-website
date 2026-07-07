@@ -67,6 +67,48 @@
     URL.revokeObjectURL(link.href);
   }
 
+  function paymentLabel(order) {
+    if (order.payment_status) return order.payment_status;
+    if (order.razorpay_payment_id) return "Paid";
+    return "—";
+  }
+
+  function renderOrderMobileCard(order) {
+    return (
+      '<article class="admin-order-card" data-order-id="' + order.id + '">' +
+        '<div class="admin-order-card-head">' +
+          '<h3 class="admin-order-card-title">' + (order.template_name || "—") + '</h3>' +
+          '<p class="admin-order-card-amount">' + global.DvitesAdmin.formatMoney(order.amount) + '</p>' +
+        '</div>' +
+        '<div class="admin-order-card-badges">' +
+          '<span class="admin-pill admin-pill-paid">' + paymentLabel(order) + '</span>' +
+          '<span class="admin-pill">' + (order.customization_status || "New") + '</span>' +
+        '</div>' +
+        '<dl class="admin-order-card-meta">' +
+          '<div><dt>Customer</dt><dd>' + (order.customer_name || order.customer_email || "—") + '</dd></div>' +
+          '<div><dt>Email</dt><dd>' + (order.customer_email || "—") + '</dd></div>' +
+          '<div><dt>Phone</dt><dd>' + (order.customer_phone || "—") + '</dd></div>' +
+          '<div><dt>Date</dt><dd>' + global.DvitesAdmin.formatDate(order.created_at) + '</dd></div>' +
+        '</dl>' +
+        '<div class="admin-order-card-actions">' +
+          '<button class="admin-btn admin-btn-primary admin-order-view" type="button" data-order-id="' + order.id + '">View</button>' +
+          '<a class="admin-btn admin-btn-success" href="' + buildCustomerWhatsApp(order) + '" target="_blank" rel="noopener">WhatsApp</a>' +
+          '<a class="admin-btn" href="' + buildCustomerEmail(order) + '">Email</a>' +
+        '</div>' +
+      '</article>'
+    );
+  }
+
+  function selectOrder(orderId, scrollToDetail) {
+    selectedOrderId = orderId;
+    var order = orders.find(function (o) { return o.id === orderId; });
+    var detail = document.getElementById("orders-detail");
+    if (detail) detail.innerHTML = renderDetail(order || null);
+    if (scrollToDetail && detail) {
+      detail.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
   function renderDetail(order) {
     if (!order) {
       return '<div class="admin-panel"><p class="admin-status">Select an order to view details.</p></div>';
@@ -128,7 +170,8 @@
           '<button class="admin-btn admin-btn-primary" id="orders-refresh" type="button">Refresh</button>' +
           '<button class="admin-btn" id="orders-export" type="button">Export CSV</button>' +
         '</div>' +
-        '<div class="admin-table-wrap">' +
+        '<div class="admin-order-cards admin-mobile-only" id="orders-mobile-list"></div>' +
+        '<div class="admin-table-wrap admin-desktop-only">' +
           '<table class="admin-table">' +
             '<thead><tr><th>Date</th><th>Template</th><th>Customer</th><th>Amount</th><th>Status</th><th>Payment</th></tr></thead>' +
             '<tbody id="orders-table-body"></tbody>' +
@@ -141,21 +184,28 @@
     document.getElementById("orders-status").value = currentStatus;
 
     var tbody = document.getElementById("orders-table-body");
+    var mobileList = document.getElementById("orders-mobile-list");
     if (!orders.length) {
-      tbody.innerHTML = '<tr><td colspan="6">No orders found.</td></tr>';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="6">No orders found.</td></tr>';
+      if (mobileList) mobileList.innerHTML = '<p class="admin-status">No orders found.</p>';
     } else {
-      tbody.innerHTML = orders.map(function (order) {
-        return (
-          '<tr data-order-id="' + order.id + '" style="cursor:pointer;">' +
-            '<td>' + global.DvitesAdmin.formatDate(order.created_at) + '</td>' +
-            '<td>' + (order.template_name || "—") + '</td>' +
-            '<td>' + (order.customer_name || order.customer_email || "—") + '</td>' +
-            '<td>' + global.DvitesAdmin.formatMoney(order.amount) + '</td>' +
-            '<td><span class="admin-pill">' + (order.customization_status || "New") + '</span></td>' +
-            '<td>' + (order.razorpay_payment_id || "—") + '</td>' +
-          '</tr>'
-        );
-      }).join("");
+      if (tbody) {
+        tbody.innerHTML = orders.map(function (order) {
+          return (
+            '<tr data-order-id="' + order.id + '" class="admin-order-row">' +
+              '<td>' + global.DvitesAdmin.formatDate(order.created_at) + '</td>' +
+              '<td>' + (order.template_name || "—") + '</td>' +
+              '<td>' + (order.customer_name || order.customer_email || "—") + '</td>' +
+              '<td>' + global.DvitesAdmin.formatMoney(order.amount) + '</td>' +
+              '<td><span class="admin-pill">' + (order.customization_status || "New") + '</span></td>' +
+              '<td>' + paymentLabel(order) + '</td>' +
+            '</tr>'
+          );
+        }).join("");
+      }
+      if (mobileList) {
+        mobileList.innerHTML = orders.map(renderOrderMobileCard).join("");
+      }
     }
 
     bindOrdersUi();
@@ -182,11 +232,15 @@
       currentStatus = event.target.value;
       loadOrders();
     });
-    document.querySelectorAll("[data-order-id]").forEach(function (row) {
+    document.querySelectorAll(".admin-order-row[data-order-id]").forEach(function (row) {
       row.addEventListener("click", function () {
-        selectedOrderId = row.getAttribute("data-order-id");
-        var order = orders.find(function (o) { return o.id === selectedOrderId; });
-        document.getElementById("orders-detail").innerHTML = renderDetail(order || null);
+        selectOrder(row.getAttribute("data-order-id"), false);
+      });
+    });
+    document.querySelectorAll(".admin-order-view[data-order-id]").forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        event.stopPropagation();
+        selectOrder(button.getAttribute("data-order-id"), true);
       });
     });
   }

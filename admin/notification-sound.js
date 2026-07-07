@@ -2,14 +2,32 @@
   "use strict";
 
   var DEFAULT_SOUND = "/assets/notifications/new-order.mp3";
+  var DEFAULT_LABEL = "Default (new-order.mp3)";
   var STORAGE_ENABLED = "dvites_notification_sound_enabled";
-  var STORAGE_URL = "dvites_notification_sound_url";
   var STORAGE_VOLUME = "dvites_notification_sound_volume";
+  var STORAGE_USE_CUSTOM = "dvites_notification_sound_custom";
+  var STORAGE_CUSTOM_FILENAME = "dvites_notification_sound_filename";
+  var DB_NAME = "dvites-admin-sound";
+  var DB_STORE = "sounds";
+  var DB_KEY = "custom";
 
   var activeAudio = null;
   var autoplayBlocked = false;
   var unlockBound = false;
   var lastPlayedAt = 0;
+  var customObjectUrl = null;
+  var customReady = false;
+
+  var ALLOWED_TYPES = [
+    "audio/mpeg",
+    "audio/mp3",
+    "audio/wav",
+    "audio/x-wav",
+    "audio/ogg",
+    "audio/mp4",
+    "audio/x-m4a",
+    "audio/m4a",
+  ];
 
   function readEnabled() {
     try {
@@ -18,14 +36,6 @@
       return value === "1";
     } catch {
       return true;
-    }
-  }
-
-  function readUrl() {
-    try {
-      return (localStorage.getItem(STORAGE_URL) || DEFAULT_SOUND).trim() || DEFAULT_SOUND;
-    } catch {
-      return DEFAULT_SOUND;
     }
   }
 
@@ -39,11 +49,36 @@
     }
   }
 
+  function readUseCustom() {
+    try {
+      return localStorage.getItem(STORAGE_USE_CUSTOM) === "1";
+    } catch {
+      return false;
+    }
+  }
+
+  function readCustomFilename() {
+    try {
+      return localStorage.getItem(STORAGE_CUSTOM_FILENAME) || "";
+    } catch {
+      return "";
+    }
+  }
+
   function saveSettings(settings) {
     try {
-      localStorage.setItem(STORAGE_ENABLED, settings.enabled ? "1" : "0");
-      localStorage.setItem(STORAGE_URL, settings.url || DEFAULT_SOUND);
-      localStorage.setItem(STORAGE_VOLUME, String(settings.volume));
+      if (settings.enabled != null) {
+        localStorage.setItem(STORAGE_ENABLED, settings.enabled ? "1" : "0");
+      }
+      if (settings.volume != null) {
+        localStorage.setItem(STORAGE_VOLUME, String(settings.volume));
+      }
+      if (settings.useCustom != null) {
+        localStorage.setItem(STORAGE_USE_CUSTOM, settings.useCustom ? "1" : "0");
+      }
+      if (settings.filename != null) {
+        localStorage.setItem(STORAGE_CUSTOM_FILENAME, settings.filename);
+      }
     } catch {
       // ignore
     }
@@ -52,9 +87,111 @@
   function getSettings() {
     return {
       enabled: readEnabled(),
-      url: readUrl(),
       volume: readVolume(),
+      useCustom: readUseCustom(),
+      filename: readCustomFilename(),
+      label: getCurrentSoundLabel(),
     };
+  }
+
+  function getCurrentSoundLabel() {
+    if (readUseCustom() && readCustomFilename()) {
+      return "✓ " + readCustomFilename();
+    }
+    return "✓ " + DEFAULT_LABEL;
+  }
+
+  function openDb() {
+    return new Promise(function (resolve, reject) {
+      if (!("indexedDB" in global)) {
+        reject(new Error("IndexedDB is not supported."));
+        return;
+      }
+      var request = indexedDB.open(DB_NAME, 1);
+      request.onupgradeneeded = function (event) {
+        event.target.result.createObjectStore(DB_STORE);
+      };
+      request.onsuccess = function () { resolve(request.result); };
+      request.onerror = function () { reject(request.error); };
+    });
+  }
+
+  function loadCustomSoundRecord() {
+    return openDb().then(function (db) {
+      return new Promise(function (resolve) {
+        var tx = db.transaction(DB_STORE, "readonly");
+        var req = tx.objectStore(DB_STORE).get(DB_KEY);
+        req.onsuccess = function () { resolve(req.result || null); };
+        req.onerror = function () { resolve(null); };
+      });
+    }).catch(function () {
+      return null;
+    });
+  }
+
+  function saveCustomSoundRecord(file) {
+    return openDb().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction(DB_STORE, "readwrite");
+        tx.objectStore(DB_STORE).put({
+          blob: file,
+          name: file.name,
+          type: file.type,
+          savedAt: Date.now(),
+        }, DB_KEY);
+        tx.oncomplete = function () { resolve(); };
+        tx.onerror = function () { reject(tx.error); };
+      });
+    });
+  }
+
+  function clearCustomSoundRecord() {
+    return openDb().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction(DB_STORE, "readwrite");
+        tx.objectStore(DB_STORE).delete(DB_KEY);
+        tx.oncomplete = function () { resolve(); };
+        tx.onerror = function () { reject(tx.error); };
+      });
+    });
+  }
+
+  function revokeCustomUrl() {
+    if (customObjectUrl) {
+      URL.revokeObjectURL(customObjectUrl);
+      customObjectUrl = null;
+    }
+  }
+
+  function loadCustomSoundIntoCache() {
+    return loadCustomSoundRecord().then(function (record) {
+      revokeCustomUrl();
+      customReady = false;
+      if (record && record.blob) {
+        customObjectUrl = URL.createObjectURL(record.blob);
+        customReady = true;
+        saveSettings({
+          useCustom: true,
+          filename: record.name || "custom-sound",
+        });
+        return;
+      }
+      if (!readUseCustom()) return;
+      saveSettings({ useCustom: false, filename: "" });
+    });
+  }
+
+  function getPlaybackUrl() {
+    if (readUseCustom() && customObjectUrl) return customObjectUrl;
+    return DEFAULT_SOUND;
+  }
+
+  function isAllowedAudioFile(file) {
+    if (!file) return false;
+    var name = (file.name || "").toLowerCase();
+    var extOk = /\.(mp3|wav|ogg|m4a)$/i.test(name);
+    var typeOk = !file.type || ALLOWED_TYPES.indexOf(file.type) !== -1;
+    return extOk || typeOk;
   }
 
   function stopActiveSound() {
@@ -101,7 +238,7 @@
 
     stopActiveSound();
 
-    var audio = new Audio(settings.url);
+    var audio = new Audio(getPlaybackUrl());
     audio.volume = settings.volume;
     audio.loop = false;
     activeAudio = audio;
@@ -132,10 +269,13 @@
     playSound(false);
     if (meta && meta.template_name) {
       var status = document.getElementById("admin-push-status");
-      if (status) {
-        status.textContent = "New order: " + meta.template_name;
-      }
+      if (status) status.textContent = "New order: " + meta.template_name;
     }
+  }
+
+  function updateCurrentSoundLabel() {
+    var label = document.getElementById("admin-sound-current");
+    if (label) label.textContent = getCurrentSoundLabel();
   }
 
   function settingsPanelHtml() {
@@ -147,49 +287,96 @@
           '<input type="checkbox" id="admin-sound-enabled"' + (settings.enabled ? " checked" : "") + ' />' +
           '<span>Enable sound</span>' +
         '</label>' +
-        '<label class="admin-sound-row admin-sound-label" for="admin-sound-url">Sound URL / path</label>' +
-        '<input class="admin-input admin-sound-input" id="admin-sound-url" type="text" value="' + settings.url.replace(/"/g, "&quot;") + '" placeholder="/assets/notifications/new-order.mp3" />' +
+        '<p class="admin-sound-current-label">Current Sound:</p>' +
+        '<p class="admin-sound-current" id="admin-sound-current">' + settings.label + '</p>' +
+        '<input type="file" id="admin-sound-file" class="admin-sound-file" accept="audio/*,.mp3,.wav,.ogg,.m4a" hidden />' +
+        '<button class="admin-btn admin-btn-primary admin-sound-choose" id="admin-sound-choose" type="button">Choose Notification Sound</button>' +
+        '<button class="admin-btn admin-sound-change" id="admin-sound-change" type="button">Change Sound</button>' +
+        '<button class="admin-btn admin-sound-reset" id="admin-sound-reset" type="button">Reset to Default</button>' +
         '<label class="admin-sound-row admin-sound-label" for="admin-sound-volume">Volume <span id="admin-sound-volume-value">' + Math.round(settings.volume * 100) + '%</span></label>' +
         '<input class="admin-sound-range" id="admin-sound-volume" type="range" min="0" max="100" step="5" value="' + Math.round(settings.volume * 100) + '" />' +
         '<button class="admin-btn admin-btn-primary admin-sound-test" id="admin-sound-test" type="button">Test Sound</button>' +
-        '<p class="admin-status" id="admin-sound-status">Default: ' + DEFAULT_SOUND + '</p>' +
+        '<p class="admin-status" id="admin-sound-status">Sounds stay on this device only.</p>' +
       '</div>'
     );
   }
 
   function bindSettingsPanel() {
     var enabled = document.getElementById("admin-sound-enabled");
-    var url = document.getElementById("admin-sound-url");
     var volume = document.getElementById("admin-sound-volume");
     var volumeValue = document.getElementById("admin-sound-volume-value");
     var testBtn = document.getElementById("admin-sound-test");
+    var chooseBtn = document.getElementById("admin-sound-choose");
+    var changeBtn = document.getElementById("admin-sound-change");
+    var resetBtn = document.getElementById("admin-sound-reset");
+    var fileInput = document.getElementById("admin-sound-file");
     var status = document.getElementById("admin-sound-status");
 
-    function persist() {
+    function persistVolume() {
       saveSettings({
         enabled: !!(enabled && enabled.checked),
-        url: (url && url.value.trim()) || DEFAULT_SOUND,
         volume: volume ? Number(volume.value) / 100 : readVolume(),
       });
     }
 
-    if (enabled) enabled.addEventListener("change", persist);
-    if (url) url.addEventListener("change", persist);
+    function openFilePicker() {
+      if (fileInput) fileInput.click();
+    }
+
+    function handleFileSelected(file) {
+      if (!isAllowedAudioFile(file)) {
+        if (status) status.textContent = "Please choose mp3, wav, ogg, or m4a.";
+        return;
+      }
+      if (status) status.textContent = "Saving sound on this device…";
+      saveCustomSoundRecord(file).then(function () {
+        return loadCustomSoundIntoCache();
+      }).then(function () {
+        updateCurrentSoundLabel();
+        if (status) status.textContent = "Custom sound saved on this device.";
+      }).catch(function () {
+        if (status) status.textContent = "Unable to save sound on this device.";
+      });
+    }
+
+    if (enabled) enabled.addEventListener("change", persistVolume);
     if (volume) {
       volume.addEventListener("input", function () {
         if (volumeValue) volumeValue.textContent = volume.value + "%";
-        persist();
+        persistVolume();
       });
-      volume.addEventListener("change", persist);
+      volume.addEventListener("change", persistVolume);
+    }
+    if (chooseBtn) chooseBtn.addEventListener("click", openFilePicker);
+    if (changeBtn) changeBtn.addEventListener("click", openFilePicker);
+    if (fileInput) {
+      fileInput.addEventListener("change", function () {
+        var file = fileInput.files && fileInput.files[0];
+        if (file) handleFileSelected(file);
+        fileInput.value = "";
+      });
+    }
+    if (resetBtn) {
+      resetBtn.addEventListener("click", function () {
+        clearCustomSoundRecord().then(function () {
+          revokeCustomUrl();
+          customReady = false;
+          saveSettings({ useCustom: false, filename: "" });
+          updateCurrentSoundLabel();
+          if (status) status.textContent = "Reset to default sound.";
+        }).catch(function () {
+          if (status) status.textContent = "Unable to reset sound.";
+        });
+      });
     }
     if (testBtn) {
       testBtn.addEventListener("click", function () {
-        persist();
+        persistVolume();
         playSound(true).then(function (ok) {
           if (status) {
             status.textContent = ok
               ? "Test sound played."
-              : "Browser blocked autoplay. Click Enable Sound banner.";
+              : "Browser blocked autoplay. Tap Enable Sound.";
           }
         });
       });
@@ -256,7 +443,9 @@
   }
 
   function init(adminFetch) {
-    mountSettingsPanel();
+    loadCustomSoundIntoCache().finally(function () {
+      mountSettingsPanel();
+    });
     bindServiceWorkerMessages();
     startOrderPolling(adminFetch);
   }
@@ -265,7 +454,6 @@
     DEFAULT_SOUND: DEFAULT_SOUND,
     getSettings: getSettings,
     saveSettings: saveSettings,
-    settingsPanelHtml: settingsPanelHtml,
     mountSettingsPanel: mountSettingsPanel,
     playSound: playSound,
     notifyNewOrder: notifyNewOrder,
