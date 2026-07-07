@@ -158,9 +158,20 @@ Admin pages do **not** load `analytics.js`.
 - Analytics: `/admin/analytics.html`
 
 ### Authentication
-On first visit, enter the value of `ADMIN_API_KEY`. It is stored in `sessionStorage` for the browser session and sent as:
+On first visit, enter your `ADMIN_API_KEY` once. After successful verification, it is stored in **`localStorage`** on this device for up to **365 days** and sent as:
 
-`X-Dvites-Admin-Key: <your-admin-key>`
+`X-Dvites-Admin-Key: <your-entered-key>`
+
+The server `ADMIN_API_KEY` is **never** embedded in page source — only Cloudflare Functions compare the header.
+
+You stay signed in as **Super Admin** until:
+- you click **Sign out**
+- 365 days pass since login
+- any admin API returns **401 Unauthorized** (invalid or rotated key)
+
+localStorage keys:
+- `dvites_admin_key`
+- `dvites_admin_login_at`
 
 ### Orders dashboard features
 - Gumroad-style dark wine UI
@@ -290,6 +301,8 @@ Payment verification still returns `success: true` even if push fails.
 | `admin/orders.js` | Orders UI logic |
 | `admin/manifest.json` | PWA manifest |
 | `admin/service-worker.js` | PWA + push handler |
+| `admin/notification-sound.js` | Custom MP3 order sound player + settings |
+| `assets/notifications/README.md` | Where to place `new-order.mp3` |
 
 ### Updated files
 | File | Change |
@@ -297,10 +310,88 @@ Payment verification still returns `success: true` even if push fails.
 | `functions/api/verify-payment.js` | Sends admin push after order save |
 | `assets/payment.js` | Tracks checkout_open + payment_success |
 | `index.html`, `templates.html`, `partner-studio.html`, `thank-you.html`, legal pages | Added `analytics.js` |
+| `admin/admin-common.js` | Sound settings panel + order polling init |
+| `admin/orders.js` | Feeds new orders into sound detector |
+| `admin/service-worker.js` | Posts `DVITES_NEW_ORDER` to open admin tabs |
+| `admin/admin.css` | Sound settings + autoplay unlock banner styles |
 
 ---
 
-## 9. Manual QA checklist
+## 11. Custom MP3 notification sound (admin)
+
+Browser push notifications **cannot reliably play a custom MP3** as the OS notification sound. Instead, Dvites plays your MP3 **inside the open admin dashboard/PWA** when a new order is detected.
+
+### Where to place the MP3
+
+Put your sound file here:
+
+```text
+assets/notifications/new-order.mp3
+```
+
+Default URL used by admin:
+
+```text
+/assets/notifications/new-order.mp3
+```
+
+See also: `assets/notifications/README.md`
+
+Recommended: short MP3, 0.3–1.5 seconds, under ~200 KB.
+
+### Admin settings (sidebar)
+
+On `/admin/orders.html` and `/admin/analytics.html`:
+
+- **Enable sound** toggle
+- **Sound URL / path** input (local path or full HTTPS URL)
+- **Volume** slider
+- **Test Sound** button
+
+Settings are saved in `localStorage`:
+
+| Key | Purpose |
+|-----|---------|
+| `dvites_notification_sound_enabled` | `1` or `0` |
+| `dvites_notification_sound_url` | MP3 path or URL |
+| `dvites_notification_sound_volume` | `0` to `1` |
+
+### When sound plays
+
+Sound plays once (no loop) when:
+
+1. **Push arrives** and an admin tab is open (service worker messages the page)
+2. **Polling detects a new order** (every 20 seconds on today’s orders)
+3. **Orders page refresh** finds a new order ID
+
+Duplicate triggers within 3 seconds are ignored.
+
+### Browser autoplay limitation
+
+Browsers often block audio until the user interacts with the page. If autoplay is blocked:
+
+- A banner appears: **“Click to enable notification sound”**
+- Click **Enable Sound** or **Test Sound** once to unlock audio for that session
+
+### How to change the sound
+
+1. Upload your MP3 to `assets/notifications/` (or host elsewhere)
+2. Open admin dashboard
+3. Set **Sound URL / path** (e.g. `/assets/notifications/my-chime.mp3`)
+4. Click **Test Sound**
+5. Toggle **Enable sound** on
+
+### QA checklist — notification sound
+
+- [ ] Add `new-order.mp3` to `assets/notifications/`
+- [ ] Open admin → click **Test Sound** → hear MP3
+- [ ] Complete test order → sound plays in open admin tab
+- [ ] Push notification still appears (OS sound separate from MP3)
+- [ ] Autoplay banner appears on fresh tab until user clicks Enable Sound
+
+---
+
+## 12. Manual QA checklist
 
 ### Analytics
 - [ ] Run SQL migration in Supabase
@@ -341,7 +432,7 @@ Payment verification still returns `success: true` even if push fails.
 
 ---
 
-## 10. Next steps (optional hardening)
+## 13. Next steps (optional hardening)
 
 1. Replace publishable-key select policies with authenticated admin-only reads
 2. Add `service_role` only inside Cloudflare if you want stricter RLS

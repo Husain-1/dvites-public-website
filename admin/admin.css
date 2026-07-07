@@ -59,6 +59,32 @@ body.admin-body {
   color: var(--admin-muted);
 }
 
+.admin-role-badge {
+  display: inline-flex !important;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(201, 168, 76, 0.14);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  color: var(--admin-gold) !important;
+  font-size: 10px !important;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-role-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(143, 31, 63, 0.22);
+  border: 1px solid rgba(143, 31, 63, 0.45);
+  color: var(--admin-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .admin-nav {
   display: grid;
   gap: 8px;
@@ -344,6 +370,71 @@ body.admin-body {
   background: var(--admin-success);
   margin-right: 6px;
   box-shadow: 0 0 0 4px rgba(62, 207, 142, 0.18);
+}
+
+.admin-sound-settings {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--admin-border);
+}
+
+.admin-sound-title {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--admin-text);
+}
+
+.admin-sound-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--admin-muted);
+}
+
+.admin-sound-label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.admin-sound-input {
+  max-width: 100%;
+  margin-bottom: 10px;
+}
+
+.admin-sound-range {
+  width: 100%;
+  margin-bottom: 10px;
+  accent-color: var(--admin-accent-soft);
+}
+
+.admin-sound-test {
+  width: 100%;
+}
+
+.admin-sound-unlock {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(29, 16, 22, 0.96);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.admin-sound-unlock p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--admin-text);
 }
 
 @media (max-width: 900px) {

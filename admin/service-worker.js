@@ -1,9 +1,10 @@
-var ADMIN_CACHE = "dvites-admin-v1";
+var ADMIN_CACHE = "dvites-admin-v2";
 var ADMIN_SHELL = [
   "/admin/orders.html",
   "/admin/analytics.html",
   "/admin/admin.css",
   "/admin/admin-common.js",
+  "/admin/notification-sound.js",
   "/admin/orders.js",
   "/admin/analytics.js",
   "/admin/manifest.json",
@@ -64,12 +65,19 @@ self.addEventListener("push", function (event) {
   }
 
   event.waitUntil(
-    self.registration.showNotification(payload.title, {
-      body: payload.body,
-      icon: "/assets/favicon.png",
-      badge: "/assets/favicon.png",
-      data: { url: payload.url || "/admin/orders.html" },
-    })
+    Promise.all([
+      self.registration.showNotification(payload.title, {
+        body: payload.body,
+        icon: "/assets/favicon.png",
+        badge: "/assets/favicon.png",
+        data: { url: payload.url || "/admin/orders.html" },
+      }),
+      clients.matchAll({ type: "window", includeUncontrolled: true }).then(function (list) {
+        list.forEach(function (client) {
+          client.postMessage({ type: "DVITES_NEW_ORDER", payload: payload });
+        });
+      }),
+    ])
   );
 });
 

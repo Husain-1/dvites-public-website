@@ -201,6 +201,9 @@
       .then(function (res) { return res.json(); })
       .then(function (data) {
         if (data.error) throw new Error(data.error);
+        if (global.DvitesAdminSound) {
+          global.DvitesAdminSound.ingestOrders(data.orders || [], true);
+        }
         renderOrders(data);
       })
       .catch(function (error) {
