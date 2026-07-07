@@ -1,3 +1,5 @@
+import { notifyAdminsOfOrder } from "../_lib/webpush.js";
+
 function jsonResponse(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -187,11 +189,21 @@ export async function onRequestPost(context) {
 
   const saveResult = await saveOrderToSupabase(env, orderRow);
 
+  let pushResult = { sent: 0, skipped: true };
+  if (saveResult.saved) {
+    pushResult = await notifyAdminsOfOrder(env, {
+      id: saveResult.orderId,
+      template_name: orderRow.template_name,
+      amount: orderRow.amount,
+    });
+  }
+
   return jsonResponse({
     success: true,
     order_saved: saveResult.saved,
     order_id: saveResult.orderId || null,
     order_save_error: saveResult.saved ? null : saveResult.error || "Unable to save order.",
+    push_sent: pushResult.sent || 0,
     razorpay_payment_id: paymentId,
     template_slug: templateSlug || null,
     template_name: templateName || "Dvites Wedding Invitation",

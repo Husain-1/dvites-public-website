@@ -1,0 +1,25 @@
+{
+  "name": "Dvites Orders",
+  "short_name": "Dvites Orders",
+  "description": "Dvites admin orders and analytics dashboard",
+  "start_url": "/admin/orders.html",
+  "scope": "/admin/",
+  "display": "standalone",
+  "background_color": "#12090d",
+  "theme_color": "#12090d",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -138,6 +138,12 @@
                   response.razorpay_payment_id
                 );
               }
+              if (typeof global.dvitesTrack === "function") {
+                global.dvitesTrack("payment_success", {
+                  template_slug: checkoutContext.templateSlug || "",
+                  template_name: checkoutContext.templateName || "",
+                });
+              }
               global.location.href = buildThankYouUrl(result, checkoutContext);
               resolve(result);
             } else {
@@ -161,6 +167,12 @@
         window.alert(FAIL_MESSAGE);
         reject(new Error("Payment failed"));
       });
+      if (typeof global.dvitesTrack === "function") {
+        global.dvitesTrack("checkout_open", {
+          template_slug: checkoutContext.templateSlug || "",
+          template_name: checkoutContext.templateName || "",
+        });
+      }
       checkout.open();
     });
   }
