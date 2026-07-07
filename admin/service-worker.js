@@ -1,9 +1,11 @@
-var ADMIN_CACHE = "dvites-admin-v4";
+var ADMIN_CACHE = "dvites-admin-v5";
 
-var ADMIN_PAGE_ROUTES = {
+var ADMIN_PAGE_TARGETS = {
   "/admin": "/admin/orders.html",
   "/admin/orders": "/admin/orders.html",
+  "/admin/orders/": "/admin/orders.html",
   "/admin/analytics": "/admin/analytics.html",
+  "/admin/analytics/": "/admin/analytics.html",
 };
 
 var OFFLINE_HTML =
@@ -16,11 +18,21 @@ var OFFLINE_HTML =
   "<p>Check your connection, then reload the admin app.</p>" +
   "<button type=\"button\" onclick=\"location.reload()\">Reload App</button></body></html>";
 
-function resolveAdminPagePath(pathname) {
-  var path = pathname.replace(/\/+$/, "") || "/admin";
-  if (ADMIN_PAGE_ROUTES[pathname]) return ADMIN_PAGE_ROUTES[pathname];
-  if (ADMIN_PAGE_ROUTES[path]) return ADMIN_PAGE_ROUTES[path];
+function normalizePath(pathname) {
+  if (!pathname) return "/admin";
+  if (pathname.length > 1 && pathname.charAt(pathname.length - 1) === "/") {
+    return pathname.replace(/\/+$/, "") || "/admin";
+  }
+  return pathname;
+}
+
+function resolveAdminPageTarget(pathname) {
+  if (ADMIN_PAGE_TARGETS[pathname]) return ADMIN_PAGE_TARGETS[pathname];
+  var normalized = normalizePath(pathname);
+  if (ADMIN_PAGE_TARGETS[normalized]) return ADMIN_PAGE_TARGETS[normalized];
   if (pathname === "/admin/orders.html" || pathname === "/admin/analytics.html") return pathname;
+  if (pathname === "/admin/orders/index.html") return "/admin/orders.html";
+  if (pathname === "/admin/analytics/index.html") return "/admin/analytics.html";
   return null;
 }
 
@@ -35,11 +47,15 @@ function isAdminScope(url) {
 function isAdminNavigationRequest(request, url) {
   if (request.mode === "navigate") return true;
   if (request.destination === "document") return true;
-  return !!resolveAdminPagePath(url.pathname);
+  return !!resolveAdminPageTarget(url.pathname);
 }
 
 function isCacheableAdminAsset(pathname) {
   return /\.(css|js|json|png|jpe?g|webp|ico|svg|woff2?)$/i.test(pathname);
+}
+
+function isRedirectResponse(response) {
+  return !response || response.type === "opaqueredirect" || (response.status >= 300 && response.status < 400);
 }
 
 function cacheOnSuccess(request, response) {
@@ -57,40 +73,55 @@ function offlinePageResponse() {
   });
 }
 
-function readCachedPage(pageUrl, originalUrl) {
+function readCachedPage(urls) {
   return caches.open(ADMIN_CACHE).then(function (cache) {
-    return cache.match(pageUrl).then(function (cached) {
-      if (cached && cached.ok) return cached;
-      return cache.match(originalUrl).then(function (alt) {
-        if (alt && alt.ok) return alt;
-        return offlinePageResponse();
+    var chain = Promise.resolve(null);
+    urls.forEach(function (url) {
+      chain = chain.then(function (found) {
+        if (found) return found;
+        return cache.match(url).then(function (cached) {
+          return cached && cached.ok ? cached : null;
+        });
       });
     });
+    return chain.then(function (found) {
+      return found || offlinePageResponse();
+    });
+  });
+}
+
+function fetchAdminDocument(targetUrl, fallbackUrls) {
+  var request = new Request(targetUrl, { credentials: "same-origin", redirect: "manual" });
+  return fetch(request).then(function (response) {
+    if (!isRedirectResponse(response) && response && response.ok) {
+      cacheOnSuccess(request, response);
+      return response;
+    }
+    var next = fallbackUrls.shift();
+    if (!next) return readCachedPage([targetUrl]);
+    return fetchAdminDocument(next, fallbackUrls);
+  }).catch(function () {
+    return readCachedPage([targetUrl].concat(fallbackUrls));
   });
 }
 
 function networkFirstPage(request) {
   var url = new URL(request.url);
-  var pagePath = resolveAdminPagePath(url.pathname);
-  if (!pagePath) {
-    return fetch(request).catch(function () { return offlinePageResponse(); });
+  var target = resolveAdminPageTarget(url.pathname);
+  if (!target) {
+    return fetch(request, { redirect: "manual" }).catch(function () {
+      return offlinePageResponse();
+    });
   }
 
-  var pageUrl = url.origin + pagePath + url.search;
-  var pageRequest = new Request(pageUrl, { credentials: "same-origin" });
+  var fallbacks = [];
+  if (target === "/admin/orders.html") {
+    fallbacks = ["/admin/orders/index.html"];
+  } else if (target === "/admin/analytics.html") {
+    fallbacks = ["/admin/analytics/index.html"];
+  }
 
-  return fetch(pageRequest).then(function (response) {
-    if (response && response.ok) {
-      cacheOnSuccess(pageRequest, response);
-      if (pagePath !== url.pathname) {
-        cacheOnSuccess(new Request(request.url), response.clone());
-      }
-      return response;
-    }
-    return readCachedPage(pageUrl, request.url);
-  }).catch(function () {
-    return readCachedPage(pageUrl, request.url);
-  });
+  return fetchAdminDocument(target, fallbacks);
 }
 
 function networkFirstAsset(request) {

@@ -4,6 +4,9 @@ const PARTNER_MIN = 3;
 const PARTNER_MAX = 5;
 const PARTNER_DISCOUNT = 0.05;
 
+const TEST_PRICE_PAISE = 500;
+const TEST_PRODUCT_PREFIX = "Payment Test —";
+
 function jsonResponse(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -17,9 +20,10 @@ function partnerTotalPaise(count) {
   return (subtotal - discount) * 100;
 }
 
-function isValidAmount(amount) {
+function isValidAmount(amount, templateName) {
   const value = Number(amount);
   if (!Number.isInteger(value) || value <= 0) return false;
+  if (value === TEST_PRICE_PAISE && templateName.startsWith(TEST_PRODUCT_PREFIX)) return true;
   if (value === PRICE_PAISE) return true;
 
   for (let count = PARTNER_MIN; count <= PARTNER_MAX; count += 1) {
@@ -53,7 +57,7 @@ export async function onRequestPost(context) {
     return jsonResponse({ error: "Missing template name." }, 400);
   }
 
-  if (!isValidAmount(amount)) {
+  if (!isValidAmount(amount, templateName)) {
     return jsonResponse({ error: "Invalid order amount." }, 400);
   }
 
