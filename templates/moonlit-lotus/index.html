@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+// REPLACE CLIENT DATA: couple name, event date, venue, city, calendar URL, CTA text
+window.__STD_CONFIG__ = {
+  "title": "Save the Date",
+  "coupleName": "Tanya & Rohan",
+  "date": "12 December 2026",
+  "venue": "The Grand Palace, New Delhi",
+  "city": "New Delhi, India",
+  "location": "New Delhi, India",
+  "ctaText": "Save to Google Calendar",
+  "calendarUrl": "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Tanya%20%26%20Rohan%20%E2%80%94%20Save%20the%20Date&dates=20261212/20261213&details=Formal+invitation+to+follow.&location=The%20Grand%20Palace%2C%20New%20Delhi"
+};
+(function () {
+  if (new URLSearchParams(location.search).get("preview") === "1") {
+    window.__STD_GALLERY_MODE__ = true;
+    document.documentElement.classList.add("dvites-preview");
+  }
+})();
+</script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="theme-color" content="#f3ece0" />
+<title>Moonlit Lotus — Digital Save the Date Invitation | Dvites</title>
+<meta name="description" content="An elegant moonlit lotus-themed digital save-the-date invitation with music, calendar integration and interactive animations." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600;1,700&display=swap" />
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600;1,700&display=swap" /></noscript>
+<link rel="preload" as="image" href="./assets/images/petal-1.webp" />
+<link rel="preload" as="image" href="./assets/images/petal-2.webp" />
+<link rel="preload" as="image" href="./assets/images/date-background.webp" />
+<link rel="preload" as="image" href="./assets/images/lotus-frame.webp" />
+<link rel="preload" as="image" href="./assets/images/mirror-fog.webp" />
+
+<style>
+/* ============================================================
+   The Moonlit Lotus — Save the Date — premium mobile invitation
+   Palette: moonlit ivory, cool lapis blue, terracotta, warm brass
+   ============================================================ */
+
+:root {
+  --ivory:       #fbf4e3;
+  --ivory-soft:  #f3ece0;
+  --lapis:       #1c4663;
+  --lapis-deep:  #16384f;
+  --terra:       #9a4a3a;
+  --gold:        #b8904a;
+  --gold-soft:   #d4ad6a;
+  --gold-bright: #e8c87e;
+  --night:       #0b1420;
+  --fog-base:    #c8d9dd;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100svh;
+  background: #f3ece0;
+  color: var(--lapis-deep);
+  font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+  overscroll-behavior: none;
+}
+body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body.wiping { overflow: hidden; touch-action: none; }
+
+html.dvites-preview body { overflow: auto !important; touch-action: auto !important; }
+html.dvites-preview .intro { display: none !important; }
+html.dvites-preview .stage,
+html.dvites-preview .card { pointer-events: none !important; }
+html.dvites-preview #stdMusicBtn { display: none !important; }
+
+.stage {
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  overflow: hidden;
+  background: transparent;
+}
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #0b1420;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 1100ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.intro.fade-out { opacity: 0; pointer-events: none; }
+
+.intro video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.intro-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 72% 58% at 50% 50%, transparent 32%, rgba(0,0,0,0.62) 100%);
+  transition: opacity 700ms ease;
+}
+.intro-veil.hidden { opacity: 0; }
+
+.tap-prompt {
+  position: absolute;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 12vh);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: var(--ivory);
+  text-align: center;
+  pointer-events: none;
+  animation: breathe 2600ms ease-in-out infinite;
+  transition: opacity 500ms ease;
+}
+.tap-prompt.hidden { opacity: 0; animation: none; pointer-events: none; }
+.tap-prompt .flourish { display: flex; align-items: center; gap: 10px; opacity: 0.85; }
+.tap-prompt .flourish .line {
+  width: 34px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212,173,106,0.85), transparent);
+}
+.tap-prompt .flourish .glyph {
+  font-family: 'Cormorant Garamond', serif; font-size: 11px; color: var(--gold-soft);
+}
+.tap-prompt .prompt-label {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: clamp(15px, 4.2vw, 19px);
+  letter-spacing: 0.44em;
+  text-transform: uppercase;
+  padding-left: 0.44em;
+  color: rgba(232, 216, 188, 0.96);
+}
+.tap-prompt .prompt-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(13px, 3.5vw, 15px);
+  letter-spacing: 0.10em;
+  color: rgba(212, 195, 160, 0.88);
+}
+@keyframes breathe {
+  0%, 100% { opacity: 0.85; transform: translateX(-50%) translateY(0); }
+  50%       { opacity: 1;    transform: translateX(-50%) translateY(-3px); }
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  background-image: url("./assets/images/date-background.webp");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(env(safe-area-inset-top) + 24px) 20px calc(env(safe-area-inset-bottom) + 28px);
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity 1200ms ease, transform 1600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card.in { opacity: 1; transform: scale(1); }
+
+.eyebrow {
+  display: flex; align-items: center; gap: 14px;
+  opacity: 0;
+  animation: rise 1100ms 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.eyebrow .rule {
+  width: clamp(24px, 7vw, 38px); height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lapis), transparent);
+}
+.eyebrow .diamond {
+  width: 6px; height: 6px;
+  background: var(--lapis);
+  transform: rotate(45deg);
+}
+
+.title {
+  margin: 16px 0 0;
+  font-family: 'Cinzel', serif;
+  font-weight: 500;
+  font-size: clamp(13px, 3.8vw, 17px);
+  letter-spacing: 0.50em;
+  text-transform: uppercase;
+  color: var(--lapis-deep);
+  padding-left: 0.50em;
+  text-align: center;
+  opacity: 0;
+  animation: rise 1100ms 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.couple {
+  margin: 8px 0 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(34px, 10vw, 52px);
+  line-height: 1.05;
+  color: var(--lapis-deep);
+  text-align: center;
+  text-wrap: balance;
+  opacity: 0;
+  animation: rise 1200ms 460ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.couple .amp { color: var(--terra); font-weight: 400; padding: 0 0.06em; }
+
+.mirror-wrap {
+  position: relative;
+  height: min(58svh, 416px);
+  width: calc(min(58svh, 416px) * 26 / 34);
+  margin: clamp(6px, 1.6vh, 14px) auto 0;
+  transform-origin: 50% 0%;
+  opacity: 0;
+  animation: rise 1400ms 620ms cubic-bezier(0.16, 1, 0.3, 1) forwards,
+             frameSway 7.5s ease-in-out 2.4s infinite;
+}
+
+@keyframes frameSway {
+  0%   { transform: rotate(-1.1deg); }
+  50%  { transform: rotate( 1.1deg); }
+  100% { transform: rotate(-1.1deg); }
+}
+
+body.wiping .mirror-wrap { animation-play-state: paused; }
+
+.mirror-glass {
+  position: absolute;
+  left: 19%;
+  top: 18.5%;
+  width: 62%;
+  height: 73%;
+  border-radius: 50%;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 70% 90% at 50% 45%, #fbf3df 0%, #efe2c4 65%, #e3d2aa 100%);
+  box-shadow:
+    inset 0 6px 18px rgba(60,45,20,0.10),
+    inset 0 -6px 14px rgba(60,45,20,0.08);
+  z-index: 5;
+}
+
+.mirror-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg,
+      rgba(255,250,235,0.28) 0%,
+      rgba(255,250,235,0.08) 22%,
+      transparent 42%,
+      transparent 70%,
+      rgba(255,250,235,0.04) 100%);
+  z-index: 6;
+  mix-blend-mode: screen;
+}
+
+.date-block {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  text-align: center;
+  padding: 15% 19% 11%;
+  z-index: 1;
+  background: transparent;
+}
+
+.mirror-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(ellipse at center,
+    rgba(212,173,106,0.18) 0%,
+    rgba(180,130,55,0.06) 40%,
+    transparent 70%);
+  transition: opacity 1000ms ease;
+}
+.mirror-glow.on { opacity: 1; animation: glowPulse 3800ms ease-in-out infinite; }
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.92; }
+  50%       { opacity: 0.52; }
+}
+
+.date-block .day,
+.date-block .month-row,
+.date-block .sep,
+.date-block .venue,
+.date-block .city {
+  opacity: 0;
+  animation-fill-mode: both;
+}
+
+.date-block.show .day       { animation: rtDay      1300ms   0ms cubic-bezier(0.16,1,0.3,1) both; }
+.date-block.show .month-row { animation: rtSlice     900ms 200ms cubic-bezier(0.16,1,0.3,1) both; }
+.date-block.show .sep       { animation: rtSep       700ms 400ms ease                       both; }
+.date-block.show .venue     { animation: rtRise      900ms 520ms cubic-bezier(0.16,1,0.3,1) both; }
+.date-block.show .city      { animation: rtCity      800ms 680ms cubic-bezier(0.16,1,0.3,1) both; }
+
+@keyframes rtDay {
+  0%   { opacity: 0; filter: blur(18px); transform: scale(1.18) translateY(8px); }
+  60%  { opacity: 1; filter: blur(0);    transform: scale(1.03) translateY(0); }
+  82%  { transform: scale(0.99); }
+  100% { opacity: 1; filter: blur(0);    transform: scale(1); }
+}
+@keyframes rtSlice {
+  from { opacity: 0; clip-path: inset(0 50% 0 50%); transform: translateY(4px); }
+  to   { opacity: 1; clip-path: inset(0 0% 0 0%);   transform: translateY(0); }
+}
+@keyframes rtSep {
+  from { opacity: 0; transform: scaleX(0); }
+  78%  { transform: scaleX(1.08); }
+  to   { opacity: 1; transform: scaleX(1); }
+}
+@keyframes rtRise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes rtCity {
+  from { opacity: 0; transform: translateY(6px); letter-spacing: 0.06em; }
+  to   { opacity: 0.88; transform: translateY(0); letter-spacing: 0.18em; }
+}
+
+.date-block .day {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: clamp(22px, 6vw, 30px);
+  line-height: 1;
+  color: var(--lapis);
+}
+.date-block .month-row {
+  display: flex; align-items: center; gap: 5px; margin-top: 4px;
+}
+.date-block .month-row .bar {
+  width: clamp(8px, 2.4vw, 13px); height: 1px;
+  background: var(--lapis-deep); opacity: 0.55;
+}
+.date-block .month {
+  font-family: 'Cinzel', serif;
+  font-weight: 400;
+  font-size: clamp(10px, 2.7vw, 13px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lapis-deep);
+  padding-left: 0.16em;
+}
+.date-block .sep {
+  margin: clamp(5px, 1.4vw, 8px) 0 clamp(4px, 1.2vw, 7px);
+  display: flex; align-items: center; gap: 5px;
+  color: var(--terra); font-size: 9px;
+}
+.date-block .sep::before, .date-block .sep::after {
+  content: '';
+  width: clamp(9px, 2.6vw, 16px); height: 1px;
+  background: currentColor; opacity: 0.45;
+}
+.date-block .venue {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+  font-size: clamp(11px, 3vw, 13px);
+  letter-spacing: 0.02em;
+  color: var(--lapis-deep);
+  line-height: 1.18;
+  text-align: center;
+  max-width: 100%;
+}
+.date-block .city {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 400;
+  font-size: clamp(8px, 2.2vw, 10px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--terra);
+  margin-top: 3px;
+  max-width: 100%;
+}
+
+.sheen-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  transition: opacity 700ms ease;
+}
+.sheen-canvas.gone { opacity: 0; }
+
+.fog-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  touch-action: none;
+  cursor: grab;
+  transition: opacity 700ms ease;
+}
+.fog-canvas.gone { opacity: 0; pointer-events: none; }
+.fog-canvas:active { cursor: grabbing; }
+
+@keyframes fogBreathe {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.78; }
+}
+.fog-canvas:not(.gone):not(.started) {
+  animation: fogBreathe 2800ms ease-in-out infinite;
+}
+
+.droplet-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: opacity 700ms ease;
+}
+.droplet-canvas.gone { opacity: 0; }
+
+.wipe-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 90px;
+  height: 90px;
+  margin: -45px 0 0 -45px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 5;
+  background: radial-gradient(circle,
+    rgba(255,248,225,0.55) 0%,
+    rgba(255,243,210,0.22) 38%,
+    transparent 72%);
+  mix-blend-mode: screen;
+  filter: blur(3px);
+  transition: opacity 0.45s ease;
+  transform: translate3d(-9999px, -9999px, 0);
+  will-change: transform, opacity;
+}
+.wipe-glow.active { opacity: 1; }
+
+.wipe-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: opacity 600ms ease;
+}
+.wipe-hint.hidden { opacity: 0; }
+.wipe-hint .inscription {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  color: rgba(22,56,79,0.92);
+  text-shadow: 0 1px 4px rgba(255,255,255,0.35);
+  animation: hintBreathe 3000ms ease-in-out infinite;
+}
+.wipe-hint .flourish {
+  display: flex; align-items: center; gap: 8px; opacity: 0.80;
+}
+.wipe-hint .flourish .line {
+  width: clamp(18px, 5vw, 28px); height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(22,56,79,0.55), transparent);
+}
+.wipe-hint .flourish .glyph {
+  font-family: 'Cormorant Garamond', serif; font-size: 10px; color: rgba(22,56,79,0.6);
+}
+.wipe-hint .text {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: clamp(14px, 3.9vw, 17px);
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+  text-align: center;
+  color: rgba(22,56,79,0.92);
+}
+.wipe-hint .sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(10px, 2.55vw, 12px);
+  color: rgba(22,56,79,0.6);
+  letter-spacing: 0.08em;
+}
+@keyframes hintBreathe {
+  0%, 100% { opacity: 0.82; transform: translateY(0); }
+  50%       { opacity: 1;    transform: translateY(-2px); }
+}
+
+.mirror-frame {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 10;
+  filter:
+    drop-shadow(0 14px 28px rgba(0,0,0,0.28))
+    drop-shadow(0 3px 8px rgba(28,40,70,0.16));
+}
+
+.formal {
+  margin-top: clamp(16px, 3.5vh, 26px);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(20px, 5.1vw, 23px);
+  letter-spacing: 0.05em;
+  color: rgba(22,56,79,0.8);
+  text-align: center;
+  opacity: 0;
+  animation: rise 1100ms 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.formal .ornament { color: var(--terra); margin: 0 9px; letter-spacing: 0; }
+
+.cta-wrap {
+  margin-top: calc(clamp(20px, 4vh, 32px) + 30px);
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,250,235,0.62) 0%, rgba(255,247,225,0.34) 100%);
+  color: #1c3551;
+  text-decoration: none;
+  font-family: 'Cinzel', serif;
+  font-weight: 500;
+  font-size: clamp(9px, 2.3vw, 11px);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  padding-left: calc(20px + 0.24em);
+  border: 1px solid rgba(28,53,81,0.42);
+  box-shadow: 0 6px 18px rgba(20,35,65,0.10), inset 0 1px 0 rgba(255,250,235,0.65);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  transform: translateY(10px) scale(0.96);
+  transition: opacity 800ms ease, transform 900ms cubic-bezier(0.16,1,0.3,1), box-shadow 300ms ease, border-color 300ms ease, background 300ms ease;
+  pointer-events: none;
+}
+.cta.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+.cta:active { transform: scale(0.97); }
+.cta .gicon { display: inline-block; width: 12px; height: 12px; }
+.cta svg path { fill: #1c3551; }
+.cta svg circle { fill: #2b6a78; }
+.cta:hover {
+  background: linear-gradient(180deg, rgba(255,250,235,0.9) 0%, rgba(255,243,210,0.6) 100%);
+  border-color: rgba(28,53,81,0.7);
+  box-shadow: 0 10px 26px rgba(20,35,65,0.16), inset 0 1px 0 rgba(255,250,235,0.7);
+}
+
+@keyframes rise {
+  0%   { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 520px) {
+  .card { padding-top: calc(env(safe-area-inset-top) + 40px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+
+<script>
+window.__resources = {
+  mirrorImg: "./assets/images/lotus-frame.webp",
+  scratchImg: "./assets/images/mirror-fog.webp",
+  bgImg: "./assets/images/date-background.webp",
+  introVideo: "./assets/video/intro.mp4",
+  petal1: "./assets/images/petal-1.webp",
+  petal2: "./assets/images/petal-2.webp"
+};
+</script>
+
+<meta property="og:title" content="Tanya &amp; Rohan — Save the Date">
+<meta property="og:description" content="Tanya &amp; Rohan are getting married. Save the date!">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tanya &amp; Rohan — Save the Date">
+<meta name="twitter:description" content="Tanya &amp; Rohan are getting married. Save the date!">
+<meta property="og:image" content="./assets/images/og-image.png">
+<meta name="twitter:image" content="./assets/images/og-image.png">
+<meta property="og:site_name" content="Dvites">
+</head>
+
+<body>
+<div id="root"></div>
+
+<script src="./assets/js/app.js"></script>
+
+<style>
+#stdMusicBtn {
+  position: fixed;
+  right: 14px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.55);
+  background: rgba(10,10,10,0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #fbf4e3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 200ms ease, background 200ms ease;
+}
+#stdMusicBtn:active { transform: scale(0.92); }
+#stdMusicBtn svg { width: 18px; height: 18px; }
+#stdMusicBtn .std-music-bar {
+  display: inline-block;
+  width: 2px;
+  height: 12px;
+  background: currentColor;
+  margin: 0 1px;
+  border-radius: 1px;
+  animation: stdMusicBars 1s ease-in-out infinite;
+  transform-origin: bottom;
+}
+#stdMusicBtn .std-music-bar:nth-child(2) { animation-delay: 0.18s; }
+#stdMusicBtn .std-music-bar:nth-child(3) { animation-delay: 0.36s; }
+#stdMusicBtn.is-paused .std-music-bar { animation-play-state: paused; transform: scaleY(0.5); }
+@keyframes stdMusicBars {
+  0%, 100% { transform: scaleY(0.45); }
+  50%      { transform: scaleY(1); }
+}
+</style>
+<audio id="stdBgAudio" src="./assets/audio/background-music.mp3" loop preload="metadata" playsinline></audio>
+<button id="stdMusicBtn" class="is-paused" aria-label="Toggle music">
+  <span class="std-music-bar"></span><span class="std-music-bar"></span><span class="std-music-bar"></span>
+</button>
+<script>
+(function () {
+  var audio = document.getElementById('stdBgAudio');
+  var btn   = document.getElementById('stdMusicBtn');
+  if (!audio || !btn) return;
+
+  var isPreview = new URLSearchParams(location.search).get('preview') === '1';
+  if (isPreview) {
+    audio.muted = true;
+    btn.style.display = 'none';
+    return;
+  }
+
+  audio.volume = 0.55;
+  var started = false;
+
+  function play() {
+    var p = audio.play();
+    if (p && typeof p.then === 'function') {
+      p.then(function () { btn.classList.remove('is-paused'); started = true; })
+       .catch(function () { btn.classList.add('is-paused'); });
+    } else {
+      btn.classList.remove('is-paused');
+      started = true;
+    }
+  }
+  function pause() {
+    audio.pause();
+    btn.classList.add('is-paused');
+  }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (audio.paused) play(); else pause();
+  });
+
+  function firstTap() {
+    if (started) return;
+    play();
+    document.removeEventListener('pointerdown', firstTap, true);
+    document.removeEventListener('touchstart',  firstTap, true);
+    document.removeEventListener('click',       firstTap, true);
+  }
+  document.addEventListener('pointerdown', firstTap, true);
+  document.addEventListener('touchstart',  firstTap, true);
+  document.addEventListener('click',       firstTap, true);
+})();
+</script>
+<script>
+(function () {
+  var isPreview = new URLSearchParams(location.search).get("preview") === "1";
+  if (!isPreview) return;
+
+  function muteMedia() {
+    document.querySelectorAll("video, audio").forEach(function (el) {
+      el.muted = true;
+      try { el.pause(); } catch (e) {}
+    });
+  }
+
+  function revealPreview() {
+    muteMedia();
+    var intro = document.querySelector(".intro");
+    if (intro) intro.remove();
+    var card = document.querySelector(".card");
+    if (card) card.classList.add("in");
+    var dateBlock = document.querySelector(".date-block");
+    if (dateBlock) dateBlock.classList.add("show");
+    var glow = document.querySelector(".mirror-glow");
+    if (glow) glow.classList.add("on");
+    document.querySelectorAll(".cta").forEach(function (el) { el.classList.add("show"); });
+    var fog = document.querySelector(".fog-canvas");
+    if (fog) fog.classList.add("gone", "started");
+    var droplet = document.querySelector(".droplet-canvas");
+    if (droplet) droplet.classList.add("gone");
+    var hint = document.querySelector(".wipe-hint");
+    if (hint) hint.classList.add("hidden");
+    document.body.classList.remove("wiping");
+  }
+
+  function waitForPreview() {
+    if (document.querySelector(".card")) {
+      setTimeout(revealPreview, 500);
+      return;
+    }
+    requestAnimationFrame(waitForPreview);
+  }
+
+  waitForPreview();
+  setInterval(muteMedia, 800);
+})();
+</script>
+</body>
+</html>

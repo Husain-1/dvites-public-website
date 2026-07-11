@@ -1,5 +1,6 @@
 const PRICE_RUPEES = 1499;
 const PRICE_PAISE = PRICE_RUPEES * 100;
+const STD_PRICE_PAISE = 99900;
 const PARTNER_MIN = 3;
 const PARTNER_MAX = 5;
 const PARTNER_DISCOUNT = 0.05;
@@ -21,6 +22,7 @@ function isValidAmount(amount) {
   const value = Number(amount);
   if (!Number.isInteger(value) || value <= 0) return false;
   if (value === PRICE_PAISE) return true;
+  if (value === STD_PRICE_PAISE) return true;
 
   for (let count = PARTNER_MIN; count <= PARTNER_MAX; count += 1) {
     if (value === partnerTotalPaise(count)) return true;

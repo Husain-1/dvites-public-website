@@ -4,6 +4,8 @@
   var EMAIL = "infodvites@gmail.com";
   var PRICE = 1499;
   var OLD_PRICE = 2499;
+  var SAVE_THE_DATE_PRICE = 999;
+  var SAVE_THE_DATE_OLD_PRICE = 1999;
   var PARTNER_MIN = 3;
   var PARTNER_MAX = 5;
   var PARTNER_DISCOUNT = 0.05;
@@ -101,6 +103,60 @@
     }
   ];
 
+  var SAVE_THE_DATE_TEMPLATES = [
+    {
+      id: "desert-sand",
+      url: "/templates/desert-sand/",
+      title: "Desert Sand",
+      category: "Save the Date",
+      thumbnailFile: "dessert sand thumbnail.webp",
+      description: "A warm, elegant Save the Date design inspired by desert tones and timeless minimalism."
+    },
+    {
+      id: "blossom-touch",
+      url: "/templates/blossom-touch/",
+      title: "Blossom Touch",
+      category: "Save the Date",
+      thumbnailFile: "blossom touch thumbnail.webp",
+      description: "A soft floral Save the Date invitation with romantic details and graceful motion."
+    },
+    {
+      id: "enchanted-mirror",
+      url: "/templates/enchanted-mirror/",
+      title: "Enchanted Mirror",
+      category: "Save the Date",
+      thumbnailFile: "enchanted mirror template.webp",
+      description: "A dreamy mirror-inspired invitation with a luxurious and magical reveal."
+    },
+    {
+      id: "moonlit-lotus",
+      url: "/templates/moonlit-lotus/",
+      title: "Moonlit Lotus",
+      category: "Save the Date",
+      thumbnailFile: "moonlit lotus thumbnail.webp",
+      description: "A refined lotus-themed design with calm night tones and elegant movement."
+    },
+    {
+      id: "royal-radiance",
+      url: "/templates/royal-radiance/",
+      title: "Royal Radiance",
+      category: "Save the Date",
+      thumbnailFile: "royal radiance thumbnail'.webp",
+      description: "A grand chandelier-inspired Save the Date invitation with rich royal styling."
+    }
+  ];
+
+  var STD_THUMBNAILS_DIR = "/save-the-date-thumbnails/";
+
+  function stdThumbnailUrl(filename) {
+    if (!filename) return "";
+    return STD_THUMBNAILS_DIR + encodeURIComponent(filename);
+  }
+
+  function getSaveTheDateThumbnail(tpl) {
+    return stdThumbnailUrl(tpl && tpl.thumbnailFile);
+  }
+
   function formatRupee(n) {
     return "₹" + n.toLocaleString("en-IN");
   }
@@ -145,12 +201,46 @@
     );
   }
 
+  function renderSaveTheDateCard(tpl) {
+    var thumbUrl = getSaveTheDateThumbnail(tpl);
+    return (
+      '<article class="tpl-card card std-card" data-id="' + tpl.id + '" data-demo-url="' + tpl.url + '" data-preview="' + thumbUrl + '" data-title="' + tpl.title + '" data-category="' + tpl.category + '" data-description="' + tpl.description.replace(/"/g, "&quot;") + '" data-amount-paise="' + (SAVE_THE_DATE_PRICE * 100) + '" data-old-price="' + SAVE_THE_DATE_OLD_PRICE + '">' +
+        '<div class="tpl-card-inner">' +
+          '<div class="tpl-preview-wrap">' +
+            '<div class="std-phone-preview">' +
+              '<div class="std-phone-screen">' +
+                '<img class="std-template-thumbnail std-thumb--' + tpl.id + '" src="' + thumbUrl + '" alt="' + tpl.title + ' preview" loading="lazy" decoding="async">' +
+              '</div>' +
+              '<img class="std-phone-frame" src="/assets/save-the-date-phone-frame.png" alt="" aria-hidden="true">' +
+            '</div>' +
+          '</div>' +
+          '<div class="tpl-body">' +
+            '<span class="save-badge">Save 50%</span>' +
+            '<h3 class="tpl-name">' + tpl.title + '</h3>' +
+            '<p class="tpl-category">' + tpl.description + '</p>' +
+            '<div class="tpl-pricing"><span class="old-price">' + formatRupee(SAVE_THE_DATE_OLD_PRICE) + '</span><span class="current-price">' + formatRupee(SAVE_THE_DATE_PRICE) + '</span></div>' +
+            '<div class="tpl-actions card-actions">' +
+              '<button type="button" class="btn btn-primary btn-customize">Customize Design</button>' +
+              '<button type="button" class="btn btn-ghost btn-watch demo-btn">Watch Demo</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</article>'
+    );
+  }
+
   function renderCatalog(container, filterFeatured) {
     if (!container) return;
     var list = filterFeatured
       ? TEMPLATES.filter(function (t) { return t.featured; }).slice(0, 6)
       : TEMPLATES;
     container.innerHTML = list.map(renderCard).join("");
+    equalizeCardHeights(container);
+  }
+
+  function renderSaveTheDateCatalog(container) {
+    if (!container) return;
+    container.innerHTML = SAVE_THE_DATE_TEMPLATES.map(renderSaveTheDateCard).join("");
     equalizeCardHeights(container);
   }
 
@@ -293,7 +383,10 @@
       }
       var modalPricing = document.querySelector("#demo-modal .modal-pricing");
       if (!modalPricing) return;
-      if (card.getAttribute("data-amount-paise") && Number(card.getAttribute("data-amount-paise")) !== PRICE * 100) {
+      var oldPriceAttr = card.getAttribute("data-old-price");
+      if (oldPriceAttr) {
+        modalPricing.innerHTML = '<span class="old-price">' + formatRupee(Number(oldPriceAttr)) + '</span><span class="current-price">' + formatRupee(Number(amountPaise) / 100) + '</span>';
+      } else if (card.getAttribute("data-amount-paise") && Number(card.getAttribute("data-amount-paise")) !== PRICE * 100) {
         modalPricing.innerHTML = '<span class="current-price">' + formatRupee(Number(amountPaise) / 100) + '</span>';
       } else {
         modalPricing.innerHTML = '<span class="old-price">' + formatRupee(OLD_PRICE) + '</span><span class="current-price">' + formatRupee(PRICE) + '</span>';
@@ -637,9 +730,12 @@
 
   global.Dvites = {
     TEMPLATES: TEMPLATES,
+    SAVE_THE_DATE_TEMPLATES: SAVE_THE_DATE_TEMPLATES,
     EMAIL: EMAIL,
     PRICE: PRICE,
+    SAVE_THE_DATE_PRICE: SAVE_THE_DATE_PRICE,
     renderCatalog: renderCatalog,
+    renderSaveTheDateCatalog: renderSaveTheDateCatalog,
     enquiryMail: enquiryMail,
     buyMail: buyMail,
     init: function () {
@@ -656,8 +752,10 @@
       global.addEventListener("resize", function () {
         var featured = document.getElementById("featured-catalog");
         var full = document.getElementById("full-catalog");
+        var std = document.getElementById("std-catalog");
         if (featured) equalizeCardHeights(featured);
         if (full) equalizeCardHeights(full);
+        if (std) equalizeCardHeights(std);
       });
     }
   };

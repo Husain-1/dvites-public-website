@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+// REPLACE CLIENT DATA: title
+// REPLACE CLIENT DATA: couple name
+// REPLACE CLIENT DATA: date
+// REPLACE CLIENT DATA: venue
+// REPLACE CLIENT DATA: city
+// REPLACE CLIENT DATA: location
+// REPLACE CLIENT DATA: CTA text
+// REPLACE CLIENT DATA: calendar URL
+window.__STD_CONFIG__ = {
+  "title": "Save the Date",
+  "coupleName": "Tanya & Rohan",
+  "date": "12 December 2026",
+  "venue": "The Grand Palace, New Delhi",
+  "city": "New Delhi, India",
+  "location": "New Delhi, India",
+  "ctaText": "Save to Google Calendar",
+  "calendarUrl": "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Tanya%20%26%20Rohan%20%E2%80%94%20Save%20the%20Date&dates=20261212/20261213&details=Formal+invitation+to+follow.&location=The%20Grand%20Palace%2C%20New%20Delhi"
+};
+(function () {
+  if (new URLSearchParams(location.search).get("preview") === "1") {
+    window.__STD_GALLERY_MODE__ = true;
+    document.documentElement.classList.add("dvites-preview");
+  }
+})();
+</script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="theme-color" content="#6c2a3d" />
+<title>Blossom Touch — Digital Save the Date Invitation | Dvites</title>
+<meta name="description" content="A luxurious blossom-themed digital save-the-date invitation with music, elegant animations and calendar integration." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" />
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" /></noscript>
+<link rel="preload" as="image" href="./assets/images/petal.webp" />
+<link rel="preload" as="image" href="./assets/images/save-the-date-background.webp" />
+<link rel="preload" as="image" href="./assets/images/blossom-touch.webp" />
+<link rel="stylesheet" href="./assets/css/styles.css" />
+
+<style>
+html.dvites-preview body { overflow: auto !important; touch-action: auto !important; }
+html.dvites-preview .intro { display: none !important; }
+html.dvites-preview .stage,
+html.dvites-preview .card { pointer-events: none !important; }
+html.dvites-preview #stdMusicBtn { display: none !important; }
+html.dvites-preview .feather-layer { opacity: 0 !important; pointer-events: none !important; }
+</style>
+
+<meta property="og:title" content="Tanya &amp; Rohan — Save the Date">
+<meta property="og:description" content="Tanya &amp; Rohan are getting married. Save the date!">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tanya &amp; Rohan — Save the Date">
+<meta name="twitter:description" content="Tanya &amp; Rohan are getting married. Save the date!">
+<meta property="og:image" content="./assets/images/og-image.png">
+<meta name="twitter:image" content="./assets/images/og-image.png">
+<meta property="og:site_name" content="Dvites">
+</head>
+<body>
+<div id="root"></div>
+
+<script src="./assets/js/app.js"></script>
+
+<style>
+#stdMusicBtn {
+  position: fixed;
+  right: 14px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.55);
+  background: rgba(10,10,10,0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #fbf4e3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 200ms ease, background 200ms ease;
+}
+#stdMusicBtn:active { transform: scale(0.92); }
+#stdMusicBtn svg { width: 18px; height: 18px; }
+#stdMusicBtn .std-music-bar {
+  display: inline-block;
+  width: 2px;
+  height: 12px;
+  background: currentColor;
+  margin: 0 1px;
+  border-radius: 1px;
+  animation: stdMusicBars 1s ease-in-out infinite;
+  transform-origin: bottom;
+}
+#stdMusicBtn .std-music-bar:nth-child(2) { animation-delay: 0.18s; }
+#stdMusicBtn .std-music-bar:nth-child(3) { animation-delay: 0.36s; }
+#stdMusicBtn.is-paused .std-music-bar { animation-play-state: paused; transform: scaleY(0.5); }
+@keyframes stdMusicBars {
+  0%, 100% { transform: scaleY(0.45); }
+  50%      { transform: scaleY(1); }
+}
+</style>
+<audio id="stdBgAudio" src="./assets/audio/background-music.mp3" loop preload="metadata" playsinline></audio>
+<button id="stdMusicBtn" class="is-paused" aria-label="Toggle music">
+  <span class="std-music-bar"></span><span class="std-music-bar"></span><span class="std-music-bar"></span>
+</button>
+<script>
+(function () {
+  var audio = document.getElementById('stdBgAudio');
+  var btn   = document.getElementById('stdMusicBtn');
+  if (!audio || !btn) return;
+
+  var isPreview = new URLSearchParams(location.search).get('preview') === '1';
+  if (isPreview) {
+    audio.muted = true;
+    btn.style.display = 'none';
+    return;
+  }
+
+  audio.volume = 0.55;
+  var started = false;
+
+  function play() {
+    var p = audio.play();
+    if (p && typeof p.then === 'function') {
+      p.then(function () { btn.classList.remove('is-paused'); started = true; })
+       .catch(function () { btn.classList.add('is-paused'); });
+    } else {
+      btn.classList.remove('is-paused');
+      started = true;
+    }
+  }
+  function pause() {
+    audio.pause();
+    btn.classList.add('is-paused');
+  }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (audio.paused) play(); else pause();
+  });
+
+  function firstTap() {
+    if (started) return;
+    play();
+    document.removeEventListener('pointerdown', firstTap, true);
+    document.removeEventListener('touchstart',  firstTap, true);
+    document.removeEventListener('click',       firstTap, true);
+  }
+  document.addEventListener('pointerdown', firstTap, true);
+  document.addEventListener('touchstart',  firstTap, true);
+  document.addEventListener('click',       firstTap, true);
+})();
+</script>
+<script>
+(function () {
+  var isPreview = new URLSearchParams(location.search).get("preview") === "1";
+  if (!isPreview) return;
+
+  function muteMedia() {
+    document.querySelectorAll("video, audio").forEach(function (el) {
+      el.muted = true;
+      try { el.pause(); } catch (e) {}
+    });
+  }
+
+  function revealPreview() {
+    muteMedia();
+    var intro = document.querySelector(".intro");
+    if (intro) intro.remove();
+    var card = document.querySelector(".card");
+    if (card) {
+      card.classList.add("in", "revealed");
+    }
+    document.querySelectorAll(".cta").forEach(function (el) {
+      el.classList.add("show");
+    });
+    var feathers = document.querySelector(".feather-layer");
+    if (feathers) {
+      feathers.style.opacity = "0";
+      feathers.style.pointerEvents = "none";
+    }
+    var hint = document.querySelector(".reveal-hint");
+    if (hint) hint.style.opacity = "0";
+    document.body.classList.remove("interacting");
+  }
+
+  function waitForPreview() {
+    if (document.querySelector(".card")) {
+      setTimeout(revealPreview, 500);
+      return;
+    }
+    requestAnimationFrame(waitForPreview);
+  }
+
+  waitForPreview();
+  setInterval(muteMedia, 800);
+})();
+</script>
+</body>
+</html>

@@ -676,6 +676,154 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 /* Page hero (templates / partner) */
+.std-intro-stats {
+  padding-top: 0;
+  padding-bottom: 36px;
+}
+
+.std-page-hero {
+  padding-bottom: 28px;
+}
+
+/* Save the Date catalogue — layered iPhone mockup previews */
+#std-catalog .tpl-card-inner {
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: none;
+  gap: 0;
+  padding: 0;
+  align-items: stretch;
+}
+
+#std-catalog .tpl-preview-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 24px 20px 18px;
+  background: linear-gradient(180deg, var(--ivory-soft), var(--ivory-card));
+  pointer-events: none;
+}
+
+#std-catalog .std-phone-preview {
+  position: relative;
+  width: min(calc(100% - 24px), 210px);
+  aspect-ratio: 473 / 985;
+  margin: 0 auto;
+  flex-shrink: 0;
+  filter: drop-shadow(0 14px 28px rgba(58, 36, 49, 0.14));
+  animation: std-phone-float 5.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+#std-catalog .std-card:nth-child(1) .std-phone-preview { animation-delay: 0s; }
+#std-catalog .std-card:nth-child(2) .std-phone-preview { animation-delay: 0.9s; }
+#std-catalog .std-card:nth-child(3) .std-phone-preview { animation-delay: 1.8s; }
+#std-catalog .std-card:nth-child(4) .std-phone-preview { animation-delay: 2.7s; }
+#std-catalog .std-card:nth-child(5) .std-phone-preview { animation-delay: 3.6s; }
+
+@keyframes std-phone-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+#std-catalog .std-phone-screen {
+  position: absolute;
+  inset: 0.7% 1.9% 0.6% 2.1%;
+  overflow: hidden;
+  border-radius: 11.5% / 5.8%;
+  background: transparent;
+  z-index: 1;
+}
+
+#std-catalog .std-template-thumbnail {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center top;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #std-catalog .std-phone-preview {
+    animation: none;
+    will-change: auto;
+  }
+}
+
+#std-catalog .std-phone-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 2;
+}
+
+#std-catalog .tpl-body {
+  padding: 6px 20px 20px;
+  text-align: center;
+  align-items: center;
+}
+
+#std-catalog .save-badge {
+  align-self: center;
+}
+
+#std-catalog .tpl-name {
+  width: 100%;
+}
+
+#std-catalog .tpl-category {
+  width: 100%;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#std-catalog .tpl-pricing {
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  #std-catalog .std-phone-preview {
+    width: min(100%, 240px);
+  }
+
+  #std-catalog .tpl-preview-wrap {
+    padding: 28px 20px 20px;
+  }
+
+  #std-catalog .tpl-body {
+    padding: 8px 22px 22px;
+  }
+}
+
+@media (min-width: 1024px) {
+  #std-catalog .std-phone-preview {
+    width: min(100%, 290px);
+  }
+
+  #std-catalog .tpl-preview-wrap {
+    padding: 32px 24px 22px;
+  }
+}
+
+@media (max-width: 520px) {
+  #std-catalog .tpl-card-inner {
+    grid-template-columns: none;
+    gap: 0;
+    padding: 0;
+  }
+
+  #std-catalog .std-phone-preview {
+    width: min(calc(100% - 32px), 200px);
+  }
+}
+
 .page-hero {
   padding: 48px 0 32px;
   text-align: center;
