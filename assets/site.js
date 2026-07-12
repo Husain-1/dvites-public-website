@@ -42,6 +42,16 @@
       featured: true
     },
     {
+      id: "pichwai-royal",
+      url: "/templates/pichwai-royal/",
+      title: "Pichwai Royal",
+      category: "Royal Wedding",
+      tags: ["royal"],
+      preview: "/templates/pichwai-royal/assets/images/meet_the_couple/meet_the_couple_bg.webp",
+      description: "A luxurious Pichwai-inspired royal wedding invitation with cinematic animations.",
+      featured: false
+    },
+    {
       id: "laavan",
       url: "/templates/laavan/",
       title: "Laavan",

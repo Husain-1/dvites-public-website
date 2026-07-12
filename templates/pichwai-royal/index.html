@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Tanya &amp; Rohan's Wedding | Dvites</title>
+  <meta name="description" content="A premium digital wedding invitation crafted by Dvites.">
+  <meta property="og:title" content="Tanya &amp; Rohan's Wedding | Dvites">
+  <meta property="og:description" content="A premium digital wedding invitation crafted by Dvites.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Dvites">
+  <meta property="og:image" content="./assets/images/demo-1.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Tanya &amp; Rohan's Wedding | Dvites">
+  <meta name="twitter:description" content="A premium digital wedding invitation crafted by Dvites.">
+  <meta name="twitter:image" content="./assets/images/demo-1.webp">
+  <link rel="icon" href="/assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cinzel:wght@400;500;600&family=Pinyon+Script&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="video" href="./assets/video/intro.mp4">
+  <link rel="preload" as="video" href="./assets/video/hero.mp4">
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <!-- TEMPORARY: Dvites preview bar styles — remove when publishing -->
+  <style id="dvites-preview-bar-styles">
+    :root { --dvites-preview-h: 48px; }
+    .dvites-preview-bar {
+      position: relative;
+      z-index: 120;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: var(--dvites-preview-h);
+      padding: 8px 16px;
+      background: rgba(35, 20, 26, 0.92);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-family: Inter, system-ui, sans-serif;
+    }
+    .dvites-preview-brand { font-weight: 700; font-size: 14px; letter-spacing: 0.04em; white-space: nowrap; }
+    .dvites-preview-copy { flex: 1; text-align: center; font-size: 13px; opacity: 0.92; }
+    .dvites-preview-bar a {
+      text-decoration: none;
+      background: #c4985a;
+      color: #1a1420;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    body.intro-active .intro {
+      top: var(--dvites-preview-h);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: calc(100vh - var(--dvites-preview-h));
+      height: calc(100dvh - var(--dvites-preview-h));
+    }
+    body.intro-active {
+      height: 100vh;
+      height: 100dvh;
+    }
+    @media (max-width: 640px) {
+      :root { --dvites-preview-h: 88px; }
+      .dvites-preview-bar { flex-wrap: wrap; justify-content: center; padding: 10px 12px; }
+      .dvites-preview-copy { width: 100%; order: 3; }
+      .dvites-preview-bar a { width: 100%; text-align: center; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body class="intro-active">
+
+<!-- TEMPORARY: Dvites preview strip — remove when publishing -->
+<div class="dvites-preview-bar" id="dvites-preview-bar">
+  <span class="dvites-preview-brand">Dvites Preview</span>
+  <span class="dvites-preview-copy">Personalize this invitation in minutes.</span>
+  <a href="/templates.html">Buy Now</a>
+</div>
+
+<section class="intro" id="intro" role="button" tabindex="0" aria-label="Ring the bell to begin the celebration">
+  <video class="intro-video" id="introVideo" muted playsinline webkit-playsinline="true" x5-playsinline="true" disableRemotePlayback preload="auto" aria-hidden="true">
+    <source src="./assets/video/intro.mp4" type="video/mp4">
+  </video>
+  <div class="intro-hint" id="introHint" aria-hidden="true">
+    <p class="intro-hint-label">Ring the bell</p>
+    <p class="intro-hint-sub">to begin the celebration</p>
+  </div>
+  <div class="intro-vignette" aria-hidden="true"></div>
+</section>
+
+<div class="screen-bloom" id="screenBloom" aria-hidden="true"></div>
+
+<main class="page" id="page" aria-hidden="true">
+
+  <section class="section hero-section" id="hero" aria-label="Tanya and Rohan">
+    <div class="hero-bg" aria-hidden="true">
+      <video class="hero-video" id="heroVideo" autoplay muted loop playsinline webkit-playsinline="true" disableRemotePlayback preload="auto">
+        <source src="./assets/video/hero.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="hero-content" id="heroContent">
+      <h1 class="hero-names">
+        <span class="hero-name" id="heroBride">Tanya</span>
+        <span class="hero-amp" aria-hidden="true">&amp;</span>
+        <span class="hero-name" id="heroGroom">Rohan</span>
+      </h1>
+      <div class="hero-divider" aria-hidden="true">
+        <img class="hero-divider-img" src="./assets/images/hero/border.webp" alt="" decoding="async" draggable="false">
+      </div>
+      <div class="hero-meta">
+        <p class="hero-date" id="heroDate">12<sup class="date-ord">th</sup> Dec 2026</p>
+        <p class="hero-venue" id="heroVenue">The Oberoi Udaivilas, Udaipur</p>
+      </div>
+    </div>
+    <a class="hero-scroll" href="#invite" aria-label="Scroll to invitation">
+      <span class="hero-scroll-label">Scroll</span>
+      <span class="hero-scroll-chevrons" aria-hidden="true"><span class="hero-chevron"></span><span class="hero-chevron"></span><span class="hero-chevron"></span></span>
+    </a>
+  </section>
+
+  <section class="section invite-section" id="invite" aria-labelledby="inviteNames">
+    <div class="invite-bg" aria-hidden="true"><img src="./assets/images/invite/invite_bg.webp" alt="" decoding="async" draggable="false"></div>
+    <img class="invite-fg" src="./assets/images/invite/invite_fg.webp" alt="" aria-hidden="true" decoding="async" draggable="false">
+    <div class="invite-card reveal-item" id="inviteCard">
+      <img class="invite-card-frame" src="./assets/images/invite/invite_card.webp" alt="" aria-hidden="true" decoding="async" draggable="false">
+      <div class="invite-card-text">
+        <p class="invite-overline">With the blessings of the divine</p>
+        <div class="invite-grandparents" id="inviteGrandparents" hidden></div>
+        <p class="invite-kicker">we request the honour of your presence<br>at the wedding celebration of</p>
+        <img class="invite-rule" src="./assets/images/invite/element_1.webp" alt="" aria-hidden="true" decoding="async" draggable="false">
+        <h2 class="invite-names" id="inviteNames">
+          <span class="invite-person"><span class="invite-name">Tanya</span><span class="invite-parent">(D/O Mr. Rajesh Sharma &amp; Mrs. Kavita Sharma)</span></span>
+          <span class="invite-amp" aria-hidden="true">&amp;</span>
+          <span class="invite-person"><span class="invite-name">Rohan</span><span class="invite-parent">(S/O Mr. Sanjay Kapoor &amp; Mrs. Neeta Kapoor)</span></span>
+        </h2>
+        <img class="invite-rule" src="./assets/images/invite/element_1.webp" alt="" aria-hidden="true" decoding="async" draggable="false">
+        <div class="invite-meta">
+          <p class="invite-date" id="inviteDate">12<sup class="date-ord">th</sup> December 2026</p>
+          <p class="invite-venue" id="inviteVenue">The Oberoi Udaivilas, Udaipur</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section events-section" id="events" aria-labelledby="eventsTitle">
+    <div class="events-decor" aria-hidden="true">
+      <img class="evt-decor evt-decor--jhoomer evt-decor--jhoomer-l" src="./assets/images/others/event_3.webp" alt="" decoding="async" loading="lazy" draggable="false">
+      <img class="evt-decor evt-decor--jhoomer evt-decor--jhoomer-r" src="./assets/images/others/event_3.webp" alt="" decoding="async" loading="lazy" draggable="false">
+      <img class="evt-decor evt-decor--chandelier evt-decor--chandelier-1" src="./assets/images/others/event_1.webp" alt="" decoding="async" loading="lazy" draggable="false">
+      <img class="evt-decor evt-decor--chandelier evt-decor--chandelier-2" src="./assets/images/others/event_1.webp" alt="" decoding="async" loading="lazy" draggable="false">
+      <img class="evt-decor evt-decor--nazar evt-decor--nazar-1" src="./assets/images/others/event_6.webp" alt="" decoding="async" loading="lazy" draggable="false">
+      <img class="evt-decor evt-decor--nazar evt-decor--nazar-2" src="./assets/images/others/event_6.webp" alt="" decoding="async" loading="lazy" draggable="false">
+      <img class="evt-decor evt-decor--nazar evt-decor--nazar-3" src="./assets/images/others/event_6.webp" alt="" decoding="async" loading="lazy" draggable="false">
+      <img class="evt-decor evt-decor--peacock" src="./assets/images/others/event_4.webp" alt="" decoding="async" loading="lazy" draggable="false">
+      <img class="evt-decor evt-decor--camel" src="./assets/images/others/event_2.webp" alt="" decoding="async" loading="lazy" draggable="false">
+      <img class="evt-decor evt-decor--horse" src="./assets/images/others/event_5.webp" alt="" decoding="async" loading="lazy" draggable="false">
+    </div>
+    <div class="events-header reveal-item">
+      <p class="events-eyebrow">Celebration Journey</p>
+      <h2 class="events-title" id="eventsTitle">Our Events</h2>
+      <img class="events-title-rule" src="./assets/images/events/border_4.webp" alt="" aria-hidden="true" decoding="async" draggable="false">
+    </div>
+    <div class="events-list" id="eventsList" role="list" aria-label="Wedding events"></div>
+  </section>
+
+  <section class="section couple-section" id="couple" aria-labelledby="coupleTitle">
+    <div class="couple-bg" aria-hidden="true"><img src="./assets/images/meet_the_couple/meet_the_couple_bg.webp" alt="" decoding="async" draggable="false"></div>
+    <div class="couple-content">
+      <div class="couple-butterfly couple-butterfly--1" aria-hidden="true"><span class="couple-butterfly-clip"><img class="couple-butterfly-sheet" src="./assets/images/meet_the_couple/butterfly_2.webp" alt="" decoding="async" draggable="false"></span></div>
+      <div class="couple-butterfly couple-butterfly--2" aria-hidden="true"><span class="couple-butterfly-clip"><img class="couple-butterfly-sheet" src="./assets/images/meet_the_couple/butterfly.webp" alt="" decoding="async" draggable="false"></span></div>
+      <div class="couple-header">
+        <p class="couple-eyebrow">A love story</p>
+        <h2 class="couple-title" id="coupleTitle">Meet the Couple</h2>
+        <img class="couple-ornament" src="./assets/images/meet_the_couple/border_3.webp" alt="" aria-hidden="true" decoding="async" draggable="false">
+      </div>
+      <div class="couple-story">
+        <p class="couple-story-body" id="coupleStory">A monsoon evening in Udaipur, a marigold archway, and a girl laughing in the rain — that was all it took.</p>
+        <div class="couple-tags" id="coupleTags" aria-hidden="true"></div>
+        <p class="couple-hashtag" id="coupleHashtag" hidden></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section gallery-section" id="gallery" aria-labelledby="galleryTitle">
+    <div class="gallery-bg" aria-hidden="true"><img src="./assets/images/gallery/gallery_bg.webp" alt="" decoding="async" draggable="false"></div>
+    <div class="gallery-inner">
+      <div class="gallery-header reveal-item">
+        <span class="gallery-flourish gallery-flourish--top" aria-hidden="true"></span>
+        <h2 class="gallery-title" id="galleryTitle">Gallery</h2>
+        <span class="gallery-flourish gallery-flourish--bot" aria-hidden="true"></span>
+      </div>
+      <div class="gallery-featured reveal-item" id="galleryFeatured" role="button" tabindex="0" aria-label="View photo full screen">
+        <img class="gallery-featured-photo" id="galleryFeaturedPhoto" alt="" decoding="async" loading="lazy">
+        <img class="gallery-featured-art" src="./assets/images/gallery/gallery_outerframe.webp" alt="" aria-hidden="true" decoding="async">
+        <button class="gallery-arrow gallery-arrow--prev" id="galleryPrev" type="button" aria-label="Previous photo"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="gallery-arrow gallery-arrow--next" id="galleryNext" type="button" aria-label="Next photo"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <p class="gallery-caption" id="galleryCaption">Moments we love</p>
+      <div class="gallery-dots" id="galleryDots" role="tablist" aria-label="Gallery navigation"></div>
+      <div class="gallery-thumbs" id="galleryThumbs" role="list" aria-label="Photo thumbnails"></div>
+    </div>
+    <div class="gallery-lightbox" id="galleryLightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+      <button class="gallery-lb-close" id="galleryLbClose" aria-label="Close">&#x2715;</button>
+      <button class="gallery-lb-prev" id="galleryLbPrev" aria-label="Previous photo">&#8249;</button>
+      <button class="gallery-lb-next" id="galleryLbNext" aria-label="Next photo">&#8250;</button>
+      <div class="gallery-lb-inner">
+        <img class="gallery-lb-img" id="galleryLbImg" alt="" decoding="async">
+        <p class="gallery-lb-caption" id="galleryLbCaption"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section ttk-section" id="things" aria-labelledby="ttkTitle">
+    <div class="ttk-atm" aria-hidden="true"></div>
+    <div class="ttk-orb ttk-orb--1" aria-hidden="true"></div>
+    <div class="ttk-orb ttk-orb--2" aria-hidden="true"></div>
+    <div class="ttk-orb ttk-orb--3" aria-hidden="true"></div>
+    <div class="ttk-inner">
+      <div class="ttk-header reveal-item">
+        <p class="ttk-eyebrow">Guest Essentials</p>
+        <h2 class="ttk-title" id="ttkTitle">Things to Know</h2>
+        <img class="ttk-title-rule" src="./assets/images/ttk/border_2.webp" alt="" aria-hidden="true" decoding="async" draggable="false">
+        <p class="ttk-subline">A few thoughtful details to help you celebrate with ease.</p>
+      </div>
+      <ul class="ttk-grid" id="ttkGrid" role="list" aria-label="Guest information cards"></ul>
+    </div>
+  </section>
+
+  <section class="section rsvp-section" id="rsvp" aria-labelledby="rsvpHeadline">
+    <div class="rsvp-bg" aria-hidden="true"></div>
+    <div class="rsvp-veil" aria-hidden="true"></div>
+    <canvas class="rsvp-fireworks" id="rsvpFireworks" aria-hidden="true"></canvas>
+    <div class="rsvp-content">
+      <p class="rsvp-eyebrow rsvp-reveal">Join the celebration</p>
+      <h2 class="rsvp-headline rsvp-reveal" id="rsvpHeadline">Will you join us?</h2>
+      <p class="rsvp-body rsvp-reveal" id="rsvpBody">We've saved a seat for you — at our table, in our hearts, and under the royal sky. Come celebrate with us as we begin this new chapter together.</p>
+      <div class="rsvp-cta-wrap rsvp-reveal">
+        <a class="rsvp-btn" id="rsvpBtn" href="#" target="_blank" rel="noreferrer"><span class="rsvp-btn-inner" id="rsvpBtnText">Yes, I'll be there</span></a>
+        <p class="rsvp-helper" id="rsvpHelper">You'll be redirected to WhatsApp to confirm your attendance.</p>
+      </div>
+      <div class="rsvp-std rsvp-reveal">
+        <p class="rsvp-std-heading">Save the Date</p>
+        <div class="rsvp-std-btns">
+          <a class="rsvp-cal-btn" id="rsvpGcalBtn" href="#" target="_blank" rel="noreferrer">
+            <svg class="rsvp-cal-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="3" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 1v4M13 1v4M2 8h16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Google Calendar
+          </a>
+          <a class="rsvp-cal-btn" id="rsvpIcalBtn" href="#" download="tanya-rohan-wedding.ics">
+            <svg class="rsvp-cal-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="3" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 1v4M13 1v4M2 8h16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M10 11v3M8.5 14h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Apple Calendar
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section countdown-section" id="countdown" aria-labelledby="countdownTitle">
+    <div class="cd-glow cd-glow--l" aria-hidden="true"></div>
+    <div class="cd-glow cd-glow--r" aria-hidden="true"></div>
+    <div class="countdown-header reveal-item">
+      <h2 class="countdown-title" id="countdownTitle"><span class="cd-title-lead">Counting Down to</span><span class="cd-title-forever">Forever</span></h2>
+      <img class="countdown-title-rule" src="./assets/images/events/border_4.webp" alt="" aria-hidden="true" decoding="async" draggable="false">
+    </div>
+    <div class="countdown-stage reveal-item">
+      <div class="countdown-frame">
+        <img class="countdown-art" src="./assets/images/invite/countdown.webp" alt="" decoding="async" draggable="false">
+        <div class="countdown-cells" id="countdownCells" role="timer" aria-label="Time remaining until the wedding">
+          <div class="cd-cell cd-cell--1"><span class="cd-num" id="cdDays">00</span><span class="cd-label">Days</span></div>
+          <div class="cd-cell cd-cell--2"><span class="cd-num" id="cdHours">00</span><span class="cd-label">Hours</span></div>
+          <div class="cd-cell cd-cell--3"><span class="cd-num" id="cdMins">00</span><span class="cd-label">Minutes</span></div>
+          <div class="cd-cell cd-cell--4"><span class="cd-num" id="cdSecs">00</span><span class="cd-label">Seconds</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer" id="siteFooter" aria-label="Footer">
+  <img class="ft-border" src="./assets/images/invite/border_5.webp" alt="" aria-hidden="true" decoding="async" draggable="false">
+  <p class="ft-names"><span class="ft-name" id="ftBride">Tanya</span><span class="ft-amp" aria-hidden="true">&amp;</span><span class="ft-name" id="ftGroom">Rohan</span></p>
+  <p class="ft-date" id="ftDate">12<sup class="date-ord">th</sup> December 2026</p>
+  <p class="ft-tagline">Forever begins today</p>
+  <div class="ft-bottom-rule" aria-hidden="true"></div>
+  <p class="ft-credit">Crafted by <a href="https://dvites.digicrave.in" target="_blank" rel="noopener">Dvites</a></p>
+</footer>
+
+<div class="fab-cluster" id="fabCluster" aria-label="Site controls">
+  <nav class="nav-panel" id="navPanel" aria-label="Page sections" aria-hidden="true">
+    <div class="nav-panel-head" aria-hidden="true"><span class="nav-panel-eyebrow">Explore</span><span class="nav-panel-rule"></span></div>
+    <a class="nav-link" href="#hero"><span class="nav-link-label">Home</span></a>
+    <a class="nav-link" href="#invite"><span class="nav-link-label">Invitation</span></a>
+    <a class="nav-link" href="#events"><span class="nav-link-label">Events</span></a>
+    <a class="nav-link" href="#couple"><span class="nav-link-label">Meet the Couple</span></a>
+    <a class="nav-link" href="#gallery"><span class="nav-link-label">Gallery</span></a>
+    <a class="nav-link" href="#things"><span class="nav-link-label">Things to Know</span></a>
+    <a class="nav-link" href="#rsvp"><span class="nav-link-label">RSVP</span></a>
+    <a class="nav-link" href="#countdown"><span class="nav-link-label">Countdown</span></a>
+  </nav>
+  <button class="fab fab-music" id="musicToggle" type="button" aria-label="Pause music" aria-pressed="true">
+    <img class="fab-img" src="./assets/images/others/music_button.webp" alt="" aria-hidden="true" decoding="async" draggable="false">
+  </button>
+  <button class="fab fab-nav" id="navToggle" type="button" aria-label="Open navigation" aria-expanded="false">
+    <img class="fab-img" src="./assets/images/others/navigation_button.webp" alt="Navigation" decoding="async" draggable="false">
+  </button>
+</div>
+
+<audio id="introAudio" src="./assets/audio/intro_audio.mp3" preload="auto" aria-hidden="true"></audio>
+<audio id="bgMusic" src="./assets/audio/music.mp3" loop preload="none"></audio>
+
+<script src="./assets/js/app.js" defer></script>
+</body>
+</html>
