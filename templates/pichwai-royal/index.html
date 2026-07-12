@@ -22,6 +22,14 @@
   <link rel="preload" as="video" href="./assets/video/intro.mp4">
   <link rel="preload" as="video" href="./assets/video/hero.mp4">
   <link rel="stylesheet" href="./assets/css/style.css">
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get("preview") === "1" || window.self !== window.top) {
+        document.documentElement.classList.add("dvites-embedded-preview");
+      }
+    })();
+  </script>
   <!-- TEMPORARY: Dvites preview bar styles — remove when publishing -->
   <style id="dvites-preview-bar-styles">
     :root { --dvites-preview-h: 48px; }
@@ -71,6 +79,21 @@
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
+    }
+    html.dvites-embedded-preview {
+      --dvites-preview-h: 0px;
+    }
+    html.dvites-embedded-preview #dvites-preview-bar,
+    html.dvites-embedded-preview .dvites-preview-bar {
+      display: none !important;
+    }
+    html.dvites-embedded-preview body.intro-active .intro {
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 100vh;
+      height: 100dvh;
     }
   </style>
 </head>

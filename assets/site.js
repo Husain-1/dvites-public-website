@@ -341,7 +341,16 @@
         if (previewLoading) previewLoading.classList.add("is-hidden");
       }, { once: true });
 
-      iframe.src = pendingDemoUrl;
+      var liveUrl = pendingDemoUrl;
+      if (
+        liveUrl &&
+        liveUrl.indexOf("/templates/pichwai-royal") !== -1 &&
+        global.DvitesPhonePreview &&
+        typeof global.DvitesPhonePreview.previewUrl === "function"
+      ) {
+        liveUrl = global.DvitesPhonePreview.previewUrl(liveUrl);
+      }
+      iframe.src = liveUrl;
     }
 
     if (livePreviewBtn) {
