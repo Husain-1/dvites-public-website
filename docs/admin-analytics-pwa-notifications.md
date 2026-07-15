@@ -416,7 +416,7 @@ Browsers often block audio until the user interacts with the page. If autoplay i
 - [ ] ₹5 test card still completes payment
 - [ ] Thank-you redirect still works
 - [ ] Supabase order still saved
-- [ ] Production ₹1,499 checkout unaffected
+- [ ] Production ₹1,199 checkout unaffected
 
 ### PWA
 - [ ] Install admin app on Android

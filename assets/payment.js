@@ -5,7 +5,7 @@
   var API_CREATE_ORDER = "/api/create-order";
   var API_VERIFY_PAYMENT = "/api/verify-payment";
   var THANK_YOU_PATH = "/thank-you.html";
-  var PRICE_PAISE = 149900;
+  var PRICE_PAISE = 119900;
   var PARTNER_MIN = 3;
   var PARTNER_MAX = 5;
   var PARTNER_DISCOUNT = 0.05;

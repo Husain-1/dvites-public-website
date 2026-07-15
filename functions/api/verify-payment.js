@@ -168,7 +168,7 @@ export async function onRequestPost(context) {
   }
 
   if (!Number.isFinite(amount) || amount <= 0) {
-    amount = 1499;
+    amount = 1199;
   }
 
   const orderRow = {
