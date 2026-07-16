@@ -331,7 +331,7 @@
       if (iframeWrap) iframeWrap.classList.remove("is-hidden");
 
       if (!iframe._dvitesPreviewBound && global.DvitesPhonePreview) {
-        global.DvitesPhonePreview.setup(iframe, { mode: "modal", autoScroll: false });
+        global.DvitesPhonePreview.setup(iframe, { mode: "modal", autoScroll: false, fitScale: true });
         iframe._dvitesPreviewBound = true;
       }
 

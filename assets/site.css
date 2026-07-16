@@ -516,6 +516,14 @@ button { font-family: inherit; cursor: pointer; }
   border-radius: 30px;
 }
 
+.modal-phone-screen {
+  pointer-events: auto;
+}
+
+.modal-phone-screen .phone-iframe-scaler:not(.is-hidden) {
+  pointer-events: auto;
+}
+
 .modal-phone-screen .phone-iframe-scaler iframe,
 .phone-iframe-scaler iframe.is-modal-demo {
   pointer-events: auto;

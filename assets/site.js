@@ -407,7 +407,7 @@
       if (livePreviewBtn) livePreviewBtn.disabled = true;
 
       if (!iframe._dvitesPreviewBound && global.DvitesPhonePreview) {
-        global.DvitesPhonePreview.setup(iframe, { mode: "modal", autoScroll: false });
+        global.DvitesPhonePreview.setup(iframe, { mode: "modal", autoScroll: false, fitScale: true });
       }
 
       iframe.addEventListener("load", function () {
@@ -419,7 +419,6 @@
       var liveUrl = pendingDemoUrl;
       if (
         liveUrl &&
-        liveUrl.indexOf("/templates/pichwai-royal") !== -1 &&
         global.DvitesPhonePreview &&
         typeof global.DvitesPhonePreview.previewUrl === "function"
       ) {

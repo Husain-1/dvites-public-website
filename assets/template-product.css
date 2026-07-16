@@ -237,19 +237,43 @@
   pointer-events: none;
 }
 
+.tp-hero-phone-mock .catalog-phone-screen {
+  background: #0d0d0d;
+  isolation: isolate;
+  pointer-events: auto;
+}
+
 .tp-hero-live-iframe {
   position: absolute;
   inset: 0;
   z-index: 4;
   border-radius: inherit;
   overflow: hidden;
+  background: #0d0d0d;
+  pointer-events: none;
+}
+
+.tp-hero-live-iframe:not(.is-hidden) {
+  pointer-events: auto;
 }
 
 .tp-hero-live-iframe iframe {
+  border: 0;
+  background: transparent;
+  display: block;
+  max-width: none;
+  pointer-events: auto;
+  touch-action: auto;
+}
+
+.tp-hero-live-iframe.phone-iframe-scaler iframe.is-modal-demo {
   width: 100%;
   height: 100%;
-  border: 0;
-  background: #fff;
+  inset: 0;
+  max-width: none;
+  pointer-events: auto;
+  touch-action: auto;
+  transform: none;
 }
 
 .tp-hero-demo-overlay.is-hidden,
@@ -272,8 +296,8 @@
   }
 
   .tp-hero-phone-mock.catalog-phone-preview {
-    width: min(62vw, 210px);
-    --catalog-phone-max-w: 210px;
+    width: min(72vw, 248px);
+    --catalog-phone-max-w: 248px;
   }
 
   .tp-hero-demo-overlay .modal-live-preview-btn {

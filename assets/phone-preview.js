@@ -88,6 +88,7 @@
         MODAL_HIDE + HIDE_RULE +
         "html,html body,body,body.t-body,#main,[data-framer-root],[data-framer-root]>*" +
         "{padding-top:0!important;margin-top:0!important}" +
+        "html,body{overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;overflow-x:hidden!important;overscroll-behavior:contain!important;touch-action:pan-y!important}" +
         ".s-invite,.s-invite .container,.hero-wrap,.hero-pin,.preloader" +
         "{padding-top:0!important;margin-top:0!important}" +
         "[data-invitation-phone-frame] .flex.flex-col.items-center.justify-start{padding-top:0!important}";
@@ -261,7 +262,7 @@
 
   function blockSwipe(doc) {
     if (!doc || !doc.body) return;
-    ["touchstart", "touchmove", "touchend", "pointerdown", "mousedown", "wheel"].forEach(function (type) {
+    ["touchstart", "touchmove", "touchend", "pointerdown", "mousedown"].forEach(function (type) {
       doc.addEventListener(type, function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -269,7 +270,287 @@
     });
   }
 
+  function getScreenEl(iframe) {
+    if (!iframe) return null;
+    return iframe.closest(
+      ".catalog-phone-screen, .phone-screen, .hero-phone-screen, .modal-phone-screen"
+    );
+  }
+
+  function shouldFitScale(iframe, mode) {
+    var opts = iframe._dvitesPreviewOpts || {};
+    if (opts.fitScale === false) return false;
+    if (opts.fitScale === true) return true;
+    if (mode === "preview") return true;
+    return !!iframe.closest(".catalog-phone-screen, .tp-hero-live-iframe, .modal-phone-screen");
+  }
+
+  function isPhoneMockupIframe(iframe) {
+    return !!iframe && !!iframe.closest(".catalog-phone-screen, .modal-phone-screen, .tp-hero-live-iframe");
+  }
+
+  function findScrollableElement(doc, win) {
+    if (!doc || !win) return null;
+
+    var best = null;
+    var bestRange = 0;
+
+    function score(el) {
+      if (!el || el.nodeType !== 1) return 0;
+      try {
+        var range = el.scrollHeight - el.clientHeight;
+        if (range <= 1) return 0;
+        var style = win.getComputedStyle(el);
+        var oy = style.overflowY;
+        if (oy === "auto" || oy === "scroll" || oy === "overlay") return range;
+        if (el.scrollTop > 0) return range;
+        if (el === doc.documentElement || el === doc.body || el === doc.scrollingElement) return range;
+        return range > 80 ? range * 0.35 : 0;
+      } catch (e) {
+        return 0;
+      }
+    }
+
+    function walk(el, depth) {
+      if (!el || depth > 16) return;
+      var s = score(el);
+      if (s > bestRange) {
+        bestRange = s;
+        best = el;
+      }
+      var child = el.firstElementChild;
+      while (child) {
+        walk(child, depth + 1);
+        child = child.nextElementSibling;
+      }
+    }
+
+    [doc.scrollingElement, doc.documentElement, doc.body, doc.getElementById("root")].forEach(function (el) {
+      if (el) walk(el, 0);
+    });
+
+    return best;
+  }
+
+  function applyMockupScroll(iframe, delta) {
+    try {
+      var win = iframe.contentWindow;
+      var doc = iframe.contentDocument;
+      if (!win || !doc) return false;
+
+      var el = findScrollableElement(doc, win);
+      if (el) {
+        var max = Math.max(0, el.scrollHeight - el.clientHeight);
+        var next = Math.max(0, Math.min(max, el.scrollTop + delta));
+        if (next !== el.scrollTop) {
+          el.scrollTop = next;
+          return true;
+        }
+      }
+
+      var before = win.scrollY || doc.documentElement.scrollTop || (doc.body ? doc.body.scrollTop : 0) || 0;
+      win.scrollBy(0, delta);
+      var after = win.scrollY || doc.documentElement.scrollTop || (doc.body ? doc.body.scrollTop : 0) || 0;
+      return after !== before;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function injectIframeWheelBridge(iframe) {
+    try {
+      var doc = iframe.contentDocument;
+      var win = iframe.contentWindow;
+      if (!doc || !win) return;
+
+      if (typeof iframe._dvitesInnerWheelCleanup === "function") {
+        iframe._dvitesInnerWheelCleanup();
+        iframe._dvitesInnerWheelCleanup = null;
+      }
+
+      function onWheel(event) {
+        if (applyMockupScroll(iframe, wheelDelta(event))) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      }
+
+      doc.addEventListener("wheel", onWheel, { passive: false, capture: true });
+      iframe._dvitesInnerWheelCleanup = function () {
+        doc.removeEventListener("wheel", onWheel, true);
+      };
+    } catch (e) { /* noop */ }
+  }
+
+  function getCatalogBaseWidth(doc) {
+    if (!doc) return 390;
+    var meta = doc.querySelector('meta[name="viewport"]');
+    if (meta) {
+      var content = meta.getAttribute("content") || "";
+      var widthMatch = content.match(/width\s*=\s*(\d+)/i);
+      if (widthMatch) return parseInt(widthMatch[1], 10);
+    }
+    return 390;
+  }
+
+  function injectCatalogViewport(doc, width, scale) {
+    if (!doc) return;
+    var scaleStr = String(Math.round(scale * 10000) / 10000);
+    var viewportContent =
+      "width=" + Math.round(width) +
+      ", initial-scale=" + scaleStr +
+      ", minimum-scale=" + scaleStr +
+      ", maximum-scale=" + scaleStr +
+      ", user-scalable=no, viewport-fit=cover";
+    var meta = doc.querySelector('meta[name="viewport"]');
+    if (!meta) {
+      meta = doc.createElement("meta");
+      meta.name = "viewport";
+      var head = doc.head || doc.documentElement;
+      if (head.firstChild) head.insertBefore(meta, head.firstChild);
+      else head.appendChild(meta);
+    }
+    meta.setAttribute("content", viewportContent);
+  }
+
+  function injectCatalogScrollStyles(doc) {
+    if (!doc) return;
+    var el = doc.getElementById("dvites-catalog-scroll");
+    if (!el) {
+      el = doc.createElement("style");
+      el.id = "dvites-catalog-scroll";
+      (doc.head || doc.documentElement).appendChild(el);
+    }
+    el.textContent =
+      "html,body{overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;" +
+      "overflow-x:hidden!important;height:auto!important;min-height:100%!important;" +
+      "touch-action:pan-y!important;overscroll-behavior:contain!important}" +
+      "#root{min-height:100%!important;height:auto!important;overflow:visible!important}" +
+      "#root .overflow-y-auto,#root .overflow-auto,#root [class*='overflow-y-auto']" +
+      "{overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}";
+  }
+
+  function wheelDelta(event) {
+    var delta = event.deltaY;
+    if (event.deltaMode === 1) delta *= 16;
+    else if (event.deltaMode === 2) delta *= 480;
+    return delta;
+  }
+
+  function bindPhoneMockupScroll(iframe, screenEl) {
+    if (!iframe || !screenEl) return;
+
+    if (typeof iframe._dvitesWheelCleanup === "function") {
+      iframe._dvitesWheelCleanup();
+      iframe._dvitesWheelCleanup = null;
+    }
+    if (typeof iframe._dvitesInnerWheelCleanup === "function") {
+      iframe._dvitesInnerWheelCleanup();
+      iframe._dvitesInnerWheelCleanup = null;
+    }
+
+    if (!iframe.hasAttribute("tabindex")) {
+      iframe.setAttribute("tabindex", "-1");
+    }
+
+    var wrap = iframe.parentElement;
+    var mock = iframe.closest(".catalog-phone-preview, .tp-hero-phone-mock, .modal-phone");
+
+    function onWheel(event) {
+      if (applyMockupScroll(iframe, wheelDelta(event))) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }
+
+    function focusIframe() {
+      try {
+        iframe.focus({ preventScroll: true });
+        var win = iframe.contentWindow;
+        if (win) win.focus();
+      } catch (e) { /* noop */ }
+    }
+
+    var nodes = [screenEl, mock, wrap, iframe].filter(Boolean);
+    nodes.forEach(function (node) {
+      node.addEventListener("wheel", onWheel, { passive: false, capture: true });
+      node.addEventListener("mouseenter", focusIframe);
+    });
+
+    iframe._dvitesWheelCleanup = function () {
+      nodes.forEach(function (node) {
+        node.removeEventListener("wheel", onWheel, true);
+        node.removeEventListener("mouseenter", focusIframe);
+      });
+    };
+
+    injectIframeWheelBridge(iframe);
+  }
+
+  function fitPhoneMockup(iframe, screenEl) {
+    var doc = iframe.contentDocument;
+    var win = iframe.contentWindow;
+    var scaler = iframe.parentElement;
+    if (!doc || !scaler || !screenEl || !win) return 1;
+
+    if (!iframe.dataset.dvitesBaseWidth) {
+      iframe.dataset.dvitesBaseWidth = String(getCatalogBaseWidth(doc));
+    }
+
+    var contentW = Number(iframe.dataset.dvitesBaseWidth) || 390;
+    var screenW = screenEl.clientWidth;
+    var scale = screenW / contentW;
+
+    injectCatalogViewport(doc, contentW, scale);
+    injectCatalogScrollStyles(doc);
+
+    scaler.style.width = "100%";
+    scaler.style.height = "100%";
+    scaler.style.position = "absolute";
+    scaler.style.inset = "0";
+    scaler.style.left = "0";
+    scaler.style.top = "0";
+    scaler.style.transform = "none";
+    scaler.style.overflow = "hidden";
+    scaler.style.borderRadius = "inherit";
+    scaler.style.pointerEvents = "none";
+
+    iframe.style.width = "100%";
+    iframe.style.height = "100%";
+    iframe.style.border = "0";
+    iframe.style.display = "block";
+    iframe.style.maxWidth = "none";
+    iframe.style.position = "absolute";
+    iframe.style.inset = "0";
+    iframe.style.top = "0";
+    iframe.style.left = "0";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.margin = "0";
+    iframe.style.transform = "none";
+    iframe.style.transformOrigin = "";
+    iframe.style.pointerEvents = "auto";
+    iframe.style.touchAction = "auto";
+    iframe.style.background = "transparent";
+    iframe.setAttribute("scrolling", "yes");
+
+    scaler.dataset.scale = String(scale);
+    scaler.dataset.fitMode = "catalog-viewport";
+
+    try {
+      win.dispatchEvent(new Event("resize"));
+    } catch (e) { /* noop */ }
+
+    bindPhoneMockupScroll(iframe, screenEl);
+
+    return scale;
+  }
+
   function fitIframeScale(iframe, screenEl) {
+    if (iframe.closest(".catalog-phone-screen, .modal-phone-screen")) {
+      return fitPhoneMockup(iframe, screenEl);
+    }
+
     var doc = iframe.contentDocument;
     var win = iframe.contentWindow;
     var scaler = iframe.parentElement;
@@ -301,7 +582,9 @@
     scaler.style.left = "50%";
     scaler.style.transform = "translateX(-50%) scale(" + scale + ")";
     scaler.style.transformOrigin = "top center";
+    scaler.style.overflow = "hidden";
     scaler.dataset.scale = String(scale);
+    scaler.dataset.fitMode = "width";
 
     return scale;
   }
@@ -366,6 +649,11 @@
       scaler.style.transform = "none";
       scaler.style.overflow = "hidden";
       scaler.dataset.scale = "1";
+    }
+
+    var screenEl = getScreenEl(iframe);
+    if (screenEl && isPhoneMockupIframe(iframe)) {
+      bindPhoneMockupScroll(iframe, screenEl);
     }
   }
 
@@ -487,6 +775,15 @@
       iframe._dvitesScrollActive = false;
       iframe._dvitesPreviewHooks = false;
       iframe._dvitesModalChromeScheduled = false;
+      delete iframe.dataset.dvitesBaseWidth;
+      if (typeof iframe._dvitesWheelCleanup === "function") {
+        iframe._dvitesWheelCleanup();
+        iframe._dvitesWheelCleanup = null;
+      }
+      if (typeof iframe._dvitesInnerWheelCleanup === "function") {
+        iframe._dvitesInnerWheelCleanup();
+        iframe._dvitesInnerWheelCleanup = null;
+      }
       disconnectIframeObservers(iframe);
       runPreviewPass(iframe, 120);
       runPreviewPass(iframe, 700);
@@ -504,8 +801,9 @@
     var opts = iframe._dvitesPreviewOpts || {};
     var mode = resolveMode(iframe, opts);
     var autoScroll = !!opts.autoScroll;
-    var screenEl = iframe.closest(".phone-screen");
+    var screenEl = getScreenEl(iframe);
     var isHero = !!iframe.closest(".hero-phone");
+    var fitScale = shouldFitScale(iframe, mode);
 
     if (isHero) iframe.classList.add("is-hero-preview");
     else iframe.classList.remove("is-hero-preview");
@@ -545,7 +843,10 @@
         }
       } else {
         hideModalChrome(doc);
-        if (screenEl) fillIframe(iframe);
+        if (screenEl) {
+          if (fitScale) fitIframeScale(iframe, screenEl);
+          else fillIframe(iframe);
+        }
         if (!iframe._dvitesModalChromeScheduled) {
           iframe._dvitesModalChromeScheduled = true;
           scheduleModalChrome(iframe, doc, mode, isHero);
@@ -561,13 +862,14 @@
   if (!global._dvitesPreviewResizeBound) {
     global._dvitesPreviewResizeBound = true;
     global.addEventListener("resize", function () {
-      document.querySelectorAll(".phone-iframe-scaler iframe").forEach(function (frame) {
-        var screen = frame.closest(".phone-screen");
+      document.querySelectorAll(".phone-iframe-scaler iframe, .tp-hero-live-iframe iframe").forEach(function (frame) {
+        var screen = getScreenEl(frame);
         if (!screen || !frame.contentDocument) return;
         var mode = resolveMode(frame, frame._dvitesPreviewOpts || {});
         var isHero = !!frame.closest(".hero-phone");
+        var fitScale = shouldFitScale(frame, mode);
         if (isHero) fillHeroPreview(frame);
-        else if (mode === "preview") fitIframeScale(frame, screen);
+        else if (mode === "preview" || fitScale) fitIframeScale(frame, screen);
         else fillIframe(frame);
       });
     });
