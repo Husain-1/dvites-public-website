@@ -48,7 +48,7 @@
   ];
 
   function productUrl(slug) {
-    return "/templates/" + slug + ".html";
+    return "/wedding/" + slug + ".html";
   }
 
   function seoTitle(name, category) {

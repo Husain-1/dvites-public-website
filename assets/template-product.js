@@ -26,7 +26,7 @@
     if (fromHtml) return fromHtml.trim().toLowerCase();
     var fromBody = document.body && document.body.getAttribute("data-template-slug");
     if (fromBody) return fromBody.trim().toLowerCase();
-    var match = global.location.pathname.match(/\/templates\/([^/.]+)\.html$/i);
+    var match = global.location.pathname.match(/\/(?:templates|wedding)\/([^/.]+)\.html$/i);
     return match ? match[1].toLowerCase() : "";
   }
 

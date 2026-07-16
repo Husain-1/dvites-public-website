@@ -7,7 +7,7 @@ const path = require("path");
 const ROOT = path.resolve(__dirname, "..");
 const DATA_FILE = path.join(ROOT, "assets", "wedding-templates-data.js");
 const SHELL_FILE = path.join(__dirname, "product-page-shell.html");
-const OUTPUT_DIR = path.join(ROOT, "templates");
+const OUTPUT_DIR = path.join(ROOT, "wedding");
 
 function loadTemplates() {
   const source = fs.readFileSync(DATA_FILE, "utf8");
@@ -124,6 +124,10 @@ function main() {
   const slugs = new Set();
   const written = [];
 
+  if (!fs.existsSync(OUTPUT_DIR)) {
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+  }
+
   templates.forEach(function (tpl) {
     validateTemplate(tpl);
     if (slugs.has(tpl.slug)) {
@@ -134,7 +138,7 @@ function main() {
     const html = renderPage(shell, tpl);
     const outPath = path.join(OUTPUT_DIR, tpl.slug + ".html");
     fs.writeFileSync(outPath, html, "utf8");
-    written.push("/templates/" + tpl.slug + ".html");
+    written.push("/wedding/" + tpl.slug + ".html");
   });
 
   console.log("Generated " + written.length + " wedding template product pages:");
