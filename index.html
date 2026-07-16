@@ -10,31 +10,30 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="preload" href="/assets/hero/phone-showcase.mp4" as="video" type="video/mp4" />
   <link rel="stylesheet" href="/assets/site.css" />
   <script src="/assets/meta-pixel.js"></script>
 </head>
-<body>
-  <div class="announce-bar" id="announce-bar" role="region" aria-label="Limited time offer">
+<body class="page-home">
+  <div class="announce-bar announce-bar--premium" id="announce-bar" role="region" aria-label="Launch offer">
     <div class="container announce-bar-inner">
       <p class="announce-bar-copy">
-        <span class="announce-bar-badge">Save 40%</span>
-        <span>Premium invites at <strong>₹1,199</strong> <s class="announce-bar-was">₹2,499</s></span>
+        <span>Launch Offer</span>
+        <span class="announce-bar-sep" aria-hidden="true">•</span>
+        <span><span class="hero-event-rotator" data-rotator="label" aria-live="polite"><span class="hero-event-rotator-inner">Wedding</span></span> Websites from <strong>₹1,199</strong></span>
+        <span class="announce-bar-sep" aria-hidden="true">•</span>
+        <span>Delivered within 24 Hours</span>
       </p>
-      <div class="announce-bar-timer" aria-live="polite">
-        <span class="announce-timer-label">Ends in</span>
-        <time class="announce-timer-value" id="announce-countdown">00:00:00</time>
-      </div>
-      <a href="#" class="announce-bar-cta" data-buy-now>Buy Now</a>
+      <a href="/templates.html" class="announce-bar-cta announce-bar-cta--premium">View Templates</a>
     </div>
   </div>
 
-  <header class="header">
+  <header class="header header--home">
     <div class="container header-inner">
       <a class="brand" href="/">
         <img src="/templates/curtains/assets/images/dvites-logo.png" alt="Dvites" />
       </a>
       <nav class="nav" aria-label="Main">
-        <a href="/" class="is-active">Home</a>
         <a href="/templates.html">Templates</a>
         <a href="/save-the-date.html">Save the Date</a>
         <a href="/#how-it-works">How It Works</a>
@@ -42,45 +41,102 @@
         <a href="/#faq">FAQ</a>
       </nav>
       <div class="header-actions">
-        <a class="btn btn-primary btn-sm" href="/templates.html">Explore</a>
+        <a class="btn btn-primary btn-sm" href="/templates.html">Create My Invitation</a>
         <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
     </div>
     <nav class="mobile-nav container" id="mobile-nav" aria-label="Mobile">
-      <a href="/">Home</a>
       <a href="/templates.html">Templates</a>
       <a href="/save-the-date.html">Save the Date</a>
       <a href="/#how-it-works">How It Works</a>
       <a href="/partner-studio.html">Partner Studio</a>
       <a href="/#faq">FAQ</a>
+      <a class="btn btn-primary" href="/templates.html">Create My Invitation</a>
     </nav>
   </header>
 
-  <section class="hero" id="home">
-    <div class="container hero-grid">
-      <div class="hero-copy">
-        <h1>Premium Digital Wedding Invitations, Ready in 24 Hours</h1>
-        <p>Choose a design, share your details, and get a beautiful wedding website your guests can open on any phone.</p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="/templates.html">Explore Templates</a>
-          <button class="btn btn-outline" type="button" id="hero-watch-demo">Watch Demo</button>
+  <section class="hero hero-v2" id="home">
+    <div class="hero-v2-decor" aria-hidden="true"></div>
+    <div class="container hero-v2-copy-layout">
+      <div class="hero-v2-copy">
+        <h1>A website as beautiful<br />as your <span class="hero-event-rotator" data-rotator="headline" aria-live="polite"><span class="hero-event-rotator-inner">wedding day</span></span></h1>
+        <p class="hero-v2-lead">Premium digital <span class="hero-event-rotator" data-rotator="type" aria-live="polite"><span class="hero-event-rotator-inner">wedding</span></span> invitations with RSVP, music, countdown, gallery and Google Maps.</p>
+        <p class="hero-v2-sub">Choose your favourite design, personalise it and receive it within 24 hours.</p>
+        <p class="hero-v2-trust">
+          <span>From ₹1,199</span>
+          <span class="hero-v2-trust-sep" aria-hidden="true">·</span>
+          <span>Secure Checkout</span>
+          <span class="hero-v2-trust-sep" aria-hidden="true">·</span>
+          <span>Delivered in 24 Hours</span>
+        </p>
+        <div class="hero-v2-actions">
+          <a class="btn btn-primary" href="/templates.html">Create My Invitation</a>
+          <a class="btn btn-outline" href="/templates.html">Explore Templates</a>
         </div>
-        <p class="hero-reassurance">From ₹1,199 · Secure checkout · Delivered in 24 hours</p>
       </div>
-      <div class="hero-visual">
-        <div class="hero-phone" aria-hidden="true">
-          <div class="phone-frame hero-phone-frame">
-            <div class="phone-screen hero-phone-screen">
-              <div class="phone-iframe-scaler">
-                <iframe id="hero-iframe" src="/templates/balcony-seaview/?preview=1&amp;preview=true&amp;skipEnvelope=true" tabindex="-1" title="Balcony Seaview template preview" loading="eager" allow="autoplay 'none'"></iframe>
-              </div>
+    </div>
+
+    <div class="hero-v2-showcase" aria-hidden="true">
+        <div class="hero-v2-marquee hero-v2-marquee--top">
+          <div class="hero-v2-marquee-track hero-v2-marquee-track--ltr">
+            <div class="hero-v2-marquee-set">
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-castle.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-sara-ibrahim.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-amira-david.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-sarah-david.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-luca-sam.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-mohamad-mounira.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-isabelle-jonathan.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-alex-jameson.webp" alt="" loading="lazy" width="120" height="200" /></div>
+            </div>
+            <div class="hero-v2-marquee-set" aria-hidden="true">
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-castle.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-sara-ibrahim.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-amira-david.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-sarah-david.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-luca-sam.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-mohamad-mounira.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-isabelle-jonathan.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/top/showcase-alex-jameson.webp" alt="" loading="lazy" width="120" height="200" /></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-v2-phone-wrap">
+          <div class="hero-v2-phone">
+            <div class="hero-v2-phone-bezel">
+              <video class="hero-v2-phone-video" autoplay muted loop playsinline preload="auto" poster="/assets/hero/top/showcase-castle.webp">
+                <source src="/assets/hero/phone-showcase.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-v2-marquee hero-v2-marquee--bottom">
+          <div class="hero-v2-marquee-track hero-v2-marquee-track--rtl">
+            <div class="hero-v2-marquee-set">
+              <div class="hero-v2-card"><img src="/assets/hero/bottom/showcase-second-paper-green.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/bottom/showcase-third-wax-gold-cream.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/bottom/showcase-second-reference.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/bottom/showcase-third-wax-rose-black.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/bottom/showcase-third-invited-red.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/bottom/showcase-second-letter-gold.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/bottom/showcase-third-wax-mm.webp" alt="" loading="lazy" width="120" height="200" /></div>
+            </div>
+            <div class="hero-v2-marquee-set" aria-hidden="true">
+              <div class="hero-v2-card"><img src="/assets/hero/bottom/showcase-second-paper-green.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/bottom/showcase-third-wax-gold-cream.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/bottom/showcase-second-reference.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/bottom/showcase-third-wax-rose-black.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/bottom/showcase-third-invited-red.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/bottom/showcase-second-letter-gold.webp" alt="" loading="lazy" width="120" height="200" /></div>
+              <div class="hero-v2-card"><img src="/assets/hero/bottom/showcase-third-wax-mm.webp" alt="" loading="lazy" width="120" height="200" /></div>
             </div>
           </div>
         </div>
       </div>
-    </div>
   </section>
 
   <section class="stats">
@@ -98,7 +154,7 @@
       <span class="trust-strip-dot" aria-hidden="true"></span>
       <span>Professionally customized</span>
       <span class="trust-strip-dot" aria-hidden="true"></span>
-      <span>Lifetime hosting included</span>
+      <span>Hosted until after your wedding</span>
     </div>
   </div>
 
@@ -106,7 +162,7 @@
     <div class="container">
       <div class="section-head">
         <span class="section-eyebrow">Featured Designs</span>
-        <h2 class="section-title">Popular Wedding Invitations</h2>
+        <h2 class="section-title">Popular <span class="hero-event-rotator" data-rotator="label" aria-live="polite"><span class="hero-event-rotator-inner">Wedding</span></span> Invitations</h2>
         <p class="section-sub">Handpicked templates loved by couples across India — each one fully customizable in 24 hours.</p>
       </div>
       <div class="catalog" id="featured-catalog" aria-label="Featured wedding invitation templates"></div>
@@ -170,9 +226,9 @@
       </div>
       <div class="faq-list">
         <div class="faq-item"><button class="faq-q" type="button"><span>Is payment secure?</span><span>+</span></button><div class="faq-a"><div class="faq-a-inner">Yes. Payments are processed securely through Razorpay. We never store your card, UPI PIN, or banking credentials on our website.</div></div></div>
-        <div class="faq-item"><button class="faq-q" type="button"><span>What is included in ₹1,199?</span><span>+</span></button><div class="faq-a"><div class="faq-a-inner">Full professional customization, your personalized invitation link, music, RSVP, maps, gallery, countdown, unlimited guest sharing, and lifetime hosting — with no hidden charges.</div></div></div>
+        <div class="faq-item"><button class="faq-q" type="button"><span>What is included in ₹1,199?</span><span>+</span></button><div class="faq-a"><div class="faq-a-inner">Full professional customization, your personalized invitation link, music, RSVP, maps, gallery, countdown, unlimited guest sharing, and hosting until after your wedding day — with no hidden charges.</div></div></div>
         <div class="faq-item"><button class="faq-q" type="button"><span>How long does customization take?</span><span>+</span></button><div class="faq-a"><div class="faq-a-inner">Most invitations are customized and delivered within 24 hours after we receive your details. Complex requests may take slightly longer — we'll always confirm the timeline upfront.</div></div></div>
-        <div class="faq-item"><button class="faq-q" type="button"><span>Can I edit after delivery?</span><span>+</span></button><div class="faq-a"><div class="faq-a-inner">Yes. We offer revisions for text, dates, and event details. Email us at infodvites@gmail.com and we'll update your invite promptly.</div></div></div>
+        <div class="faq-item"><button class="faq-q" type="button"><span>Can I edit after delivery?</span><span>+</span></button><div class="faq-a"><div class="faq-a-inner">Yes. We can update text, dates, and event details after delivery. Email us at infodvites@gmail.com and we'll help promptly.</div></div></div>
         <div class="faq-item"><button class="faq-q" type="button"><span>Do guests need to install an app?</span><span>+</span></button><div class="faq-a"><div class="faq-a-inner">No app needed. Your invitation opens as a beautiful website in any mobile browser — Safari, Chrome, and more.</div></div></div>
         <div class="faq-item"><button class="faq-q" type="button"><span>Can I add music and photos?</span><span>+</span></button><div class="faq-a"><div class="faq-a-inner">Absolutely. Every template supports background music, photo galleries, and personalized imagery. Share your photos with us and we'll integrate them beautifully.</div></div></div>
         <div class="faq-item"><button class="faq-q" type="button"><span>Can I share the invite easily?</span><span>+</span></button><div class="faq-a"><div class="faq-a-inner">Yes — one link works everywhere. Share via message, email, or social media. Guests tap and your invitation opens instantly.</div></div></div>
@@ -261,22 +317,17 @@
           <li>Music Included</li>
           <li>Countdown</li>
           <li>Events &amp; Maps</li>
-          <li>Gallery</li>
           <li>RSVP Ready</li>
           <li>Easy Link Sharing</li>
           <li>Works perfectly on Desktop, Tablet &amp; Mobile</li>
-          <li>Lifetime Hosting</li>
+          <li>Hosted Until After Your Wedding</li>
         </ul>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-primary" id="modal-buy">Buy Now</button>
-          <p class="modal-buy-reassurance">Secure checkout · Share details on WhatsApp after payment · No hidden fees</p>
-        </div>
         <div class="modal-urgency" aria-live="polite">
           <div class="urgency-track">
             <p class="urgency-msg is-active">🔥 24 Hour Delivery Guaranteed</p>
             <p class="urgency-msg">✨ Personalized by Professional Designers</p>
             <p class="urgency-msg">💬 Delivered directly on WhatsApp</p>
-            <p class="urgency-msg">❤️ Unlimited Guests. Lifetime Hosting.</p>
+            <p class="urgency-msg">❤️ Unlimited Guests. Hosted Until After Your Wedding.</p>
             <p class="urgency-msg">🎵 Music, RSVP, Maps Included</p>
             <p class="urgency-msg">🔒 Secure Payment. No Hidden Charges.</p>
           </div>
@@ -292,7 +343,7 @@
             <li class="process-arrow" aria-hidden="true">↓</li>
             <li><span class="process-icon">⚡</span><span>Receive your personalized invitation within 24 hours.</span></li>
             <li class="process-arrow" aria-hidden="true">↓</li>
-            <li><span class="process-icon">👀</span><span>Review once. We'll make revisions if required.</span></li>
+            <li><span class="process-icon">👀</span><span>Review your preview link once. We'll adjust details if anything needs fixing.</span></li>
             <li class="process-arrow" aria-hidden="true">↓</li>
             <li><span class="process-icon">🔗</span><span>Share your invite instantly with unlimited guests.</span></li>
           </ol>
@@ -301,8 +352,13 @@
           <div class="trust-item"><span>✔</span> 24 Hour Delivery</div>
           <div class="trust-item"><span>✔</span> Unlimited Sharing</div>
           <div class="trust-item"><span>✔</span> Works on every phone</div>
-          <div class="trust-item"><span>✔</span> Lifetime Hosting</div>
+          <div class="trust-item"><span>✔</span> Hosted Until After Your Wedding</div>
           <div class="trust-item"><span>✔</span> Personalized Support</div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-primary" id="modal-buy">Buy Now</button>
+          <a href="#" class="btn btn-outline modal-view-details-btn" id="modal-view-details" hidden>View Details</a>
+          <p class="modal-buy-reassurance">Secure checkout · Share details on WhatsApp after payment · No hidden fees</p>
         </div>
       </div>
     </div>
@@ -311,6 +367,7 @@
   <script src="/assets/analytics.js"></script>
   <script src="/assets/payment.js"></script>
   <script src="/assets/phone-preview.js"></script>
+  <script src="/assets/wedding-templates-data.js"></script>
   <script src="/assets/site.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {

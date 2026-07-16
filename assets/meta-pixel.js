@@ -38,15 +38,17 @@
     return text || fallback;
   }
 
-  global.dvitesTrackViewContent = function (templateName, category, price) {
+  global.dvitesTrackViewContent = function (templateName, category, price, contentId) {
     if (!canTrack()) return;
-    global.fbq("track", "ViewContent", {
+    var payload = {
       content_name: asText(templateName, "Dvites Template"),
       content_category: asText(category, "Wedding Invitation"),
       content_type: "product",
       value: asNumber(price, 0),
       currency: "INR",
-    });
+    };
+    if (contentId) payload.content_ids = [asText(contentId, "")];
+    global.fbq("track", "ViewContent", payload);
   };
 
   global.dvitesTrackViewDemo = function (templateName) {

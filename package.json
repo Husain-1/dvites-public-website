@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "generate:template-pages": "node scripts/generate-template-pages.js"
+  },
   "dependencies": {
     "web-push": "^3.6.7"
   }
