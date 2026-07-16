@@ -124,12 +124,54 @@
     );
   }
 
-  function getProductPageUrl(tpl) {
-    if (tpl.productUrl) return tpl.productUrl;
-    if (global.DvitesWeddingTemplates && global.DvitesWeddingTemplates.getBySlug(tpl.id)) {
-      return global.DvitesWeddingTemplates.productUrl(tpl.id);
+  function isDemoTemplateUrl(url) {
+    return typeof url === "string" && /^\/templates\/[^/?#]+\/$/.test(url);
+  }
+
+  function resolveProductPageUrl(source) {
+    var slug = "";
+    var candidate = "";
+
+    if (source && source.getAttribute) {
+      candidate = source.getAttribute("data-product-url") || source.getAttribute("href") || "";
+      slug = source.getAttribute("data-id") || "";
+    } else if (typeof source === "string") {
+      slug = source.trim();
+    } else if (source && source.id) {
+      slug = source.id;
+      candidate = source.productUrl || "";
     }
+
+    if (candidate && candidate.indexOf(".html") !== -1 && !isDemoTemplateUrl(candidate)) {
+      return candidate;
+    }
+
+    if (slug && global.DvitesWeddingTemplates && global.DvitesWeddingTemplates.getBySlug(slug)) {
+      return global.DvitesWeddingTemplates.productUrl(slug);
+    }
+
     return "";
+  }
+
+  function getProductPageUrl(tpl) {
+    return resolveProductPageUrl(tpl);
+  }
+
+  function bindProductNavigation(root) {
+    var scope = root || document;
+
+    scope.querySelectorAll(".btn-view-details, .tpl-name-link").forEach(function (link) {
+      if (link.dataset.productNavBound === "1") return;
+      link.dataset.productNavBound = "1";
+      link.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var card = link.closest(".card[data-id]");
+        var url = resolveProductPageUrl(card || link);
+        if (!url) return;
+        event.preventDefault();
+        global.location.assign(url);
+      });
+    });
   }
 
   function renderCard(tpl) {
@@ -209,6 +251,7 @@
       : TEMPLATES;
     container.innerHTML = list.map(renderCard).join("");
     equalizeCardHeights(container);
+    bindProductNavigation(container);
   }
 
   function renderSaveTheDateCatalog(container) {
@@ -400,18 +443,28 @@
 
     function setModalProductLink(cardOrSlug) {
       if (!modalViewDetails) return;
-      var productUrl = "";
-      if (cardOrSlug && cardOrSlug.getAttribute) {
-        productUrl = cardOrSlug.getAttribute("data-product-url") || "";
-      } else if (typeof cardOrSlug === "string" && global.DvitesWeddingTemplates) {
-        productUrl = global.DvitesWeddingTemplates.productUrl(cardOrSlug);
-      }
+      var productUrl = resolveProductPageUrl(cardOrSlug);
       if (productUrl) {
         modalViewDetails.href = productUrl;
         modalViewDetails.hidden = false;
       } else {
+        modalViewDetails.href = "#";
         modalViewDetails.hidden = true;
       }
+    }
+
+    if (modalViewDetails && modalViewDetails.dataset.productNavBound !== "1") {
+      modalViewDetails.dataset.productNavBound = "1";
+      modalViewDetails.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var url = resolveProductPageUrl(modalViewDetails);
+        if (!url && modalBuy && modalBuy.dataset.templateSlug) {
+          url = resolveProductPageUrl(modalBuy.dataset.templateSlug);
+        }
+        if (!url) return;
+        event.preventDefault();
+        global.location.assign(url);
+      });
     }
 
     function bindCards() {
@@ -424,13 +477,13 @@
         card.setAttribute("aria-label", "Preview " + (card.getAttribute("data-title") || "template"));
 
         card.addEventListener("click", function (event) {
-          if (event.target.closest(".btn-view-details, .tpl-name-link, .btn-customize, a[href]")) return;
+          if (event.target.closest(".btn-view-details, .tpl-name-link, .btn-customize, .tpl-actions, a[href]")) return;
           openModal(card);
         });
 
         card.addEventListener("keydown", function (event) {
           if (event.key === "Enter" || event.key === " ") {
-            if (event.target.closest(".btn-view-details, .tpl-name-link, .btn-customize, a[href]")) return;
+            if (event.target.closest(".btn-view-details, .tpl-name-link, .btn-customize, .tpl-actions, a[href]")) return;
             event.preventDefault();
             openModal(card);
           }
@@ -549,7 +602,10 @@
       if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
     });
 
-    global.DvitesRebindModal = bindCards;
+    global.DvitesRebindModal = function () {
+      bindCards();
+      bindProductNavigation();
+    };
     global.DvitesOpenModalById = function (id) {
       var card = document.querySelector('.card[data-id="' + id + '"]');
       if (card) {
