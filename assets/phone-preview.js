@@ -454,7 +454,7 @@
     }
 
     var wrap = iframe.parentElement;
-    var mock = iframe.closest(".catalog-phone-preview, .tp-hero-phone-mock, .modal-phone");
+    var mock = iframe.closest(".catalog-phone-preview, .tp-hero-phone-mock, .modal-phone, .tp-mobile-demo-phone");
 
     function onWheel(event) {
       if (applyMockupScroll(iframe, wheelDelta(event))) {
@@ -862,7 +862,7 @@
   if (!global._dvitesPreviewResizeBound) {
     global._dvitesPreviewResizeBound = true;
     global.addEventListener("resize", function () {
-      document.querySelectorAll(".phone-iframe-scaler iframe, .tp-hero-live-iframe iframe").forEach(function (frame) {
+      document.querySelectorAll(".phone-iframe-scaler iframe, .tp-hero-live-iframe iframe, #tp-mobile-demo-iframe").forEach(function (frame) {
         var screen = getScreenEl(frame);
         if (!screen || !frame.contentDocument) return;
         var mode = resolveMode(frame, frame._dvitesPreviewOpts || {});
