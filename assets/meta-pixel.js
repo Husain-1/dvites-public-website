@@ -1,9 +1,9 @@
 (function (global) {
   "use strict";
 
-  var PIXEL_ID = "9797589963588399";
+  var PIXEL_ID = "27514697381530186";
 
-  /* Meta Pixel base code — Capcut test */
+  /* Meta Pixel — Dvites Website Purchases */
   !(function (f, b, e, v, n, t, s) {
     if (f.fbq) return;
     n = f.fbq = function () {
