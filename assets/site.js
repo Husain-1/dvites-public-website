@@ -446,8 +446,44 @@
       }
     }
 
+    function closeModalQuiet() {
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
+      resetModalPreview();
+    }
+
     function loadModalLivePreview() {
-      if (!pendingDemoUrl || !iframe || modalIframeReady) return;
+      if (!pendingDemoUrl) return;
+
+      if (
+        global.DvitesFullDemo &&
+        typeof global.DvitesFullDemo.isMobileViewport === "function" &&
+        global.DvitesFullDemo.isMobileViewport()
+      ) {
+        var slug = modalBuy ? modalBuy.dataset.templateSlug : "";
+        var amountPaise = modalBuy ? Number(modalBuy.dataset.amountPaise) : PRICE * 100;
+        var templateName = modalTitle ? modalTitle.textContent.trim() : "Dvites Template";
+        var productUrl = resolveProductPageUrl(slug || modalViewDetails);
+
+        if (typeof global.dvitesTrackViewDemo === "function") {
+          global.dvitesTrackViewDemo(templateName);
+        }
+
+        closeModalQuiet();
+
+        global.DvitesFullDemo.open({
+          demoUrl: pendingDemoUrl,
+          templateSlug: slug,
+          templateName: templateName,
+          amountPaise: amountPaise,
+          productUrl: productUrl || "",
+          exitUrl: global.location.href
+        });
+        return;
+      }
+
+      if (!iframe || modalIframeReady) return;
 
       if (previewStage) previewStage.classList.add("is-loading");
       if (previewLoading) previewLoading.classList.remove("is-hidden");

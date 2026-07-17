@@ -1,0 +1,104 @@
+/* Full-screen live template demo (mobile-friendly) */
+body.dvites-full-demo-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+.dvites-full-demo {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: none;
+  flex-direction: column;
+  background: #fff;
+}
+
+.dvites-full-demo.is-open {
+  display: flex;
+}
+
+.dvites-full-demo-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding:
+    max(10px, env(safe-area-inset-top, 0px))
+    max(12px, env(safe-area-inset-right, 0px))
+    10px
+    max(12px, env(safe-area-inset-left, 0px));
+  background: rgba(255, 255, 255, 0.98);
+  border-bottom: 1px solid rgba(92, 26, 40, 0.12);
+  box-shadow: 0 4px 18px rgba(42, 24, 24, 0.06);
+}
+
+.dvites-full-demo-exit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(92, 26, 40, 0.16);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--maroon-deep, #5c1a28);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dvites-full-demo-buy {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #8d193a 0%, #a82248 50%, #6e1230 100%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(141, 25, 58, 0.24);
+}
+
+.dvites-full-demo-buy:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.dvites-full-demo-frame {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background: #fff;
+}
+
+.dvites-full-demo-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
+
+.dvites-full-demo-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  background: #fff;
+  color: var(--maroon-deep, #5c1a28);
+  font-size: 15px;
+  font-weight: 600;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.dvites-full-demo-loading.is-hidden {
+  display: none;
+}

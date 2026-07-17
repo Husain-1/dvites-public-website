@@ -35,28 +35,24 @@
     return global.DvitesWeddingTemplates.getBySlug(getSlug());
   }
 
-  function renderMobileDemoModal(previewUrl, title) {
-    return (
-      '<div id="tp-mobile-demo-modal" class="tp-mobile-demo-modal" aria-hidden="true">' +
-        '<button type="button" class="tp-mobile-demo-close" id="tp-mobile-demo-close" aria-label="Close demo" data-tp-demo-close>&times;</button>' +
-        '<div class="tp-mobile-demo-stage" id="tp-mobile-demo-stage" data-tp-demo-close>' +
-          '<div class="tp-mobile-demo-phone catalog-phone-preview" id="tp-mobile-demo-phone" role="dialog" aria-modal="true" aria-label="' + escapeHtml(title) + ' live demo">' +
-            '<div class="catalog-phone-screen">' +
-              '<img class="catalog-template-thumbnail tp-mobile-demo-thumb" id="tp-mobile-demo-thumb" src="' + escapeHtml(previewUrl) + '" alt="' + escapeHtml(title) + ' preview" width="390" height="844" decoding="async" />' +
-              '<p class="tp-mobile-demo-loading" id="tp-mobile-demo-loading" aria-live="polite">Loading invitation…</p>' +
-              '<div class="phone-iframe-scaler tp-hero-live-iframe is-hidden" id="tp-mobile-demo-iframe-wrap">' +
-                '<iframe id="tp-mobile-demo-iframe" class="is-modal-demo" title="' + escapeHtml(title) + ' live demo"></iframe>' +
-              '</div>' +
-            '</div>' +
-            '<img class="catalog-phone-frame" src="/assets/save-the-date-phone-frame.png" alt="" aria-hidden="true" />' +
-          '</div>' +
-        '</div>' +
-      '</div>'
-    );
+  function openFullPageDemo(tpl) {
+    if (!global.DvitesFullDemo || typeof global.DvitesFullDemo.open !== "function") {
+      return false;
+    }
+    return global.DvitesFullDemo.open({
+      demoUrl: tpl.demoUrl,
+      templateSlug: tpl.slug,
+      templateName: tpl.name,
+      amountPaise: tpl.amountPaise,
+      productUrl: tpl.productUrl || global.location.pathname,
+      exitUrl: global.location.href
+    });
   }
 
   function isMobileDemoViewport() {
-    return global.matchMedia("(max-width: 767px)").matches;
+    return global.DvitesFullDemo && typeof global.DvitesFullDemo.isMobileViewport === "function"
+      ? global.DvitesFullDemo.isMobileViewport()
+      : global.matchMedia("(max-width: 767px)").matches;
   }
 
   function getLiveUrl(tpl) {
@@ -325,146 +321,6 @@
     }
   }
 
-  function ensureMobileDemoModal(tpl) {
-    var modal = $("tp-mobile-demo-modal");
-    if (modal) return modal;
-
-    var wrap = document.createElement("div");
-    wrap.innerHTML = renderMobileDemoModal(tpl.heroImage, tpl.name);
-    modal = wrap.firstElementChild;
-    if (!modal) return null;
-
-    document.body.appendChild(modal);
-
-    var phone = $("tp-mobile-demo-phone");
-    if (phone) {
-      phone.addEventListener("click", function (event) {
-        event.stopPropagation();
-      });
-    }
-
-    modal.querySelectorAll("[data-tp-demo-close]").forEach(function (el) {
-      el.addEventListener("click", function (event) {
-        event.preventDefault();
-        closeMobileDemoModal();
-      });
-    });
-
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape") closeMobileDemoModal();
-    });
-
-    return modal;
-  }
-
-  function revealMobileDemoLive(modal, thumb, loading, iframeWrap, iframe) {
-    if (modal) modal.dataset.liveReady = "1";
-    if (thumb) thumb.classList.add("is-hidden");
-    if (loading) loading.classList.add("is-hidden");
-    if (iframeWrap) iframeWrap.classList.remove("is-hidden");
-    if (iframe && global.DvitesPhonePreview) {
-      [80, 350, 900, 1800].forEach(function (delay) {
-        setTimeout(function () {
-          global.dispatchEvent(new Event("resize"));
-        }, delay);
-      });
-    }
-  }
-
-  function openMobileDemoModal(tpl) {
-    var modal = ensureMobileDemoModal(tpl);
-    if (!modal) return;
-
-    var thumb = $("tp-mobile-demo-thumb");
-    var loading = $("tp-mobile-demo-loading");
-    var iframeWrap = $("tp-mobile-demo-iframe-wrap");
-    var iframe = $("tp-mobile-demo-iframe");
-    var mobileLiveReady = modal.dataset.liveReady === "1";
-
-    document.body.classList.add("tp-mobile-demo-open");
-    modal.classList.add("is-open");
-    modal.setAttribute("aria-hidden", "false");
-
-    if (typeof global.dvitesTrack === "function") {
-      global.dvitesTrack("template_demo_open", {
-        template_slug: tpl.slug,
-        template_name: tpl.name,
-        surface: "mobile_popup",
-      });
-    }
-    if (typeof global.dvitesTrackViewDemo === "function") {
-      global.dvitesTrackViewDemo(tpl.name);
-    }
-
-    if (mobileLiveReady && iframe && iframe.src && iframe.src !== "about:blank") {
-      if (thumb) thumb.classList.add("is-hidden");
-      if (loading) loading.classList.add("is-hidden");
-      if (iframeWrap) iframeWrap.classList.remove("is-hidden");
-      [50, 200, 600, 1200].forEach(function (delay) {
-        setTimeout(function () {
-          global.dispatchEvent(new Event("resize"));
-        }, delay);
-      });
-      return;
-    }
-
-    if (thumb) {
-      thumb.src = tpl.heroImage;
-      thumb.alt = tpl.name + " preview";
-      thumb.classList.remove("is-hidden");
-    }
-    if (loading) loading.classList.remove("is-hidden");
-    /* Keep iframe in layout (not display:none) so the browser actually loads it. */
-    if (iframeWrap) iframeWrap.classList.remove("is-hidden");
-
-    if (!iframe) return;
-
-    if (!iframe._dvitesPreviewBound && global.DvitesPhonePreview) {
-      global.DvitesPhonePreview.setup(iframe, { mode: "modal", autoScroll: false, fitScale: true });
-      iframe._dvitesPreviewBound = true;
-    }
-
-    var revealed = false;
-    var readyPoll = null;
-
-    function onMobileDemoReady() {
-      if (revealed) return;
-      revealed = true;
-      if (readyPoll) {
-        clearInterval(readyPoll);
-        readyPoll = null;
-      }
-      revealMobileDemoLive(modal, thumb, loading, iframeWrap, iframe);
-    }
-
-    iframe.addEventListener("load", onMobileDemoReady, { once: true });
-
-    iframe.title = tpl.name + " live demo";
-    iframe.src = getLiveUrl(tpl);
-
-    readyPoll = setInterval(function () {
-      try {
-        var doc = iframe.contentDocument;
-        if (doc && doc.body && doc.body.childElementCount > 0) {
-          onMobileDemoReady();
-        }
-      } catch (e) { /* noop */ }
-    }, 250);
-
-    setTimeout(function () {
-      onMobileDemoReady();
-    }, 12000);
-  }
-
-  function closeMobileDemoModal() {
-    var modal = $("tp-mobile-demo-modal");
-    if (!modal || !modal.classList.contains("is-open")) return;
-
-    modal.classList.remove("is-open");
-    modal.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("tp-mobile-demo-open");
-  }
-
   function initHeroLivePreview(tpl) {
     var overlayBtn = $("tp-hero-demo-overlay");
     var stage = $("tp-hero-demo-stage");
@@ -514,7 +370,7 @@
       event.preventDefault();
       event.stopPropagation();
       if (isMobileDemoViewport()) {
-        openMobileDemoModal(tpl);
+        openFullPageDemo(tpl);
         return;
       }
       loadHeroLivePreview();
