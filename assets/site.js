@@ -33,6 +33,54 @@
     return [];
   }
 
+  function buildSaveTheDateCatalogRecords() {
+    return SAVE_THE_DATE_TEMPLATES.map(function (tpl) {
+      return {
+        id: tpl.id,
+        url: tpl.url,
+        title: tpl.title,
+        category: tpl.category || "Save the Date",
+        tags: tpl.tags || [],
+        preview: getSaveTheDateThumbnail(tpl),
+        description: tpl.description,
+        featured: false,
+        price: SAVE_THE_DATE_PRICE,
+        oldPrice: SAVE_THE_DATE_OLD_PRICE,
+        saveLabel: "Save 50%"
+      };
+    });
+  }
+
+  function buildPartnerCatalogTemplates() {
+    var wedding = buildWeddingCatalogTemplates();
+    var saveTheDate = buildSaveTheDateCatalogRecords();
+    var seen = {};
+    var combined = [];
+
+    wedding.concat(saveTheDate).forEach(function (tpl) {
+      if (!tpl || !tpl.id || seen[tpl.id]) return;
+      seen[tpl.id] = true;
+      combined.push({
+        id: tpl.id,
+        url: tpl.url,
+        title: tpl.title,
+        category: tpl.category,
+        tags: tpl.tags || [],
+        preview: tpl.preview,
+        description: tpl.description,
+        price: tpl.price != null ? tpl.price : PRICE,
+        oldPrice: tpl.oldPrice,
+        saveLabel: tpl.saveLabel
+      });
+    });
+
+    return combined;
+  }
+
+  function templateUnitPrice(tpl) {
+    return tpl && tpl.price != null ? tpl.price : PRICE;
+  }
+
   var TEMPLATES = buildWeddingCatalogTemplates().concat([DESERT_SAND_CATALOG]);
 
   var SAVE_THE_DATE_TEMPLATES = [
@@ -696,14 +744,16 @@
     var cart = document.getElementById("partner-cart");
     if (!grid || !cart) return;
 
-    grid.innerHTML = TEMPLATES.map(function (tpl) {
+    var partnerTemplates = buildPartnerCatalogTemplates();
+
+    grid.innerHTML = partnerTemplates.map(function (tpl) {
       return (
         '<label class="partner-item" data-id="' + tpl.id + '">' +
           '<input type="checkbox" name="partner-template" value="' + tpl.id + '" />' +
           '<div class="partner-item-thumb" style="background-image:url(\'' + tpl.preview + '\')"></div>' +
           '<div class="partner-item-info">' +
             '<strong>' + tpl.title + '</strong>' +
-            '<span>' + tpl.category + ' · ' + formatRupee(PRICE) + '</span>' +
+            '<span>' + tpl.category + ' · ' + formatRupee(templateUnitPrice(tpl)) + '</span>' +
           '</div>' +
         '</label>'
       );
@@ -731,7 +781,11 @@
     function updateCart() {
       var checked = grid.querySelectorAll('input:checked');
       var count = checked.length;
-      var subtotal = count * PRICE;
+      var subtotal = 0;
+      checked.forEach(function (input) {
+        var tpl = partnerTemplates.find(function (t) { return t.id === input.value; });
+        if (tpl) subtotal += templateUnitPrice(tpl);
+      });
       var qualifies = count >= PARTNER_MIN && count <= PARTNER_MAX;
       var discount = qualifies ? Math.round(subtotal * PARTNER_DISCOUNT) : 0;
       var total = subtotal - discount;
@@ -771,15 +825,19 @@
 
     orderBtn.addEventListener("click", function () {
       var selected = [];
+      var subtotal = 0;
       grid.querySelectorAll("input:checked").forEach(function (input) {
-        var tpl = TEMPLATES.find(function (t) { return t.id === input.value; });
-        if (tpl) selected.push(tpl.title);
+        var tpl = partnerTemplates.find(function (t) { return t.id === input.value; });
+        if (tpl) {
+          selected.push(tpl.title);
+          subtotal += templateUnitPrice(tpl);
+        }
       });
       if (selected.length < PARTNER_MIN || selected.length > PARTNER_MAX) return;
       if (!global.DvitesPayment) return;
 
       var templateName = "Partner Studio (" + selected.length + " templates): " + selected.join(", ");
-      var amountPaise = global.DvitesPayment.calculatePartnerTotalPaise(selected.length);
+      var amountPaise = global.DvitesPayment.calculatePartnerTotalPaise(Math.round(subtotal * 100));
 
       global.DvitesPayment.startCheckout({
         templateName: templateName,

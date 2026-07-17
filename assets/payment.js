@@ -14,8 +14,8 @@
     "Payment verification failed. Please contact infodvites@gmail.com.";
   /* END PAYMENT CONFIG */
 
-  function calculatePartnerTotalPaise(count) {
-    var subtotal = count * (PRICE_PAISE / 100);
+  function calculatePartnerTotalPaise(subtotalPaise) {
+    var subtotal = subtotalPaise / 100;
     var discount = Math.round(subtotal * PARTNER_DISCOUNT);
     return Math.round((subtotal - discount) * 100);
   }
