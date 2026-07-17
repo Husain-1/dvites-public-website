@@ -2583,6 +2583,31 @@ body.modal-open { overflow: hidden; }
     right: 8px;
     z-index: 10001;
   }
+
+  .modal.is-live-demo .modal-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .modal.is-live-demo .modal-preview {
+    flex-shrink: 0;
+    touch-action: none;
+  }
+
+  .modal.is-live-demo .modal-phone-screen,
+  .modal.is-live-demo .modal-phone-screen .phone-iframe-scaler,
+  .modal.is-live-demo .modal-phone-screen .phone-iframe-scaler iframe {
+    touch-action: pan-y;
+  }
+
+  .modal.is-live-demo .modal-details {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
 }
 
 /* Partner Studio */

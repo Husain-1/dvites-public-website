@@ -422,7 +422,12 @@
     function resetModalPreview() {
       pendingDemoUrl = null;
       modalIframeReady = false;
+      modal.classList.remove("is-live-demo");
       if (iframe) {
+        if (typeof iframe._dvitesTouchCleanup === "function") {
+          iframe._dvitesTouchCleanup();
+          iframe._dvitesTouchCleanup = null;
+        }
         iframe.src = "about:blank";
         iframe.removeAttribute("src");
       }
@@ -446,44 +451,8 @@
       }
     }
 
-    function closeModalQuiet() {
-      modal.classList.remove("is-open");
-      modal.setAttribute("aria-hidden", "true");
-      document.body.classList.remove("modal-open");
-      resetModalPreview();
-    }
-
     function loadModalLivePreview() {
-      if (!pendingDemoUrl) return;
-
-      if (
-        global.DvitesFullDemo &&
-        typeof global.DvitesFullDemo.isMobileViewport === "function" &&
-        global.DvitesFullDemo.isMobileViewport()
-      ) {
-        var slug = modalBuy ? modalBuy.dataset.templateSlug : "";
-        var amountPaise = modalBuy ? Number(modalBuy.dataset.amountPaise) : PRICE * 100;
-        var templateName = modalTitle ? modalTitle.textContent.trim() : "Dvites Template";
-        var productUrl = resolveProductPageUrl(slug || modalViewDetails);
-
-        if (typeof global.dvitesTrackViewDemo === "function") {
-          global.dvitesTrackViewDemo(templateName);
-        }
-
-        closeModalQuiet();
-
-        global.DvitesFullDemo.open({
-          demoUrl: pendingDemoUrl,
-          templateSlug: slug,
-          templateName: templateName,
-          amountPaise: amountPaise,
-          productUrl: productUrl || "",
-          exitUrl: global.location.href
-        });
-        return;
-      }
-
-      if (!iframe || modalIframeReady) return;
+      if (!pendingDemoUrl || !iframe) return;
 
       if (previewStage) previewStage.classList.add("is-loading");
       if (previewLoading) previewLoading.classList.remove("is-hidden");
@@ -496,6 +465,7 @@
 
       iframe.addEventListener("load", function () {
         modalIframeReady = true;
+        modal.classList.add("is-live-demo");
         if (previewStage) previewStage.classList.add("is-hidden");
         if (previewLoading) previewLoading.classList.add("is-hidden");
       }, { once: true });

@@ -20,6 +20,14 @@
     return global.innerWidth >= 768 ? 72 : 64;
   }
 
+  function isMobileViewport() {
+    return !!(global.matchMedia && global.matchMedia("(max-width: 767px)").matches);
+  }
+
+  function isModalMockup(iframe) {
+    return !!iframe && !!iframe.closest(".modal-phone-screen");
+  }
+
   function resolveMode(iframe, opts) {
     opts = opts || {};
     if (opts.mode === "preview" || opts.mode === "modal") return opts.mode;
@@ -280,6 +288,7 @@
   function usesNativeTouchMockup(iframe) {
     if (!iframe) return false;
     if (iframe.closest(".tp-mobile-demo-phone")) return true;
+    if (isModalMockup(iframe) && isMobileViewport()) return true;
     if (!global.matchMedia) return false;
     return global.matchMedia("(max-width: 767px) and (pointer: coarse)").matches;
   }
@@ -499,6 +508,65 @@
     injectIframeWheelBridge(iframe);
   }
 
+  function cleanupMockupTouchScroll(iframe) {
+    if (!iframe) return;
+    if (typeof iframe._dvitesTouchCleanup === "function") {
+      iframe._dvitesTouchCleanup();
+      iframe._dvitesTouchCleanup = null;
+    }
+  }
+
+  function bindMockupTouchScroll(iframe, screenEl) {
+    if (!iframe || !screenEl) return;
+    if (!isMobileViewport() && !usesNativeTouchMockup(iframe)) return;
+    if (!isModalMockup(iframe) && !iframe.closest(".catalog-phone-screen, .tp-hero-live-iframe")) return;
+
+    cleanupMockupTouchScroll(iframe);
+
+    var lastY = 0;
+    var tracking = false;
+
+    function onTouchStart(event) {
+      if (event.touches.length !== 1) return;
+      lastY = event.touches[0].clientY;
+      tracking = true;
+    }
+
+    function onTouchMove(event) {
+      if (!tracking || event.touches.length !== 1) return;
+      var y = event.touches[0].clientY;
+      var delta = lastY - y;
+      lastY = y;
+      if (Math.abs(delta) < 0.5) return;
+      var scrolled = applyMockupScroll(iframe, delta);
+      if (isModalMockup(iframe) || scrolled) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }
+
+    function onTouchEnd() {
+      tracking = false;
+    }
+
+    var nodes = [screenEl, iframe.parentElement, iframe].filter(Boolean);
+    nodes.forEach(function (node) {
+      node.addEventListener("touchstart", onTouchStart, { passive: true });
+      node.addEventListener("touchmove", onTouchMove, { passive: false });
+      node.addEventListener("touchend", onTouchEnd, { passive: true });
+      node.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    });
+
+    iframe._dvitesTouchCleanup = function () {
+      nodes.forEach(function (node) {
+        node.removeEventListener("touchstart", onTouchStart);
+        node.removeEventListener("touchmove", onTouchMove);
+        node.removeEventListener("touchend", onTouchEnd);
+        node.removeEventListener("touchcancel", onTouchEnd);
+      });
+    };
+  }
+
   function injectNativeTouchScrollPatch(doc) {
     if (!doc) return;
     var el = doc.getElementById("dvites-native-touch-patch");
@@ -553,6 +621,8 @@
     try {
       win.dispatchEvent(new Event("resize"));
     } catch (e) { /* noop */ }
+
+    bindMockupTouchScroll(iframe, screenEl);
 
     return 1;
   }
@@ -616,6 +686,7 @@
     } catch (e) { /* noop */ }
 
     bindPhoneMockupScroll(iframe, screenEl);
+    bindMockupTouchScroll(iframe, screenEl);
 
     return scale;
   }
@@ -850,6 +921,7 @@
       iframe._dvitesPreviewHooks = false;
       iframe._dvitesModalChromeScheduled = false;
       delete iframe.dataset.dvitesBaseWidth;
+      cleanupMockupTouchScroll(iframe);
       if (typeof iframe._dvitesWheelCleanup === "function") {
         iframe._dvitesWheelCleanup();
         iframe._dvitesWheelCleanup = null;
