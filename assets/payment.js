@@ -82,6 +82,83 @@
   }
   /* END CREATE ORDER CALL */
 
+  function readCookie(name) {
+    var pattern = "(?:^|; )" + name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "=([^;]*)";
+    var match = document.cookie.match(new RegExp(pattern));
+    return match ? decodeURIComponent(match[1]) : "";
+  }
+
+  var ATTRIBUTION_KEY = "dvites_attribution_v1";
+
+  function readStoredAttribution() {
+    try {
+      var raw = sessionStorage.getItem(ATTRIBUTION_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function writeStoredAttribution(next) {
+    try {
+      sessionStorage.setItem(ATTRIBUTION_KEY, JSON.stringify(next));
+    } catch (e) { /* noop */ }
+  }
+
+  function captureAttribution() {
+    var stored = readStoredAttribution();
+    var params = new URLSearchParams(global.location.search);
+    var next = Object.assign({}, stored);
+    var now = Date.now();
+
+    if (!next.landing_url) {
+      next.landing_url = global.location.href;
+    }
+    if (!next.event_source_url) {
+      next.event_source_url = global.location.href;
+    }
+
+    ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"].forEach(function (key) {
+      var value = params.get(key);
+      if (value && !next[key]) next[key] = value;
+    });
+
+    var fbclid = params.get("fbclid");
+    if (fbclid && !next.fbclid) {
+      next.fbclid = fbclid;
+      next.fbc_created_at = now;
+    }
+
+    writeStoredAttribution(next);
+  }
+
+  function resolveFbc(stored) {
+    var fromCookie = readCookie("_fbc");
+    if (fromCookie) return fromCookie;
+    if (stored && stored.fbclid) {
+      var created = stored.fbc_created_at || Date.now();
+      return "fb.1." + created + "." + stored.fbclid;
+    }
+    return "";
+  }
+
+  function getMetaAttributionPayload() {
+    var stored = readStoredAttribution();
+    return {
+      meta_fbp: readCookie("_fbp") || stored.meta_fbp || "",
+      meta_fbc: resolveFbc(stored) || stored.meta_fbc || "",
+      event_source_url: stored.event_source_url || global.location.href || "",
+      landing_url: stored.landing_url || global.location.href || "",
+      utm_source: stored.utm_source || "",
+      utm_medium: stored.utm_medium || "",
+      utm_campaign: stored.utm_campaign || "",
+      utm_content: stored.utm_content || "",
+      utm_term: stored.utm_term || "",
+    };
+  }
+
+  captureAttribution();
+
   /* VERIFY PAYMENT CALL */
   function verifyPayment(payload) {
     return fetch(API_VERIFY_PAYMENT, {
@@ -116,7 +193,7 @@
           color: RAZORPAY_THEME_COLOR,
         },
         handler: function (response) {
-          verifyPayment({
+          verifyPayment(Object.assign({
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_signature: response.razorpay_signature,
@@ -128,7 +205,7 @@
             customer_email: checkoutContext.customerEmail || "",
             customer_phone: checkoutContext.customerPhone || "",
             notes: checkoutContext.notes || "",
-          }).then(function (result) {
+          }, getMetaAttributionPayload())).then(function (result) {
             if (result.success) {
               if (typeof global.dvitesTrackPurchase === "function") {
                 global.dvitesTrackPurchase(

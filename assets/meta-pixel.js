@@ -83,15 +83,36 @@
     });
   };
 
+  var PURCHASE_GUARD_KEY = "dvites_meta_purchase_ids";
+
+  function markPurchaseTracked(eventId) {
+    if (!eventId) return true;
+    try {
+      var raw = sessionStorage.getItem(PURCHASE_GUARD_KEY);
+      var ids = raw ? JSON.parse(raw) : [];
+      if (ids.indexOf(eventId) >= 0) return false;
+      ids.push(eventId);
+      if (ids.length > 24) ids = ids.slice(-24);
+      sessionStorage.setItem(PURCHASE_GUARD_KEY, JSON.stringify(ids));
+      return true;
+    } catch (e) {
+      return true;
+    }
+  }
+
   global.dvitesTrackPurchase = function (templateName, price, orderId) {
     if (!canTrack()) return;
-    global.fbq("track", "Purchase", {
+    var eventId = asText(orderId, "");
+    if (eventId && !markPurchaseTracked(eventId)) return;
+    var payload = {
       content_name: asText(templateName, "Dvites Template"),
       content_type: "product",
       value: asNumber(price, 0),
       currency: "INR",
-      order_id: asText(orderId, ""),
-    });
+      order_id: eventId,
+    };
+    var options = eventId ? { eventID: eventId } : {};
+    global.fbq("track", "Purchase", payload, options);
   };
 
   document.addEventListener("click", function (event) {
