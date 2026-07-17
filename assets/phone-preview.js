@@ -277,6 +277,13 @@
     );
   }
 
+  function usesNativeTouchMockup(iframe) {
+    if (!iframe) return false;
+    if (iframe.closest(".tp-mobile-demo-phone")) return true;
+    if (!global.matchMedia) return false;
+    return global.matchMedia("(max-width: 767px) and (pointer: coarse)").matches;
+  }
+
   function shouldFitScale(iframe, mode) {
     var opts = iframe._dvitesPreviewOpts || {};
     if (opts.fitScale === false) return false;
@@ -358,6 +365,7 @@
   }
 
   function injectIframeWheelBridge(iframe) {
+    if (usesNativeTouchMockup(iframe)) return;
     try {
       var doc = iframe.contentDocument;
       var win = iframe.contentWindow;
@@ -413,7 +421,7 @@
     meta.setAttribute("content", viewportContent);
   }
 
-  function injectCatalogScrollStyles(doc) {
+  function injectCatalogScrollStyles(doc, nativeTouch) {
     if (!doc) return;
     var el = doc.getElementById("dvites-catalog-scroll");
     if (!el) {
@@ -421,13 +429,17 @@
       el.id = "dvites-catalog-scroll";
       (doc.head || doc.documentElement).appendChild(el);
     }
+    var overscroll = nativeTouch ? "auto" : "contain";
     el.textContent =
       "html,body{overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;" +
       "overflow-x:hidden!important;height:auto!important;min-height:100%!important;" +
-      "touch-action:pan-y!important;overscroll-behavior:contain!important}" +
-      "#root{min-height:100%!important;height:auto!important;overflow:visible!important}" +
+      "touch-action:pan-y!important;overscroll-behavior-y:" + overscroll + "!important;" +
+      "scroll-behavior:auto!important;-webkit-scroll-behavior:auto!important}" +
+      "#root{min-height:100%!important;height:auto!important;overflow:visible!important;" +
+      "touch-action:pan-y!important;-webkit-overflow-scrolling:touch!important}" +
       "#root .overflow-y-auto,#root .overflow-auto,#root [class*='overflow-y-auto']" +
-      "{overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}";
+      "{overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;" +
+      "overscroll-behavior-y:" + overscroll + "!important}";
   }
 
   function wheelDelta(event) {
@@ -438,7 +450,7 @@
   }
 
   function bindPhoneMockupScroll(iframe, screenEl) {
-    if (!iframe || !screenEl) return;
+    if (!iframe || !screenEl || usesNativeTouchMockup(iframe)) return;
 
     if (typeof iframe._dvitesWheelCleanup === "function") {
       iframe._dvitesWheelCleanup();
@@ -487,11 +499,73 @@
     injectIframeWheelBridge(iframe);
   }
 
+  function injectNativeTouchScrollPatch(doc) {
+    if (!doc) return;
+    var el = doc.getElementById("dvites-native-touch-patch");
+    if (!el) {
+      el = doc.createElement("style");
+      el.id = "dvites-native-touch-patch";
+      (doc.head || doc.documentElement).appendChild(el);
+    }
+    el.textContent =
+      "html,body,#root,#main,[data-framer-root]{overscroll-behavior-y:auto!important;" +
+      "touch-action:pan-y!important;-webkit-overflow-scrolling:touch!important;" +
+      "scroll-behavior:auto!important}";
+  }
+
+  function fitPhoneMockupNativeTouch(iframe, screenEl, doc, win, scaler) {
+    var screenW = Math.max(320, Math.round(screenEl.clientWidth || 360));
+
+    injectCatalogViewport(doc, screenW, 1);
+    injectCatalogScrollStyles(doc, true);
+    injectNativeTouchScrollPatch(doc);
+
+    scaler.style.width = "100%";
+    scaler.style.height = "100%";
+    scaler.style.position = "absolute";
+    scaler.style.inset = "0";
+    scaler.style.left = "0";
+    scaler.style.top = "0";
+    scaler.style.transform = "none";
+    scaler.style.overflow = "hidden";
+    scaler.style.borderRadius = "inherit";
+    scaler.style.pointerEvents = "none";
+    scaler.style.touchAction = "pan-y";
+
+    iframe.style.width = "100%";
+    iframe.style.height = "100%";
+    iframe.style.border = "0";
+    iframe.style.display = "block";
+    iframe.style.maxWidth = "none";
+    iframe.style.position = "absolute";
+    iframe.style.inset = "0";
+    iframe.style.margin = "0";
+    iframe.style.transform = "none";
+    iframe.style.transformOrigin = "";
+    iframe.style.pointerEvents = "auto";
+    iframe.style.touchAction = "pan-y";
+    iframe.style.background = "transparent";
+    iframe.setAttribute("scrolling", "yes");
+
+    scaler.dataset.scale = "1";
+    scaler.dataset.fitMode = "catalog-native-touch";
+
+    try {
+      win.dispatchEvent(new Event("resize"));
+    } catch (e) { /* noop */ }
+
+    return 1;
+  }
+
   function fitPhoneMockup(iframe, screenEl) {
     var doc = iframe.contentDocument;
     var win = iframe.contentWindow;
     var scaler = iframe.parentElement;
     if (!doc || !scaler || !screenEl || !win) return 1;
+
+    if (usesNativeTouchMockup(iframe)) {
+      return fitPhoneMockupNativeTouch(iframe, screenEl, doc, win, scaler);
+    }
 
     if (!iframe.dataset.dvitesBaseWidth) {
       iframe.dataset.dvitesBaseWidth = String(getCatalogBaseWidth(doc));
@@ -502,7 +576,7 @@
     var scale = screenW / contentW;
 
     injectCatalogViewport(doc, contentW, scale);
-    injectCatalogScrollStyles(doc);
+    injectCatalogScrollStyles(doc, false);
 
     scaler.style.width = "100%";
     scaler.style.height = "100%";
@@ -871,6 +945,11 @@
         if (isHero) fillHeroPreview(frame);
         else if (mode === "preview" || fitScale) fitIframeScale(frame, screen);
         else fillIframe(frame);
+        if (usesNativeTouchMockup(frame) && frame.contentDocument) {
+          try {
+            frame.contentWindow.dispatchEvent(new Event("resize"));
+          } catch (e) { /* noop */ }
+        }
       });
     });
   }

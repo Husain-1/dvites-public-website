@@ -400,6 +400,11 @@
       if (thumb) thumb.classList.add("is-hidden");
       if (loading) loading.classList.add("is-hidden");
       if (iframeWrap) iframeWrap.classList.remove("is-hidden");
+      [50, 200, 600, 1200].forEach(function (delay) {
+        setTimeout(function () {
+          global.dispatchEvent(new Event("resize"));
+        }, delay);
+      });
       return;
     }
 
