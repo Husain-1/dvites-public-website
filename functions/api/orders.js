@@ -1,6 +1,6 @@
 import { isAdminAuthorized, adminUnauthorizedResponse } from "../_lib/admin-auth.js";
 import { rangeToBounds } from "../_lib/dates.js";
-import { supabaseSelect } from "../_lib/supabase.js";
+import { supabaseDelete, supabaseSelect } from "../_lib/supabase.js";
 
 function jsonResponse(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -13,13 +13,35 @@ function enc(value) {
   return encodeURIComponent(value);
 }
 
+async function buildDisplayIdMap(env) {
+  const result = await supabaseSelect(
+    env,
+    "orders",
+    "select=id&order=created_at.asc&limit=10000"
+  );
+  if (!result.ok) return {};
+  const map = {};
+  result.data.forEach(function (row, index) {
+    map[row.id] = String(index + 1).padStart(4, "0");
+  });
+  return map;
+}
+
+function attachDisplayId(order, displayIdMap) {
+  if (!order) return order;
+  return Object.assign({}, order, {
+    display_id: displayIdMap[order.id] || "—",
+  });
+}
+
 function buildFollowUpMessage(order) {
+  const orderRef = order.display_id || order.id || "—";
   const lines = [
     "Hi " + (order.customer_name || "there") + ",",
     "",
     "Thank you for your Dvites order. Please share your wedding details, photos, and events so we can customize your invitation.",
     "",
-    "Order ID: " + (order.id || "—"),
+    "Order ID: #" + orderRef,
     "Payment ID: " + (order.razorpay_payment_id || "—"),
     "Template: " + (order.template_name || "—"),
     "",
@@ -41,6 +63,8 @@ export async function onRequestGet(context) {
   const to = url.searchParams.get("to") || "";
   const limit = Math.min(Number(url.searchParams.get("limit") || 200), 500);
 
+  const displayIdMap = await buildDisplayIdMap(env);
+
   if (id) {
     const result = await supabaseSelect(
       env,
@@ -50,12 +74,16 @@ export async function onRequestGet(context) {
     if (!result.ok || !result.data.length) {
       return jsonResponse({ error: "Order not found." }, 404);
     }
-    const order = result.data[0];
+    const order = attachDisplayId(result.data[0], displayIdMap);
     const message = buildFollowUpMessage(order);
     return jsonResponse({
       order,
       follow_up: {
-        whatsapp: "https://wa.me/" + (order.customer_phone || "").replace(/\D/g, "") + "?text=" + encodeURIComponent(message),
+        whatsapp:
+          "https://wa.me/" +
+          (order.customer_phone || "").replace(/\D/g, "") +
+          "?text=" +
+          encodeURIComponent(message),
         email:
           "mailto:" +
           (order.customer_email || "") +
@@ -78,10 +106,14 @@ export async function onRequestGet(context) {
   const result = await supabaseSelect(env, "orders", query);
   if (!result.ok) return jsonResponse({ error: result.error }, 500);
 
-  let orders = result.data;
+  let orders = result.data.map(function (order) {
+    return attachDisplayId(order, displayIdMap);
+  });
+
   if (search) {
     orders = orders.filter(function (order) {
       const haystack = [
+        order.display_id,
         order.id,
         order.customer_name,
         order.customer_email,
@@ -124,4 +156,22 @@ export async function onRequestGet(context) {
       month_orders: monthOrders.length,
     },
   });
+}
+
+export async function onRequestDelete(context) {
+  const { request, env } = context;
+  if (!isAdminAuthorized(request, env)) return adminUnauthorizedResponse();
+
+  const url = new URL(request.url);
+  const id = (url.searchParams.get("id") || "").trim();
+  if (!id) {
+    return jsonResponse({ error: "Missing order id." }, 400);
+  }
+
+  const result = await supabaseDelete(env, "orders", "id=eq." + enc(id));
+  if (!result.ok) {
+    return jsonResponse({ error: result.error || "Unable to delete order." }, 500);
+  }
+
+  return jsonResponse({ ok: true, deleted_id: id });
 }

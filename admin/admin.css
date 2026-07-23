@@ -1,17 +1,18 @@
-/* Dvites Admin — dark wine dashboard */
+/* Dvites Admin — ivory & maroon (matches site theme) */
 :root {
-  --admin-bg: #12090d;
-  --admin-surface: #1d1016;
-  --admin-surface-2: #26161d;
-  --admin-border: rgba(255, 255, 255, 0.08);
-  --admin-text: #f7eef1;
-  --admin-muted: #b7a0a8;
-  --admin-accent: #8f1f3f;
-  --admin-accent-soft: #b33a5d;
-  --admin-gold: #c9a84c;
-  --admin-success: #3ecf8e;
-  --admin-danger: #ff6b7f;
+  --admin-bg: #faf7f2;
+  --admin-surface: #fffdf9;
+  --admin-surface-2: #f3ece3;
+  --admin-border: rgba(92, 26, 40, 0.1);
+  --admin-text: #2a1818;
+  --admin-muted: #6b5b5b;
+  --admin-accent: #5c1a28;
+  --admin-accent-soft: #7a2438;
+  --admin-gold: #b8943f;
+  --admin-success: #2d8a5e;
+  --admin-danger: #c0392b;
   --admin-radius: 14px;
+  --admin-shadow: 0 4px 24px rgba(42, 24, 24, 0.06);
 }
 
 * { box-sizing: border-box; }
@@ -24,7 +25,7 @@ html {
 body.admin-body {
   margin: 0;
   font-family: Inter, system-ui, sans-serif;
-  background: var(--admin-bg);
+  background: linear-gradient(180deg, #fff 0%, var(--admin-bg) 100%);
   color: var(--admin-text);
   line-height: 1.5;
   min-height: 100vh;
@@ -51,6 +52,7 @@ body.admin-drawer-open {
 .admin-sidebar {
   background: var(--admin-surface);
   border-right: 1px solid var(--admin-border);
+  box-shadow: var(--admin-shadow);
   padding: 24px 18px;
   position: sticky;
   top: 0;
@@ -81,9 +83,9 @@ body.admin-drawer-open {
   margin-top: 8px;
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(201, 168, 76, 0.14);
-  border: 1px solid rgba(201, 168, 76, 0.35);
-  color: var(--admin-gold) !important;
+  background: rgba(92, 26, 40, 0.08);
+  border: 1px solid rgba(92, 26, 40, 0.18);
+  color: var(--admin-accent) !important;
   font-size: 10px !important;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -95,9 +97,9 @@ body.admin-drawer-open {
   align-items: center;
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(143, 31, 63, 0.22);
-  border: 1px solid rgba(143, 31, 63, 0.45);
-  color: var(--admin-text);
+  background: rgba(92, 26, 40, 0.08);
+  border: 1px solid rgba(92, 26, 40, 0.2);
+  color: var(--admin-accent);
   font-size: 12px;
   font-weight: 700;
 }
@@ -119,8 +121,8 @@ body.admin-drawer-open {
 
 .admin-nav a:hover,
 .admin-nav a.is-active {
-  background: rgba(143, 31, 63, 0.22);
-  color: var(--admin-text);
+  background: rgba(92, 26, 40, 0.1);
+  color: var(--admin-accent);
 }
 
 .admin-main {
@@ -173,8 +175,11 @@ body.admin-drawer-open {
 
 .admin-title {
   margin: 0;
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
   font-weight: 700;
+  color: var(--admin-accent);
+  letter-spacing: -0.01em;
 }
 
 .admin-subtitle {
@@ -205,13 +210,15 @@ body.admin-drawer-open {
   cursor: pointer;
 }
 
-.admin-btn:hover { border-color: rgba(255, 255, 255, 0.18); }
+.admin-btn:hover { border-color: rgba(92, 26, 40, 0.25); }
 .admin-btn-primary {
-  background: linear-gradient(135deg, var(--admin-accent) 0%, #6d1730 100%);
+  background: linear-gradient(135deg, var(--admin-accent) 0%, var(--admin-accent-soft) 100%);
   border-color: transparent;
+  color: #fff;
 }
-.admin-btn-success { background: rgba(62, 207, 142, 0.16); color: var(--admin-success); }
-.admin-btn-danger { background: rgba(255, 107, 127, 0.12); color: var(--admin-danger); }
+.admin-btn-primary:hover { border-color: transparent; opacity: 0.92; }
+.admin-btn-success { background: rgba(45, 138, 94, 0.1); color: var(--admin-success); border-color: rgba(45, 138, 94, 0.25); }
+.admin-btn-danger { background: rgba(192, 57, 43, 0.08); color: var(--admin-danger); border-color: rgba(192, 57, 43, 0.25); }
 
 .admin-grid {
   display: grid;
@@ -225,6 +232,7 @@ body.admin-drawer-open {
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius);
   padding: 18px;
+  box-shadow: var(--admin-shadow);
 }
 
 .admin-card-label {
@@ -241,6 +249,10 @@ body.admin-drawer-open {
   color: var(--admin-text);
 }
 
+.admin-card-value-gold {
+  color: var(--admin-gold);
+}
+
 .admin-card-note {
   margin-top: 6px;
   font-size: 12px;
@@ -253,6 +265,7 @@ body.admin-drawer-open {
   border-radius: var(--admin-radius);
   padding: 18px;
   margin-bottom: 20px;
+  box-shadow: var(--admin-shadow);
 }
 
 .admin-panel h2 {
@@ -279,9 +292,9 @@ body.admin-drawer-open {
 }
 
 .admin-chip.is-active {
-  background: rgba(143, 31, 63, 0.24);
-  color: var(--admin-text);
-  border-color: rgba(143, 31, 63, 0.5);
+  background: rgba(92, 26, 40, 0.1);
+  color: var(--admin-accent);
+  border-color: rgba(92, 26, 40, 0.35);
 }
 
 .admin-input,
@@ -319,7 +332,8 @@ body.admin-drawer-open {
   letter-spacing: 0.06em;
 }
 
-.admin-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+.admin-table tr:hover td { background: rgba(92, 26, 40, 0.04); }
+.admin-table tr.is-selected td { background: rgba(92, 26, 40, 0.07); }
 
 .admin-pill {
   display: inline-flex;
@@ -327,8 +341,14 @@ body.admin-drawer-open {
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
-  background: rgba(201, 168, 76, 0.14);
+  background: rgba(184, 148, 63, 0.12);
   color: var(--admin-gold);
+}
+
+.admin-pill-id {
+  background: rgba(92, 26, 40, 0.08);
+  color: var(--admin-accent);
+  font-variant-numeric: tabular-nums;
 }
 
 .admin-bar-chart {
@@ -347,7 +367,7 @@ body.admin-drawer-open {
 .admin-bar-track {
   height: 8px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(92, 26, 40, 0.08);
   overflow: hidden;
 }
 
@@ -395,11 +415,14 @@ body.admin-drawer-open {
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius);
   padding: 24px;
+  box-shadow: var(--admin-shadow);
 }
 
 .admin-auth-card h1 {
   margin: 0 0 8px;
-  font-size: 1.5rem;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.75rem;
+  color: var(--admin-accent);
 }
 
 .admin-auth-card p {
@@ -425,7 +448,7 @@ body.admin-drawer-open {
   border-radius: 50%;
   background: var(--admin-success);
   margin-right: 6px;
-  box-shadow: 0 0 0 4px rgba(62, 207, 142, 0.18);
+  box-shadow: 0 0 0 4px rgba(45, 138, 94, 0.18);
 }
 
 .admin-sound-settings {
@@ -509,9 +532,9 @@ body.admin-drawer-open {
   gap: 12px;
   padding: 14px 16px;
   border-radius: 12px;
-  background: rgba(29, 16, 22, 0.96);
-  border: 1px solid rgba(201, 168, 76, 0.35);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  background: rgba(255, 253, 249, 0.98);
+  border: 1px solid rgba(184, 148, 63, 0.35);
+  box-shadow: 0 16px 40px rgba(42, 24, 24, 0.12);
 }
 
 .admin-sound-unlock p {
@@ -532,9 +555,9 @@ body.admin-drawer-open {
   gap: 12px;
   padding: 14px 16px;
   border-radius: 12px;
-  background: rgba(29, 16, 22, 0.96);
-  border: 1px solid rgba(143, 31, 63, 0.45);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  background: rgba(255, 253, 249, 0.98);
+  border: 1px solid rgba(92, 26, 40, 0.2);
+  box-shadow: 0 16px 40px rgba(42, 24, 24, 0.12);
 }
 
 .admin-sw-reload p {
@@ -587,7 +610,7 @@ body.admin-drawer-open {
 }
 
 .admin-pill-paid {
-  background: rgba(62, 207, 142, 0.16);
+  background: rgba(45, 138, 94, 0.12);
   color: var(--admin-success);
 }
 
@@ -641,7 +664,7 @@ body.admin-drawer-open {
     position: fixed;
     inset: 0;
     z-index: 1090;
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(42, 24, 24, 0.35);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
@@ -707,9 +730,21 @@ body.admin-drawer-open {
       calc(12px + env(safe-area-inset-top, 0))
       16px
       12px;
-    background: rgba(18, 9, 13, 0.94);
+    background: rgba(255, 253, 249, 0.94);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--admin-border);
+  }
+
+  .admin-mobile-title {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--admin-accent);
+    font-family: "Cormorant Garamond", Georgia, serif;
   }
 
   .admin-menu-toggle {
@@ -730,16 +765,6 @@ body.admin-drawer-open {
   .admin-mobile-title-wrap {
     min-width: 0;
     flex: 1;
-  }
-
-  .admin-mobile-title {
-    display: block;
-    font-size: 1rem;
-    font-weight: 700;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .admin-mobile-subtitle {

@@ -8,9 +8,15 @@
   var currentRange = "all";
   var currentStatus = "";
   var searchQuery = "";
+  var refreshTimer = null;
 
   function contentEl() {
     return document.getElementById("admin-content");
+  }
+
+  function orderRef(order) {
+    if (!order) return "—";
+    return order.display_id ? "#" + order.display_id : (order.id || "—");
   }
 
   function buildCustomerWhatsApp(order) {
@@ -19,7 +25,7 @@
       "",
       "Thank you for your Dvites order. Please share your wedding details, photos, and events so we can customize your invitation.",
       "",
-      "Order ID: " + (order.id || "—"),
+      "Order ID: " + orderRef(order),
       "Payment ID: " + (order.razorpay_payment_id || "—"),
       "Template: " + (order.template_name || "—"),
     ].join("\n");
@@ -34,7 +40,7 @@
       "",
       "Thank you for your Dvites order. Please share your wedding details, photos, and events.",
       "",
-      "Order ID: " + (order.id || "—"),
+      "Order ID: " + orderRef(order),
       "Payment ID: " + (order.razorpay_payment_id || "—"),
       "Template: " + (order.template_name || "—"),
     ].join("\n");
@@ -48,7 +54,7 @@
 
   function exportCsv(rows) {
     var headers = [
-      "id", "created_at", "template_name", "template_slug", "amount", "currency",
+      "display_id", "id", "created_at", "template_name", "template_slug", "amount", "currency",
       "payment_status", "customization_status", "customer_name", "customer_email",
       "customer_phone", "razorpay_payment_id", "razorpay_order_id"
     ];
@@ -77,6 +83,7 @@
     return (
       '<article class="admin-order-card" data-order-id="' + order.id + '">' +
         '<div class="admin-order-card-head">' +
+          '<p><span class="admin-pill admin-pill-id">' + orderRef(order) + '</span></p>' +
           '<h3 class="admin-order-card-title">' + (order.template_name || "—") + '</h3>' +
           '<p class="admin-order-card-amount">' + global.DvitesAdmin.formatMoney(order.amount) + '</p>' +
         '</div>' +
@@ -94,6 +101,7 @@
           '<button class="admin-btn admin-btn-primary admin-order-view" type="button" data-order-id="' + order.id + '">View</button>' +
           '<a class="admin-btn admin-btn-success" href="' + buildCustomerWhatsApp(order) + '" target="_blank" rel="noopener">WhatsApp</a>' +
           '<a class="admin-btn" href="' + buildCustomerEmail(order) + '">Email</a>' +
+          '<button class="admin-btn admin-btn-danger admin-order-delete" type="button" data-order-id="' + order.id + '">Delete</button>' +
         '</div>' +
       '</article>'
     );
@@ -101,12 +109,16 @@
 
   function selectOrder(orderId, scrollToDetail) {
     selectedOrderId = orderId;
+    document.querySelectorAll(".admin-order-row").forEach(function (row) {
+      row.classList.toggle("is-selected", row.getAttribute("data-order-id") === orderId);
+    });
     var order = orders.find(function (o) { return o.id === orderId; });
     var detail = document.getElementById("orders-detail");
     if (detail) detail.innerHTML = renderDetail(order || null);
     if (scrollToDetail && detail) {
       detail.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+    bindDetailActions();
   }
 
   function renderDetail(order) {
@@ -117,7 +129,7 @@
       '<div class="admin-panel">' +
         '<h2>Order Details</h2>' +
         '<dl class="admin-detail-grid">' +
-          '<div class="admin-detail-row"><dt>Order ID</dt><dd>' + (order.id || "—") + '</dd></div>' +
+          '<div class="admin-detail-row"><dt>Order ID</dt><dd><span class="admin-pill admin-pill-id">' + orderRef(order) + '</span></dd></div>' +
           '<div class="admin-detail-row"><dt>Created</dt><dd>' + global.DvitesAdmin.formatDate(order.created_at) + '</dd></div>' +
           '<div class="admin-detail-row"><dt>Template</dt><dd>' + (order.template_name || "—") + '</dd></div>' +
           '<div class="admin-detail-row"><dt>Amount</dt><dd>' + global.DvitesAdmin.formatMoney(order.amount) + '</dd></div>' +
@@ -132,9 +144,38 @@
         '<div class="admin-actions">' +
           '<a class="admin-btn admin-btn-success" href="' + buildCustomerWhatsApp(order) + '" target="_blank" rel="noopener">WhatsApp Follow-up</a>' +
           '<a class="admin-btn" href="' + buildCustomerEmail(order) + '">Email Follow-up</a>' +
+          '<button class="admin-btn admin-btn-danger" id="orders-delete-selected" type="button" data-order-id="' + order.id + '">Delete Order</button>' +
         '</div>' +
       '</div>'
     );
+  }
+
+  function deleteOrder(orderId) {
+    var order = orders.find(function (o) { return o.id === orderId; });
+    var label = order ? orderRef(order) : "this order";
+    if (!global.confirm("Delete " + label + " permanently? It will be removed from revenue and all records.")) {
+      return;
+    }
+
+    global.DvitesAdmin.adminFetch("/api/orders?id=" + encodeURIComponent(orderId), { method: "DELETE" })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data.error) throw new Error(data.error);
+        if (selectedOrderId === orderId) selectedOrderId = null;
+        loadOrders();
+      })
+      .catch(function (error) {
+        global.alert(error.message || "Unable to delete order.");
+      });
+  }
+
+  function bindDetailActions() {
+    var deleteBtn = document.getElementById("orders-delete-selected");
+    if (deleteBtn) {
+      deleteBtn.addEventListener("click", function () {
+        deleteOrder(deleteBtn.getAttribute("data-order-id"));
+      });
+    }
   }
 
   function renderOrders(data) {
@@ -146,7 +187,7 @@
     el.innerHTML =
       '<div class="admin-grid">' +
         '<div class="admin-card"><div class="admin-card-label">Total orders</div><div class="admin-card-value">' + (summary.total_orders || 0) + '</div></div>' +
-        '<div class="admin-card"><div class="admin-card-label">Total revenue</div><div class="admin-card-value">' + global.DvitesAdmin.formatMoney(summary.total_revenue) + '</div></div>' +
+        '<div class="admin-card"><div class="admin-card-label">Total revenue</div><div class="admin-card-value admin-card-value-gold">' + global.DvitesAdmin.formatMoney(summary.total_revenue) + '</div></div>' +
         '<div class="admin-card"><div class="admin-card-label">Today</div><div class="admin-card-value">' + (summary.today_orders || 0) + '</div></div>' +
         '<div class="admin-card"><div class="admin-card-label">This week</div><div class="admin-card-value">' + (summary.week_orders || 0) + '</div></div>' +
         '<div class="admin-card"><div class="admin-card-label">This month</div><div class="admin-card-value">' + (summary.month_orders || 0) + '</div></div>' +
@@ -173,7 +214,7 @@
         '<div class="admin-order-cards admin-mobile-only" id="orders-mobile-list"></div>' +
         '<div class="admin-table-wrap admin-desktop-only">' +
           '<table class="admin-table">' +
-            '<thead><tr><th>Date</th><th>Template</th><th>Customer</th><th>Amount</th><th>Status</th><th>Payment</th></tr></thead>' +
+            '<thead><tr><th>Order</th><th>Date</th><th>Template</th><th>Customer</th><th>Amount</th><th>Status</th><th>Payment</th><th></th></tr></thead>' +
             '<tbody id="orders-table-body"></tbody>' +
           '</table>' +
         '</div>' +
@@ -186,19 +227,21 @@
     var tbody = document.getElementById("orders-table-body");
     var mobileList = document.getElementById("orders-mobile-list");
     if (!orders.length) {
-      if (tbody) tbody.innerHTML = '<tr><td colspan="6">No orders found.</td></tr>';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="8">No orders found.</td></tr>';
       if (mobileList) mobileList.innerHTML = '<p class="admin-status">No orders found.</p>';
     } else {
       if (tbody) {
         tbody.innerHTML = orders.map(function (order) {
           return (
-            '<tr data-order-id="' + order.id + '" class="admin-order-row">' +
+            '<tr data-order-id="' + order.id + '" class="admin-order-row' + (selectedOrderId === order.id ? ' is-selected' : '') + '">' +
+              '<td><span class="admin-pill admin-pill-id">' + orderRef(order) + '</span></td>' +
               '<td>' + global.DvitesAdmin.formatDate(order.created_at) + '</td>' +
               '<td>' + (order.template_name || "—") + '</td>' +
               '<td>' + (order.customer_name || order.customer_email || "—") + '</td>' +
               '<td>' + global.DvitesAdmin.formatMoney(order.amount) + '</td>' +
               '<td><span class="admin-pill">' + (order.customization_status || "New") + '</span></td>' +
               '<td>' + paymentLabel(order) + '</td>' +
+              '<td><button class="admin-btn admin-btn-danger admin-order-delete" type="button" data-order-id="' + order.id + '" style="padding:6px 10px;font-size:12px;">Delete</button></td>' +
             '</tr>'
           );
         }).join("");
@@ -212,6 +255,7 @@
     if (selectedOrderId) {
       var selected = orders.find(function (o) { return o.id === selectedOrderId; });
       document.getElementById("orders-detail").innerHTML = renderDetail(selected || null);
+      bindDetailActions();
     }
   }
 
@@ -233,7 +277,8 @@
       loadOrders();
     });
     document.querySelectorAll(".admin-order-row[data-order-id]").forEach(function (row) {
-      row.addEventListener("click", function () {
+      row.addEventListener("click", function (event) {
+        if (event.target.closest(".admin-order-delete")) return;
         selectOrder(row.getAttribute("data-order-id"), false);
       });
     });
@@ -241,6 +286,12 @@
       button.addEventListener("click", function (event) {
         event.stopPropagation();
         selectOrder(button.getAttribute("data-order-id"), true);
+      });
+    });
+    document.querySelectorAll(".admin-order-delete[data-order-id]").forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        event.stopPropagation();
+        deleteOrder(button.getAttribute("data-order-id"));
       });
     });
   }
@@ -266,9 +317,25 @@
       });
   }
 
+  function startAutoRefresh() {
+    if (refreshTimer) clearInterval(refreshTimer);
+    refreshTimer = setInterval(function () {
+      if (document.visibilityState === "visible") loadOrders();
+    }, 45000);
+  }
+
   function init() {
     if (!global.DvitesAdmin.ensureAuthShell("Orders", "orders")) return;
     loadOrders();
+    startAutoRefresh();
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.addEventListener("message", function (event) {
+        if (event.data && event.data.type === "DVITES_NEW_ORDER") {
+          loadOrders();
+        }
+      });
+    }
   }
 
   if (document.readyState === "loading") {

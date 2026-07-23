@@ -1,4 +1,4 @@
-import { supabaseSelect } from "./supabase.js";
+import { supabaseDelete, supabaseSelect } from "./supabase.js";
 
 function base64UrlToUint8Array(base64String) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -141,7 +141,9 @@ async function sendWebPush(subscription, payload, vapid) {
   const response = await fetch(subscription.endpoint, {
     method: "POST",
     headers: {
-      TTL: "86400",
+      TTL: "60",
+      Urgency: "high",
+      Topic: "dvites-new-order",
       "Content-Type": "application/octet-stream",
       "Content-Encoding": "aes128gcm",
       Authorization: "vapid t=" + jwt + ", k=" + vapid.publicKey,
@@ -174,9 +176,12 @@ export async function notifyAdminsOfOrder(env, order) {
       Number(order.amount || 0).toLocaleString("en-IN"),
     url: "/admin/orders.html",
     order_id: order.id || null,
+    tag: "dvites-new-order-" + (order.id || Date.now()),
   };
 
   let sent = 0;
+  let failed = 0;
+
   for (const sub of result.data) {
     try {
       const pushResult = await sendWebPush(
@@ -184,11 +189,21 @@ export async function notifyAdminsOfOrder(env, order) {
         payload,
         { publicKey, privateKey, subject }
       );
-      if (pushResult.ok) sent += 1;
+      if (pushResult.ok) {
+        sent += 1;
+      } else if (pushResult.status === 404 || pushResult.status === 410) {
+        await supabaseDelete(
+          env,
+          "push_subscriptions",
+          "endpoint=eq." + encodeURIComponent(sub.endpoint)
+        );
+      } else {
+        failed += 1;
+      }
     } catch {
-      // Continue notifying other subscriptions.
+      failed += 1;
     }
   }
 
-  return { sent, skipped: false };
+  return { sent, failed, skipped: false };
 }

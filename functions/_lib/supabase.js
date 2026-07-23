@@ -100,3 +100,23 @@ export async function supabaseCount(env, table, queryString) {
   const match = range.match(/\/(\d+)$/);
   return { ok: true, count: match ? Number(match[1]) : 0 };
 }
+
+export async function supabaseDelete(env, table, queryString) {
+  const config = getSupabaseConfig(env);
+  if (!config) return { ok: false, error: "Supabase is not configured." };
+
+  const url = config.url + "/rest/v1/" + table + (queryString ? "?" + queryString : "");
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: supabaseHeaders(config.key, { Prefer: "return=minimal" }),
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+    const message =
+      (data && (data.message || data.error || data.hint)) || "Delete failed.";
+    return { ok: false, error: String(message).slice(0, 240) };
+  }
+
+  return { ok: true };
+}

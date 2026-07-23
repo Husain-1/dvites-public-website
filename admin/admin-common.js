@@ -340,63 +340,84 @@
     var status = document.getElementById("admin-push-status");
     if (!button) return;
 
+    function setPushStatus(text) {
+      if (status) status.textContent = text;
+    }
+
+    function savePushSubscription() {
+      return fetch("/api/push-subscribe")
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (!data.publicKey) throw new Error("VAPID public key missing.");
+          return navigator.serviceWorker.ready.then(function (registration) {
+            return registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(data.publicKey),
+            });
+          });
+        })
+        .then(function (subscription) {
+          var json = subscription.toJSON();
+          return fetch("/api/push-subscribe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              endpoint: json.endpoint,
+              p256dh: json.keys.p256dh,
+              auth: json.keys.auth,
+              user_agent: navigator.userAgent,
+            }),
+          });
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (result) {
+          if (result.ok) {
+            setPushStatus("Order notifications enabled on this device.");
+            button.textContent = "Notifications Active";
+            return true;
+          }
+          throw new Error(result.error || "Unable to save subscription.");
+        });
+    }
+
     fetch("/api/push-subscribe")
       .then(function (res) { return res.json(); })
       .then(function (data) {
         if (!data.enabled) {
-          status.textContent = "Push not configured on server yet.";
+          setPushStatus("Push not configured on server yet.");
           button.disabled = true;
+          return;
+        }
+
+        if (!("Notification" in global) || !("serviceWorker" in navigator)) {
+          setPushStatus("Install as app on iPhone for push alerts (Add to Home Screen).");
+          return;
+        }
+
+        if (Notification.permission === "granted") {
+          savePushSubscription().catch(function () {
+            setPushStatus("Tap below to re-enable order notifications.");
+          });
+        } else if (Notification.permission === "denied") {
+          setPushStatus("Notifications blocked. Enable in browser settings.");
         }
       })
       .catch(function () {});
 
     button.addEventListener("click", function () {
       if (!("Notification" in global) || !("serviceWorker" in navigator)) {
-        status.textContent = "Notifications are not supported on this device.";
+        setPushStatus("Notifications are not supported on this device.");
         return;
       }
 
       Notification.requestPermission().then(function (permission) {
         if (permission !== "granted") {
-          status.textContent = "Notification permission denied.";
+          setPushStatus("Notification permission denied.");
           return;
         }
-
-        return fetch("/api/push-subscribe")
-          .then(function (res) { return res.json(); })
-          .then(function (data) {
-            if (!data.publicKey) throw new Error("VAPID public key missing.");
-            return navigator.serviceWorker.ready.then(function (registration) {
-              return registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(data.publicKey),
-              });
-            });
-          })
-          .then(function (subscription) {
-            var json = subscription.toJSON();
-            return fetch("/api/push-subscribe", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                endpoint: json.endpoint,
-                p256dh: json.keys.p256dh,
-                auth: json.keys.auth,
-                user_agent: navigator.userAgent,
-              }),
-            });
-          })
-          .then(function (res) { return res.json(); })
-          .then(function (result) {
-            if (result.ok) {
-              status.textContent = "Order notifications enabled on this device.";
-            } else {
-              status.textContent = result.error || "Unable to save subscription.";
-            }
-          })
-          .catch(function (error) {
-            status.textContent = error.message || "Unable to enable notifications.";
-          });
+        savePushSubscription().catch(function (error) {
+          setPushStatus(error.message || "Unable to enable notifications.");
+        });
       });
     });
   }
