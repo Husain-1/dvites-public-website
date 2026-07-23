@@ -408,6 +408,10 @@ body.admin-drawer-open {
   font-size: 14px;
 }
 
+.admin-auth-password {
+  margin-top: 10px;
+}
+
 .admin-status {
   margin-top: 12px;
   font-size: 13px;

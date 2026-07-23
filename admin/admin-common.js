@@ -61,15 +61,48 @@
     global.location.reload();
   }
 
-  function verifyAdminKey(key) {
-    return fetch("/api/orders?range=today", {
-      headers: { "X-Dvites-Admin-Key": key },
-    }).then(function (response) {
-      if (response.status === 401) return false;
-      return response.ok;
-    }).catch(function () {
-      return false;
-    });
+  function verifyAdminLogin(username, password) {
+    return fetch("/api/admin-login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+      }),
+    })
+      .then(function (response) {
+        return response.text().then(function (text) {
+          var data = null;
+          try {
+            data = text ? JSON.parse(text) : null;
+          } catch (e) {
+            data = null;
+          }
+
+          if (response.status === 404 || (text && text.trim().charAt(0) === "<")) {
+            return {
+              ok: false,
+              error:
+                "Admin login needs the Cloudflare API. Live Server cannot run /api routes. Stop Live Server and run: npm run dev",
+            };
+          }
+
+          if (!response.ok || !data || !data.ok || !data.adminKey) {
+            return {
+              ok: false,
+              error: (data && data.error) || "Invalid email or password.",
+            };
+          }
+          return { ok: true, adminKey: data.adminKey };
+        });
+      })
+      .catch(function () {
+        return {
+          ok: false,
+          error:
+            "Unable to reach the login API. Use npm run dev (Wrangler), not Live Server, for admin.",
+        };
+      });
   }
 
   function adminFetch(url, options) {
@@ -90,41 +123,47 @@
       '<div class="admin-auth">' +
         '<div class="admin-auth-card">' +
           '<h1>Dvites Admin</h1>' +
-          '<p>Enter your admin API key once. This device will stay signed in as <strong>' + ROLE_LABEL + '</strong> for up to 365 days.</p>' +
-          '<input class="admin-input" id="admin-key-input" type="password" placeholder="Admin API key" autocomplete="current-password" />' +
+          '<p>Sign in with your admin credentials to access the <strong>' + ROLE_LABEL + '</strong> dashboard on this device for up to 365 days.</p>' +
+          '<input class="admin-input" id="admin-email-input" type="text" inputmode="email" autocomplete="username" placeholder="Email or username" />' +
+          '<input class="admin-input admin-auth-password" id="admin-password-input" type="password" autocomplete="current-password" placeholder="Password" />' +
           '<div style="margin-top:12px;display:flex;gap:10px;">' +
-            '<button class="admin-btn admin-btn-primary" id="admin-key-save" type="button">Continue</button>' +
+            '<button class="admin-btn admin-btn-primary" id="admin-login-submit" type="button">Sign in</button>' +
           '</div>' +
           '<p class="admin-status" id="admin-auth-status"></p>' +
         '</div>' +
       '</div>';
 
-    var saveBtn = document.getElementById("admin-key-save");
-    var input = document.getElementById("admin-key-input");
+    var saveBtn = document.getElementById("admin-login-submit");
+    var emailInput = document.getElementById("admin-email-input");
+    var passwordInput = document.getElementById("admin-password-input");
     var status = document.getElementById("admin-auth-status");
 
     function submitLogin() {
-      var value = (input.value || "").trim();
-      if (!value) {
-        status.textContent = "Please enter the admin key.";
+      var username = (emailInput.value || "").trim();
+      var password = passwordInput.value || "";
+      if (!username || !password) {
+        status.textContent = "Please enter your email and password.";
         return;
       }
-      status.textContent = "Verifying access…";
+      status.textContent = "Signing in…";
       saveBtn.disabled = true;
-      verifyAdminKey(value).then(function (ok) {
+      verifyAdminLogin(username, password).then(function (result) {
         saveBtn.disabled = false;
-        if (!ok) {
-          status.textContent = "Invalid admin key. Please try again.";
+        if (!result.ok) {
+          status.textContent = result.error || "Invalid email or password.";
           return;
         }
-        setAdminKey(value);
+        setAdminKey(result.adminKey);
         global.location.reload();
       });
     }
 
     saveBtn.addEventListener("click", submitLogin);
-    input.addEventListener("keydown", function (event) {
+    passwordInput.addEventListener("keydown", function (event) {
       if (event.key === "Enter") submitLogin();
+    });
+    emailInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") passwordInput.focus();
     });
   }
 

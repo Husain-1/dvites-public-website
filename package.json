@@ -1,9 +1,13 @@
 {
   "scripts": {
     "generate:template-pages": "node scripts/generate-template-pages.js",
-    "test:meta-capi": "node tests/meta-capi.test.mjs"
+    "test:meta-capi": "node tests/meta-capi.test.mjs",
+    "dev": "wrangler pages dev . --port 8788"
   },
   "dependencies": {
     "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "wrangler": "^4.24.0"
   }
 }
