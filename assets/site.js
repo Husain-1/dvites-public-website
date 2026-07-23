@@ -2,7 +2,7 @@
   "use strict";
 
   var EMAIL = "infodvites@gmail.com";
-  var PRICE = 1199;
+  var PRICE = 799;
   var OLD_PRICE = 2499;
   var SAVE_THE_DATE_PRICE = 999;
   var SAVE_THE_DATE_OLD_PRICE = 1999;
@@ -156,7 +156,7 @@
   function buyMail(title) {
     return mailto(
       "Buy Now — " + title + " Wedding Invitation",
-      "Hi Dvites,\n\nI'd like to purchase the " + title + " template (₹1,199).\n\nPlease confirm availability and payment details.\n\nThank you."
+      "Hi Dvites,\n\nI'd like to purchase the " + title + " template (" + formatRupee(PRICE) + ").\n\nPlease confirm availability and payment details.\n\nThank you."
     );
   }
 

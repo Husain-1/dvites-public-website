@@ -25,10 +25,10 @@ async function testPhoneNormalizationAndHashing() {
 }
 
 function testPaiseToRupees() {
-  assert.equal(paiseToRupees(119900), 1199);
+  assert.equal(paiseToRupees(79900), 799);
   assert.equal(paiseToRupees(99900), 999);
-  assert.equal(rupeesFromTrustedSources({ paymentAmountPaise: 119900, orderAmountPaise: 99900 }), 1199);
-  assert.equal(rupeesFromTrustedSources({ paymentAmountPaise: null, orderAmountPaise: 119900 }), 1199);
+  assert.equal(rupeesFromTrustedSources({ paymentAmountPaise: 79900, orderAmountPaise: 99900 }), 799);
+  assert.equal(rupeesFromTrustedSources({ paymentAmountPaise: null, orderAmountPaise: 79900 }), 799);
 }
 
 function testPayloadGeneration() {
@@ -37,7 +37,7 @@ function testPayloadGeneration() {
     eventTime: 1700000000,
     eventSourceUrl: "https://dvites.digicrave.in/wedding/curtains.html",
     currency: "INR",
-    value: 1199,
+    value: 799,
     orderId: "order_internal_1",
     contentId: "curtains",
     contentName: "Curtains",
@@ -46,7 +46,7 @@ function testPayloadGeneration() {
 
   assert.equal(payload.event_name, "Purchase");
   assert.equal(payload.event_id, "pay_ABC123");
-  assert.equal(payload.custom_data.value, 1199);
+  assert.equal(payload.custom_data.value, 799);
   assert.equal(payload.custom_data.currency, "INR");
   assert.equal(payload.custom_data.content_ids[0], "curtains");
   assert.equal(payload.custom_data.num_items, 1);
@@ -81,7 +81,7 @@ async function testMissingEnvironmentSkips() {
   const result = await sendMetaPurchase({
     env: {},
     eventId: "pay_test_1",
-    value: 1199,
+    value: 799,
     currency: "INR",
   });
   assert.equal(result.skipped, true);
@@ -95,7 +95,7 @@ async function testMetaApiFailureDoesNotThrow() {
       META_CAPI_ACCESS_TOKEN: "test-token-not-real",
     },
     eventId: "pay_test_2",
-    value: 1199,
+    value: 799,
     currency: "INR",
     contentName: "Curtains",
     orderId: "order_abc",
@@ -124,7 +124,7 @@ async function testSuccessfulMetaMock() {
       META_CAPI_ACCESS_TOKEN: "test-token-not-real",
     },
     eventId: "pay_test_3",
-    value: 1199,
+    value: 799,
     currency: "INR",
     contentId: "curtains",
     contentName: "Curtains",
@@ -149,7 +149,7 @@ function testBrowserServerEventIdParity() {
   const browserOptions = { eventID: paymentId };
   const serverPayload = buildPurchasePayload({
     eventId: paymentId,
-    value: 1199,
+    value: 799,
     currency: "INR",
     contentName: "Curtains",
     orderId: "internal-order",

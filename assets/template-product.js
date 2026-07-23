@@ -211,6 +211,63 @@
     });
   }
 
+  function swatchLabel(name) {
+    var word = String(name || "").trim().split(/\s+/)[0];
+    return word || "Template";
+  }
+
+  function pickBrowseSwatches(currentSlug, limit) {
+    if (!global.DvitesWeddingTemplates || !global.DvitesWeddingTemplates.list) return [];
+    var list = global.DvitesWeddingTemplates.list.filter(function (item) {
+      return item.slug !== currentSlug;
+    });
+    for (var i = list.length - 1; i > 0; i -= 1) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = list[i];
+      list[i] = list[j];
+      list[j] = temp;
+    }
+    return list.slice(0, limit || 4);
+  }
+
+  function populateBrowseSwatches(tpl) {
+    var root = $("tp-browse-swatches");
+    if (!root) return;
+
+    var picks = pickBrowseSwatches(tpl.slug, 4);
+    var swatchHtml = picks.map(function (item) {
+      return (
+        '<a class="tp-swatch" href="' + escapeHtml(item.productUrl) + '" data-swatch-slug="' + escapeHtml(item.slug) + '" title="' + escapeHtml(item.name) + '">' +
+          '<span class="tp-swatch-frame">' +
+            '<img src="' + escapeHtml(item.thumbnail || item.previewImage) + '" alt="" width="52" height="104" loading="lazy" decoding="async" />' +
+          '</span>' +
+          '<span class="tp-swatch-label">' + escapeHtml(swatchLabel(item.name)) + '</span>' +
+        '</a>'
+      );
+    }).join("");
+
+    var browseHtml =
+      '<a class="tp-swatch tp-swatch--browse" href="/templates.html" data-swatch-slug="browse-all" title="Browse more templates">' +
+        '<span class="tp-swatch-frame tp-swatch-frame--browse">' +
+          '<span class="tp-swatch-browse-text">Browse more template</span>' +
+        '</span>' +
+        '<span class="tp-swatch-label tp-swatch-label--spacer" aria-hidden="true"></span>' +
+      '</a>';
+
+    root.innerHTML = '<div class="tp-swatch-row">' + swatchHtml + browseHtml + '</div>';
+
+    root.querySelectorAll("[data-swatch-slug]").forEach(function (link) {
+      link.addEventListener("click", function () {
+        if (typeof global.dvitesTrack === "function") {
+          global.dvitesTrack("template_swatch_click", {
+            from_slug: tpl.slug,
+            to_slug: link.getAttribute("data-swatch-slug") || "",
+          });
+        }
+      });
+    });
+  }
+
   function populateRelated(tpl) {
     var grid = $("tp-related-grid");
     if (!grid || !global.DvitesWeddingTemplates) return;
@@ -455,6 +512,7 @@
       thumb.innerHTML = '<img src="' + escapeHtml(tpl.thumbnail) + '" alt="' + escapeHtml(tpl.name) + '" width="120" height="250" loading="lazy" decoding="async" />';
     }
 
+    populateBrowseSwatches(tpl);
     populateHeroFeatures(tpl);
     populateProof(tpl);
     populateFeatures(tpl);

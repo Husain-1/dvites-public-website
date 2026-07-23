@@ -187,7 +187,7 @@
       demoUrl: opts.demoUrl,
       templateSlug: opts.templateSlug || "",
       templateName: opts.templateName || "Dvites Template",
-      amountPaise: Number(opts.amountPaise) || 119900,
+      amountPaise: Number(opts.amountPaise) || 79900,
       productUrl: opts.productUrl || "",
       exitUrl: opts.exitUrl || global.location.href
     };

@@ -192,7 +192,7 @@ export async function onRequestPost(context) {
     }
   }
   if (!amount) {
-    amount = 1199;
+    amount = 799;
   }
 
   const metaAmountRupees =

@@ -2,7 +2,7 @@
   "use strict";
 
   var SITE_ORIGIN = "https://www.dvites.com";
-  var DEFAULT_PRICE = 1199;
+  var DEFAULT_PRICE = 799;
   var DEFAULT_OLD_PRICE = 2499;
   var DEFAULT_SAVE_LABEL = "Save 40%";
   var DEFAULT_DELIVERY = "Delivered within 24 hours";
@@ -60,7 +60,7 @@
       name +
       " — premium animated wedding website by Dvites. " +
       shortDescription +
-      " Customised in 24 hours. From ₹1,199."
+      " Customised in 24 hours. From ₹799."
     );
   }
 
