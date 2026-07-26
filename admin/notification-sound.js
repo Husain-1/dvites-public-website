@@ -282,20 +282,19 @@
     var settings = getSettings();
     return (
       '<div class="admin-sound-settings">' +
-        '<h3 class="admin-sound-title">Notification Sound</h3>' +
+        '<h3 class="admin-sound-title">Notification sound</h3>' +
         '<label class="admin-sound-row">' +
           '<input type="checkbox" id="admin-sound-enabled"' + (settings.enabled ? " checked" : "") + ' />' +
           '<span>Enable sound</span>' +
         '</label>' +
-        '<p class="admin-sound-current-label">Current Sound:</p>' +
+        '<p class="admin-sound-current-label">Current</p>' +
         '<p class="admin-sound-current" id="admin-sound-current">' + settings.label + '</p>' +
         '<input type="file" id="admin-sound-file" class="admin-sound-file" accept="audio/*,.mp3,.wav,.ogg,.m4a" hidden />' +
-        '<button class="admin-btn admin-btn-primary admin-sound-choose" id="admin-sound-choose" type="button">Choose Notification Sound</button>' +
-        '<button class="admin-btn admin-sound-change" id="admin-sound-change" type="button">Change Sound</button>' +
-        '<button class="admin-btn admin-sound-reset" id="admin-sound-reset" type="button">Reset to Default</button>' +
+        '<button class="admin-btn admin-btn-primary admin-sound-choose" id="admin-sound-choose" type="button">Choose sound</button>' +
+        '<button class="admin-btn admin-sound-reset" id="admin-sound-reset" type="button">Reset to default</button>' +
         '<label class="admin-sound-row admin-sound-label" for="admin-sound-volume">Volume <span id="admin-sound-volume-value">' + Math.round(settings.volume * 100) + '%</span></label>' +
         '<input class="admin-sound-range" id="admin-sound-volume" type="range" min="0" max="100" step="5" value="' + Math.round(settings.volume * 100) + '" />' +
-        '<button class="admin-btn admin-btn-primary admin-sound-test" id="admin-sound-test" type="button">Test Sound</button>' +
+        '<button class="admin-btn admin-sound-test" id="admin-sound-test" type="button">Test sound</button>' +
         '<p class="admin-status" id="admin-sound-status">Sounds stay on this device only.</p>' +
       '</div>'
     );
@@ -307,7 +306,6 @@
     var volumeValue = document.getElementById("admin-sound-volume-value");
     var testBtn = document.getElementById("admin-sound-test");
     var chooseBtn = document.getElementById("admin-sound-choose");
-    var changeBtn = document.getElementById("admin-sound-change");
     var resetBtn = document.getElementById("admin-sound-reset");
     var fileInput = document.getElementById("admin-sound-file");
     var status = document.getElementById("admin-sound-status");
@@ -348,7 +346,6 @@
       volume.addEventListener("change", persistVolume);
     }
     if (chooseBtn) chooseBtn.addEventListener("click", openFilePicker);
-    if (changeBtn) changeBtn.addEventListener("click", openFilePicker);
     if (fileInput) {
       fileInput.addEventListener("change", function () {
         var file = fileInput.files && fileInput.files[0];
@@ -443,9 +440,7 @@
   }
 
   function init(adminFetch) {
-    loadCustomSoundIntoCache().finally(function () {
-      mountSettingsPanel();
-    });
+    loadCustomSoundIntoCache().finally(function () {});
     bindServiceWorkerMessages();
     startOrderPolling(adminFetch);
   }
@@ -454,7 +449,8 @@
     DEFAULT_SOUND: DEFAULT_SOUND,
     getSettings: getSettings,
     saveSettings: saveSettings,
-    mountSettingsPanel: mountSettingsPanel,
+    settingsPanelHtml: settingsPanelHtml,
+    bindSettingsPanel: bindSettingsPanel,
     playSound: playSound,
     notifyNewOrder: notifyNewOrder,
     ingestOrders: ingestOrders,

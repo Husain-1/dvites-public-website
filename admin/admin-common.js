@@ -118,6 +118,105 @@
     });
   }
 
+  function ensureToastHost() {
+    if (document.getElementById("admin-toast-host")) return;
+    var host = document.createElement("div");
+    host.id = "admin-toast-host";
+    host.className = "admin-toast-host";
+    host.setAttribute("aria-live", "polite");
+    document.body.appendChild(host);
+  }
+
+  function showToast(message, variant) {
+    ensureToastHost();
+    var host = document.getElementById("admin-toast-host");
+    var toast = document.createElement("div");
+    toast.className = "admin-toast" + (variant === "error" ? " is-error" : "");
+    toast.textContent = message;
+    host.appendChild(toast);
+    global.setTimeout(function () {
+      toast.classList.add("is-out");
+      global.setTimeout(function () { toast.remove(); }, 220);
+    }, 3200);
+  }
+
+  function closeModal() {
+    var backdrop = document.getElementById("admin-modal-backdrop");
+    if (backdrop) backdrop.remove();
+    document.body.classList.remove("admin-modal-open");
+  }
+
+  function openModal(title, bodyHtml, footerHtml) {
+    closeModal();
+    var backdrop = document.createElement("div");
+    backdrop.id = "admin-modal-backdrop";
+    backdrop.className = "admin-modal-backdrop";
+    backdrop.innerHTML =
+      '<div class="admin-modal" role="dialog" aria-modal="true" aria-labelledby="admin-modal-title">' +
+        '<div class="admin-modal-head">' +
+          '<h2 id="admin-modal-title">' + title + '</h2>' +
+          '<button type="button" class="admin-modal-close" aria-label="Close">&times;</button>' +
+        '</div>' +
+        '<div class="admin-modal-body">' + bodyHtml + '</div>' +
+        (footerHtml ? '<div class="admin-modal-foot">' + footerHtml + '</div>' : "") +
+      '</div>';
+    document.body.appendChild(backdrop);
+    document.body.classList.add("admin-modal-open");
+    backdrop.addEventListener("click", function (event) {
+      if (event.target === backdrop) closeModal();
+    });
+    var closeBtn = backdrop.querySelector(".admin-modal-close");
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
+    document.addEventListener("keydown", function onKey(event) {
+      if (event.key === "Escape") {
+        closeModal();
+        document.removeEventListener("keydown", onKey);
+      }
+    });
+    return backdrop;
+  }
+
+  function confirmDialog(options) {
+    options = options || {};
+    return new Promise(function (resolve) {
+      var foot =
+        '<button type="button" class="admin-btn" id="admin-confirm-cancel">' + (options.cancelLabel || "Cancel") + '</button>' +
+        '<button type="button" class="admin-btn admin-btn-danger" id="admin-confirm-ok">' + (options.confirmLabel || "Confirm") + '</button>';
+      var modal = openModal(options.title || "Confirm", "<p>" + (options.message || "") + "</p>", foot);
+      modal.querySelector("#admin-confirm-cancel").addEventListener("click", function () {
+        closeModal();
+        resolve(false);
+      });
+      modal.querySelector("#admin-confirm-ok").addEventListener("click", function () {
+        closeModal();
+        resolve(true);
+      });
+    });
+  }
+
+  function iconSvg(name) {
+    if (name === "whatsapp") {
+      return '<svg class="admin-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
+    }
+    if (name === "mail") {
+      return '<svg class="admin-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2m0 2-8 5-8-5h16m0 12H4V8l8 5 8-5v10"/></svg>';
+    }
+    if (name === "trash") {
+      return '<svg class="admin-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 3h6l1 2h4v2H4V5h4l1-2m1 6h2v9H10V9m4 0h2v9h-2V9M7 9h2v9H7V9z"/></svg>';
+    }
+    if (name === "more") {
+      return '<svg class="admin-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/></svg>';
+    }
+    if (name === "bell") {
+      return '<svg class="admin-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22m7-6v-5a7 7 0 0 0-14 0v5l-2 2v1h18v-1l-2-2z"/></svg>';
+    }
+    return "";
+  }
+
+  function renderLoadingPanel(message) {
+    return '<div class="admin-panel admin-loading"><div class="admin-spinner" aria-hidden="true"></div><p class="admin-status">' + (message || "Loading…") + '</p></div>';
+  }
+
   function renderLoginForm(root) {
     root.innerHTML =
       '<div class="admin-auth">' +
@@ -188,13 +287,14 @@
           '<nav class="admin-nav" id="admin-nav">' +
             '<a href="/admin/orders.html"' + (activeNav === "orders" ? ' class="is-active"' : "") + '>Orders</a>' +
             '<a href="/admin/analytics.html"' + (activeNav === "analytics" ? ' class="is-active"' : "") + '>Analytics</a>' +
+            '<a href="/admin/customers.html"' + (activeNav === "customers" ? ' class="is-active"' : "") + '>Customers</a>' +
             '<a href="/" target="_blank" rel="noopener">View Site</a>' +
           '</nav>' +
           '<div class="admin-sidebar-footer">' +
+            '<button class="admin-btn admin-notify-compact" id="admin-notify-open" type="button">' +
+              iconSvg("bell") + '<span>Notifications</span><strong id="admin-notify-badge">Active</strong>' +
+            '</button>' +
             '<button class="admin-btn" id="admin-logout" type="button">Sign out</button>' +
-            '<button class="admin-btn admin-btn-success" id="admin-enable-push" type="button">Enable Order Notifications</button>' +
-            '<p class="admin-status" id="admin-push-status"></p>' +
-            '<div id="admin-sound-mount"></div>' +
           '</div>' +
         '</aside>' +
         '<main class="admin-main">' +
@@ -208,7 +308,12 @@
           '</header>' +
           '<div class="admin-topbar admin-desktop-topbar">' +
             '<div><h1 class="admin-title">' + pageTitle + '</h1><p class="admin-subtitle">Signed in as <strong>' + ROLE_LABEL + '</strong> on this device</p></div>' +
-            '<div class="admin-actions" id="admin-top-actions"><span class="admin-role-pill">' + ROLE_LABEL + '</span></div>' +
+            '<div class="admin-actions" id="admin-top-actions">' +
+              '<button class="admin-btn admin-notify-compact admin-desktop-only" id="admin-notify-open-desktop" type="button">' +
+                iconSvg("bell") + '<span>Notifications</span>' +
+              '</button>' +
+              '<span class="admin-role-pill">' + ROLE_LABEL + '</span>' +
+            '</div>' +
           '</div>' +
           '<div id="admin-content"></div>' +
         '</main>' +
@@ -221,11 +326,58 @@
 
     initMobileNav();
     initPushNotifications();
+    initNotificationSettingsModal();
     initServiceWorkerUpdates();
     if (global.DvitesAdminSound) {
       global.DvitesAdminSound.init(adminFetch);
     }
     return true;
+  }
+
+  function getPushDiagnostics() {
+    var perm = "Notification" in global ? Notification.permission : "unsupported";
+    var sw = "serviceWorker" in navigator ? "checking" : "unsupported";
+    var sub = "—";
+    var promise = Promise.resolve({ permission: perm, serviceWorker: sw, subscription: sub });
+    if (!("serviceWorker" in navigator)) return promise;
+    return navigator.serviceWorker.ready.then(function (reg) {
+      sw = reg.active ? "Active" : "Inactive";
+      return reg.pushManager.getSubscription();
+    }).then(function (subscription) {
+      sub = subscription ? "Active" : "Missing";
+      return { permission: perm, serviceWorker: sw, subscription: sub };
+    }).catch(function () {
+      return { permission: perm, serviceWorker: "Error", subscription: "Unknown" };
+    });
+  }
+
+  function initNotificationSettingsModal() {
+    function openSettings() {
+      var soundHtml = global.DvitesAdminSound ? global.DvitesAdminSound.settingsPanelHtml() : "";
+      getPushDiagnostics().then(function (diag) {
+        var body =
+          '<section class="admin-modal-section">' +
+            '<h3>Push notifications</h3>' +
+            '<p class="admin-status" id="admin-push-status">Checking…</p>' +
+            '<button class="admin-btn admin-btn-primary" id="admin-enable-push" type="button">Enable on this device</button>' +
+            '<button class="admin-btn" id="admin-push-reregister" type="button">Re-register notifications</button>' +
+            '<dl class="admin-diag-list">' +
+              '<div><dt>Permission</dt><dd>' + diag.permission + '</dd></div>' +
+              '<div><dt>Service worker</dt><dd>' + diag.serviceWorker + '</dd></div>' +
+              '<div><dt>Subscription</dt><dd>' + diag.subscription + '</dd></div>' +
+            '</dl>' +
+          '</section>' +
+          '<section class="admin-modal-section">' + soundHtml + '</section>';
+        openModal("Notification settings", body, '<button type="button" class="admin-btn admin-btn-primary" id="admin-notify-done">Done</button>');
+        var done = document.getElementById("admin-notify-done");
+        if (done) done.addEventListener("click", closeModal);
+        if (global.DvitesAdminSound) global.DvitesAdminSound.bindSettingsPanel();
+        initPushNotifications(true);
+      });
+    }
+    document.querySelectorAll("#admin-notify-open, #admin-notify-open-desktop").forEach(function (btn) {
+      btn.addEventListener("click", openSettings);
+    });
   }
 
   function initMobileNav() {
@@ -335,17 +487,22 @@
     return output;
   }
 
-  function initPushNotifications() {
+  function initPushNotifications(fromModal) {
+    if (global.__dvitesPushInit && !fromModal) return;
+    if (!fromModal) global.__dvitesPushInit = true;
+
     var button = document.getElementById("admin-enable-push");
     var status = document.getElementById("admin-push-status");
-    if (!button) return;
+    var reregister = document.getElementById("admin-push-reregister");
+    var badge = document.getElementById("admin-notify-badge");
 
     function setPushStatus(text) {
       if (status) status.textContent = text;
+      if (badge && text) badge.textContent = text.indexOf("enabled") !== -1 || text.indexOf("Active") !== -1 ? "Active" : "Setup";
     }
 
     function savePushSubscription() {
-      return fetch("/api/push-subscribe")
+      return adminFetch("/api/push-subscribe")
         .then(function (res) { return res.json(); })
         .then(function (data) {
           if (!data.publicKey) throw new Error("VAPID public key missing.");
@@ -358,7 +515,7 @@
         })
         .then(function (subscription) {
           var json = subscription.toJSON();
-          return fetch("/api/push-subscribe", {
+          return adminFetch("/api/push-subscribe", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -373,53 +530,66 @@
         .then(function (result) {
           if (result.ok) {
             setPushStatus("Order notifications enabled on this device.");
-            button.textContent = "Notifications Active";
+            if (button) button.textContent = "Notifications active";
             return true;
           }
           throw new Error(result.error || "Unable to save subscription.");
         });
     }
 
-    fetch("/api/push-subscribe")
+    adminFetch("/api/push-subscribe")
       .then(function (res) { return res.json(); })
       .then(function (data) {
         if (!data.enabled) {
-          setPushStatus("Push not configured on server yet.");
-          button.disabled = true;
+          setPushStatus("Push not configured on server (VAPID keys).");
+          if (button) button.disabled = true;
           return;
         }
-
         if (!("Notification" in global) || !("serviceWorker" in navigator)) {
-          setPushStatus("Install as app on iPhone for push alerts (Add to Home Screen).");
+          setPushStatus("Use Add to Home Screen on mobile for background alerts.");
           return;
         }
-
         if (Notification.permission === "granted") {
           savePushSubscription().catch(function () {
-            setPushStatus("Tap below to re-enable order notifications.");
+            setPushStatus("Tap Enable to register this device.");
           });
         } else if (Notification.permission === "denied") {
-          setPushStatus("Notifications blocked. Enable in browser settings.");
+          setPushStatus("Notifications blocked in browser settings.");
+        } else {
+          setPushStatus("Tap Enable to allow order notifications.");
         }
       })
       .catch(function () {});
 
-    button.addEventListener("click", function () {
-      if (!("Notification" in global) || !("serviceWorker" in navigator)) {
-        setPushStatus("Notifications are not supported on this device.");
-        return;
-      }
-
-      Notification.requestPermission().then(function (permission) {
-        if (permission !== "granted") {
-          setPushStatus("Notification permission denied.");
+    if (button && !button.dataset.bound) {
+      button.dataset.bound = "1";
+      button.addEventListener("click", function () {
+        if (!("Notification" in global) || !("serviceWorker" in navigator)) {
+          setPushStatus("Notifications are not supported on this device.");
           return;
         }
-        savePushSubscription().catch(function (error) {
-          setPushStatus(error.message || "Unable to enable notifications.");
+        Notification.requestPermission().then(function (permission) {
+          if (permission !== "granted") {
+            setPushStatus("Notification permission denied.");
+            return;
+          }
+          savePushSubscription().catch(function (error) {
+            setPushStatus(error.message || "Unable to enable notifications.");
+          });
         });
       });
-    });
+    }
+
+    if (reregister && !reregister.dataset.bound) {
+      reregister.dataset.bound = "1";
+      reregister.addEventListener("click", function () {
+        savePushSubscription()
+          .then(function () { showToast("Push subscription updated."); })
+          .catch(function (error) {
+            showToast(error.message || "Could not re-register.", "error");
+          });
+      });
+    }
   }
 
   function formatMoney(value) {
@@ -443,6 +613,12 @@
     ensureAuthShell: ensureAuthShell,
     formatMoney: formatMoney,
     formatDate: formatDate,
+    showToast: showToast,
+    confirmDialog: confirmDialog,
+    openModal: openModal,
+    closeModal: closeModal,
+    iconSvg: iconSvg,
+    renderLoadingPanel: renderLoadingPanel,
     ROLE_LABEL: ROLE_LABEL,
   };
 })(window);

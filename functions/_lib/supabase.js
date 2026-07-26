@@ -5,6 +5,21 @@ export function getSupabaseConfig(env) {
   return { url, key };
 }
 
+/** Service role bypasses RLS — use only in Cloudflare Functions, never in the browser. */
+export function getSupabaseServiceConfig(env) {
+  const url = String(env.SUPABASE_URL || "").replace(/\/$/, "");
+  const key =
+    env.SUPABASE_SERVICE_ROLE_KEY ||
+    env.SUPABASE_SECRET_KEY ||
+    "";
+  if (!url || !key) return null;
+  return { url, key };
+}
+
+export function getSupabaseAdminConfig(env) {
+  return getSupabaseServiceConfig(env) || getSupabaseConfig(env);
+}
+
 export function supabaseHeaders(key, extra = {}) {
   return {
     "Content-Type": "application/json",
@@ -102,21 +117,31 @@ export async function supabaseCount(env, table, queryString) {
 }
 
 export async function supabaseDelete(env, table, queryString) {
-  const config = getSupabaseConfig(env);
+  const config = getSupabaseAdminConfig(env);
   if (!config) return { ok: false, error: "Supabase is not configured." };
 
   const url = config.url + "/rest/v1/" + table + (queryString ? "?" + queryString : "");
   const response = await fetch(url, {
     method: "DELETE",
-    headers: supabaseHeaders(config.key, { Prefer: "return=minimal" }),
+    headers: supabaseHeaders(config.key, { Prefer: "return=representation" }),
   });
 
+  const data = await response.json().catch(() => null);
+
   if (!response.ok) {
-    const data = await response.json().catch(() => null);
     const message =
       (data && (data.message || data.error || data.hint)) || "Delete failed.";
     return { ok: false, error: String(message).slice(0, 240) };
   }
 
-  return { ok: true };
+  const rows = Array.isArray(data) ? data : data ? [data] : [];
+  if (!rows.length) {
+    return {
+      ok: false,
+      error:
+        "Delete blocked by database permissions. Run docs/sql/orders-delete-policy.sql in Supabase, or set SUPABASE_SERVICE_ROLE_KEY in Cloudflare.",
+    };
+  }
+
+  return { ok: true, data: rows[0] };
 }

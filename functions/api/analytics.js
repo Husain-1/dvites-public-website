@@ -1,5 +1,6 @@
 import { isAdminAuthorized, adminUnauthorizedResponse } from "../_lib/admin-auth.js";
 import { rangeToBounds, liveSinceIso } from "../_lib/dates.js";
+import { normalizeAnalyticsPagePath } from "../_lib/page-path.js";
 import { supabaseCount, supabaseSelect } from "../_lib/supabase.js";
 
 function jsonResponse(data, status = 200) {
@@ -51,7 +52,10 @@ async function groupByField(env, field, eventType, start, end) {
 
   const counts = {};
   result.data.forEach((row) => {
-    const key = row[field] || "(unknown)";
+    let key = row[field] || "(unknown)";
+    if (field === "page_path") {
+      key = normalizeAnalyticsPagePath(key);
+    }
     counts[key] = (counts[key] || 0) + 1;
   });
 

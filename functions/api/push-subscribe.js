@@ -1,3 +1,4 @@
+import { isAdminAuthorized, adminUnauthorizedResponse } from "../_lib/admin-auth.js";
 import { supabaseUpsert } from "../_lib/supabase.js";
 
 function jsonResponse(data, status = 200) {
@@ -15,6 +16,7 @@ function cleanText(value, max) {
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+  if (!isAdminAuthorized(request, env)) return adminUnauthorizedResponse();
 
   let body;
   try {

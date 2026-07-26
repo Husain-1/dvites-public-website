@@ -11,3 +11,5 @@ ADMIN_PASSWORD=5372
 # Optional — needed for orders/analytics data after login
 # SUPABASE_URL=https://your-project.supabase.co
 # SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+# For admin delete without extra SQL policies (recommended on Cloudflare only):
+# SUPABASE_SERVICE_ROLE_KEY=your-service-role-key

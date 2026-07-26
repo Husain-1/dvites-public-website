@@ -21,7 +21,7 @@ self.addEventListener("message", function (event) {
 });
 
 self.addEventListener("push", function (event) {
-  var payload = { title: "New Dvites Order", body: "A new order was received.", url: "/admin/orders.html" };
+  var payload = { title: "New Dvites Order 🎉", body: "A new order was received.", url: "/admin/orders.html" };
   if (event.data) {
     try {
       payload = Object.assign(payload, event.data.json());

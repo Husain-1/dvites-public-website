@@ -120,3 +120,15 @@ create policy "orders_select_anon"
   on public.orders for select
   to anon, authenticated
   using (true);
+
+drop policy if exists "orders_delete_anon" on public.orders;
+create policy "orders_delete_anon"
+  on public.orders for delete
+  to anon, authenticated
+  using (true);
+
+drop policy if exists "push_subscriptions_delete_anon" on public.push_subscriptions;
+create policy "push_subscriptions_delete_anon"
+  on public.push_subscriptions for delete
+  to anon, authenticated
+  using (true);
