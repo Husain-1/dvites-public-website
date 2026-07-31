@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en" data-template-slug="{{SLUG}}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{SEO_TITLE}}</title>
+  <meta name="description" content="{{SEO_DESCRIPTION}}" />
+  <link rel="canonical" href="{{CANONICAL}}" />
+  <meta property="og:type" content="product" />
+  <meta property="og:title" content="{{SEO_TITLE}}" />
+  <meta property="og:description" content="{{SEO_DESCRIPTION}}" />
+  <meta property="og:url" content="{{CANONICAL}}" />
+  <meta property="og:image" content="{{OG_IMAGE}}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{{SEO_TITLE}}" />
+  <meta name="twitter:description" content="{{SEO_DESCRIPTION}}" />
+  <meta name="twitter:image" content="{{OG_IMAGE}}" />
+  <link rel="icon" href="/assets/favicon.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="stylesheet" href="/assets/template-product.css" />
+  <link rel="stylesheet" href="/assets/full-demo.css" />
+  <link rel="preload" href="{{HERO_IMAGE}}" as="image" />
+  <script type="application/ld+json">{{JSON_LD}}</script>
+  <script src="/assets/meta-pixel.js"></script>
+  <script src="/assets/google-tag.js"></script>
+  <script src="/assets/clarity.js"></script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=27514697381530186&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
+</head>
+<body class="page-template-product" data-template-slug="{{SLUG}}">
+  <div class="announce-bar announce-bar--premium" role="region" aria-label="Offer">
+    <div class="container announce-bar-inner">
+      <p class="announce-bar-copy">
+        <span>Save the Date invitations from <strong>₹{{PRICE}}</strong></span>
+      </p>
+      <a href="#order" class="announce-bar-cta announce-bar-cta--premium">Create My Invitation</a>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a class="brand" href="/">
+        <img src="/templates/curtains/assets/images/dvites-logo.png" alt="Dvites" width="120" height="32" />
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="/templates.html">Templates</a>
+        <a href="/save-the-date.html" class="is-active">Save the Date</a>
+        <a href="/#how-it-works">How It Works</a>
+        <a href="/partner-studio.html">Partner Studio</a>
+        <a href="/#faq">FAQ</a>
+      </nav>
+      <div class="header-actions">
+        <a href="#order" class="btn btn-primary btn-sm tp-header-cta">Create My Invitation</a>
+        <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <nav class="mobile-nav container" id="mobile-nav" aria-label="Mobile">
+      <a href="/templates.html">Templates</a>
+      <a href="/save-the-date.html">Save the Date</a>
+      <a href="/#how-it-works">How It Works</a>
+      <a href="/partner-studio.html">Partner Studio</a>
+      <a href="/#faq">FAQ</a>
+      <a href="#order" class="btn btn-primary">Create My Invitation</a>
+    </nav>
+  </header>
+
+  <main id="tp-main">
+    <div id="tp-not-found" class="tp-not-found container" hidden>
+      <h1>Template not found</h1>
+      <p>We couldn't find this Save the Date template.</p>
+      <a class="btn btn-primary" href="/save-the-date.html">Browse Save the Date designs</a>
+    </div>
+
+    <div id="tp-content">
+      <section class="tp-hero">
+        <div class="container tp-hero-grid">
+          <div class="tp-hero-preview">
+            <div id="tp-hero-phone">{{HERO_MOCKUP}}</div>
+          </div>
+          <div class="tp-hero-copy">
+            <nav class="tp-breadcrumb" aria-label="Breadcrumb">
+              <a href="/">Home</a>
+              <span aria-hidden="true">/</span>
+              <a href="/save-the-date.html">Save the Date</a>
+              <span aria-hidden="true">/</span>
+              <span id="tp-breadcrumb-name">{{NAME}}</span>
+            </nav>
+            <span class="section-eyebrow" id="tp-category">{{CATEGORY}}</span>
+            <h1 id="tp-name">{{NAME}}</h1>
+            <p class="tp-lead" id="tp-short-desc">{{SEO_DESCRIPTION}}</p>
+            <div class="tp-price-row">
+              <span class="old-price" id="tp-old-price">₹{{OLD_PRICE}}</span>
+              <span class="current-price" id="tp-price">₹{{PRICE}}</span>
+              <span class="save-badge" id="tp-save-badge">{{SAVE_LABEL}}</span>
+            </div>
+            <div class="tp-browse-swatches" id="tp-browse-swatches" aria-label="Browse more Save the Date designs"></div>
+            <p class="tp-delivery" id="tp-delivery">Delivered within 24 hours</p>
+            <ul class="tp-hero-features" id="tp-hero-features"></ul>
+            <div class="tp-hero-actions">
+              <button type="button" class="btn btn-buy-ray tp-hero-buy" id="tp-hero-buy">Buy Now</button>
+            </div>
+            <p class="tp-reassurance">Secure Razorpay checkout · Personalised after payment</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="tp-section" id="proof">
+        <div class="container">
+          <span class="section-eyebrow">Guest experience</span>
+          <h2 class="section-title">See what your guests will experience</h2>
+          <div class="tp-proof-grid" id="tp-proof-grid"></div>
+        </div>
+      </section>
+
+      <section class="tp-section tp-section--soft" id="included">
+        <div class="container">
+          <span class="section-eyebrow">Included</span>
+          <h2 class="section-title">What's included</h2>
+          <ul class="tp-feature-grid" id="tp-feature-grid"></ul>
+        </div>
+      </section>
+
+      <section class="tp-section" id="personalisation">
+        <div class="container">
+          <span class="section-eyebrow">Personalisation</span>
+          <h2 class="section-title">What we personalise — and what stays designed</h2>
+          <p class="tp-personalisation-note">This is a premium template-based service. Your wedding information and available content are personalised, while the core design remains the same as the selected demo.</p>
+          <div class="tp-two-col">
+            <div>
+              <h3>What we personalise</h3>
+              <ul id="tp-personalize-list"></ul>
+            </div>
+            <div>
+              <h3>What remains as designed</h3>
+              <ul id="tp-fixed-list"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tp-section tp-section--soft" id="how-order">
+        <div class="container">
+          <span class="section-eyebrow">How it works</span>
+          <h2 class="section-title">How ordering works</h2>
+          <ol class="tp-steps">
+            <li><strong>Choose this template</strong><span>Select the design you love and place your order.</span></li>
+            <li><strong>Complete secure payment and submit your wedding details</strong><span>Share names, date, venue and preferred details on WhatsApp.</span></li>
+            <li><strong>Receive your personalised Save the Date within 24 hours</strong><span>We customise your invitation and send a preview for approval.</span></li>
+          </ol>
+          <p class="tp-order-note">Delivery begins after complete details are received. Incomplete information may delay delivery.</p>
+        </div>
+      </section>
+
+      <section class="tp-section" id="order">
+        <div class="container">
+          <div class="tp-order-card" id="tp-order-card">
+            <div class="tp-order-card-preview" id="tp-order-thumb"></div>
+            <div class="tp-order-card-body">
+              <h2 class="tp-order-title" id="tp-order-name">{{NAME}}</h2>
+              <p class="tp-order-price" id="tp-order-price">₹{{PRICE}}</p>
+              <ul class="tp-order-meta" id="tp-order-meta"></ul>
+              <button type="button" class="btn btn-primary btn-lg tp-order-btn" id="tp-order-btn">Order This Template</button>
+              <p class="tp-reassurance">Secure Razorpay checkout · No hidden charges</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tp-section tp-section--soft" id="faq">
+        <div class="container tp-faq-wrap">
+          <span class="section-eyebrow">FAQ</span>
+          <h2 class="section-title">Questions about this template</h2>
+          <div class="faq-list" id="tp-faq-list"></div>
+        </div>
+      </section>
+
+      <section class="tp-section" id="related">
+        <div class="container">
+          <span class="section-eyebrow">More designs</span>
+          <h2 class="section-title">You may also like</h2>
+          <div class="tp-related-grid" id="tp-related-grid"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <img src="/templates/curtains/assets/images/dvites-logo.png" alt="Dvites" />
+        <p>Premium digital wedding invitations — customized in 24 hours, shared instantly with everyone you love.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Explore</h4>
+        <a href="/templates.html">Templates</a>
+        <a href="/save-the-date.html">Save the Date</a>
+        <a href="/#how-it-works">How It Works</a>
+        <a href="/partner-studio.html">Partner Studio</a>
+        <a href="/#faq">FAQ</a>
+      </div>
+      <div class="footer-links">
+        <h4>Information</h4>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+        <a href="/terms-of-service.html">Terms of Service</a>
+        <a href="/refund-cancellation-policy.html">Refund &amp; Cancellation Policy</a>
+      </div>
+      <div class="footer-links">
+        <h4>Contact</h4>
+        <a href="mailto:infodvites@gmail.com">infodvites@gmail.com</a>
+        <a href="#order" class="tp-footer-order">Buy Now</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">© 2026 Dvites · Crafted with love for unforgettable weddings</div>
+  </footer>
+
+  <div class="tp-sticky-bar" id="tp-sticky-bar" hidden aria-hidden="true">
+    <div class="tp-sticky-bar-inner container">
+      <div class="tp-sticky-copy">
+        <strong id="tp-sticky-name">{{NAME}}</strong>
+        <span id="tp-sticky-price">₹{{PRICE}}</span>
+      </div>
+      <button type="button" class="btn btn-buy-ray btn-sm" id="tp-sticky-order">Buy Now</button>
+    </div>
+  </div>
+
+  <script src="/assets/wedding-templates-data.js"></script>
+  <script src="/assets/save-the-date-templates-data.js"></script>
+  <script src="/assets/payment.js"></script>
+  <script src="/assets/analytics.js"></script>
+  <script src="/assets/phone-preview.js"></script>
+  <script src="/assets/full-demo.js"></script>
+  <script src="/assets/site.js"></script>
+  <script src="/assets/template-product.js"></script>
+</body>
+</html>

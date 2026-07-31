@@ -10,19 +10,30 @@
   var PARTNER_MAX = 5;
   var PARTNER_DISCOUNT = 0.05;
 
-  var DESERT_SAND_CATALOG = {
-    id: "desert-sand",
-    url: "/templates/desert-sand/",
-    title: "Desert Sand",
-    category: "Hindu Save the Date",
-    tags: ["hinduism", "minimal"],
-    preview: "/templates/desert-sand/assets/images/poster.webp",
-    description: "A warm, elegant Save the Date design inspired by desert tones and timeless minimalism.",
-    featured: false,
-    price: SAVE_THE_DATE_PRICE,
-    oldPrice: SAVE_THE_DATE_OLD_PRICE,
-    saveLabel: "Save 50%"
-  };
+  function buildDesertSandCatalogRecord() {
+    if (global.DvitesSaveTheDateTemplates && global.DvitesSaveTheDateTemplates.getBySlug) {
+      var tpl = global.DvitesSaveTheDateTemplates.getBySlug("desert-sand");
+      if (tpl && global.DvitesSaveTheDateTemplates.toCatalogRecord) {
+        return global.DvitesSaveTheDateTemplates.toCatalogRecord(tpl);
+      }
+    }
+    return {
+      id: "desert-sand",
+      url: "/templates/desert-sand/",
+      title: "Desert Sand",
+      category: "Hindu Save the Date",
+      tags: ["hinduism", "minimal"],
+      preview: "/save-the-date-thumbnails/dessert%20sand%20thumbnail.webp",
+      description: "A warm, elegant Save the Date design inspired by desert tones and timeless minimalism.",
+      featured: false,
+      price: SAVE_THE_DATE_PRICE,
+      oldPrice: SAVE_THE_DATE_OLD_PRICE,
+      saveLabel: "Save 50%",
+      productUrl: "/save-the-date/desert-sand.html"
+    };
+  }
+
+  var DESERT_SAND_CATALOG = buildDesertSandCatalogRecord();
 
   function buildWeddingCatalogTemplates() {
     if (global.DvitesWeddingTemplates && global.DvitesWeddingTemplates.list) {
@@ -34,21 +45,12 @@
   }
 
   function buildSaveTheDateCatalogRecords() {
-    return SAVE_THE_DATE_TEMPLATES.map(function (tpl) {
-      return {
-        id: tpl.id,
-        url: tpl.url,
-        title: tpl.title,
-        category: tpl.category || "Save the Date",
-        tags: tpl.tags || [],
-        preview: getSaveTheDateThumbnail(tpl),
-        description: tpl.description,
-        featured: false,
-        price: SAVE_THE_DATE_PRICE,
-        oldPrice: SAVE_THE_DATE_OLD_PRICE,
-        saveLabel: "Save 50%"
-      };
-    });
+    if (global.DvitesSaveTheDateTemplates && global.DvitesSaveTheDateTemplates.list) {
+      return global.DvitesSaveTheDateTemplates.list.map(function (tpl) {
+        return global.DvitesSaveTheDateTemplates.toCatalogRecord(tpl);
+      });
+    }
+    return [];
   }
 
   function buildPartnerCatalogTemplates() {
@@ -82,61 +84,6 @@
   }
 
   var TEMPLATES = buildWeddingCatalogTemplates().concat([DESERT_SAND_CATALOG]);
-
-  var SAVE_THE_DATE_TEMPLATES = [
-    {
-      id: "desert-sand",
-      url: "/templates/desert-sand/",
-      title: "Desert Sand",
-      category: "Save the Date",
-      tags: ["hinduism", "minimal"],
-      thumbnailFile: "dessert sand thumbnail.webp",
-      description: "A warm, elegant Save the Date design inspired by desert tones and timeless minimalism."
-    },
-    {
-      id: "blossom-touch",
-      url: "/templates/blossom-touch/",
-      title: "Blossom Touch",
-      category: "Save the Date",
-      thumbnailFile: "blossom touch thumbnail.webp",
-      description: "A soft floral Save the Date invitation with romantic details and graceful motion."
-    },
-    {
-      id: "enchanted-mirror",
-      url: "/templates/enchanted-mirror/",
-      title: "Enchanted Mirror",
-      category: "Save the Date",
-      thumbnailFile: "enchanted mirror template.webp",
-      description: "A dreamy mirror-inspired invitation with a luxurious and magical reveal."
-    },
-    {
-      id: "moonlit-lotus",
-      url: "/templates/moonlit-lotus/",
-      title: "Moonlit Lotus",
-      category: "Save the Date",
-      thumbnailFile: "moonlit lotus thumbnail.webp",
-      description: "A refined lotus-themed design with calm night tones and elegant movement."
-    },
-    {
-      id: "royal-radiance",
-      url: "/templates/royal-radiance/",
-      title: "Royal Radiance",
-      category: "Save the Date",
-      thumbnailFile: "royal radiance thumbnail'.webp",
-      description: "A grand chandelier-inspired Save the Date invitation with rich royal styling."
-    }
-  ];
-
-  var STD_THUMBNAILS_DIR = "/save-the-date-thumbnails/";
-
-  function stdThumbnailUrl(filename) {
-    if (!filename) return "";
-    return STD_THUMBNAILS_DIR + encodeURIComponent(filename);
-  }
-
-  function getSaveTheDateThumbnail(tpl) {
-    return stdThumbnailUrl(tpl && tpl.thumbnailFile);
-  }
 
   function formatRupee(n) {
     return "₹" + n.toLocaleString("en-IN");
@@ -194,6 +141,10 @@
       return candidate;
     }
 
+    if (slug && global.DvitesSaveTheDateTemplates && global.DvitesSaveTheDateTemplates.getBySlug(slug)) {
+      return global.DvitesSaveTheDateTemplates.productUrl(slug);
+    }
+
     if (slug && global.DvitesWeddingTemplates && global.DvitesWeddingTemplates.getBySlug(slug)) {
       return global.DvitesWeddingTemplates.productUrl(slug);
     }
@@ -202,6 +153,7 @@
   }
 
   function getProductPageUrl(tpl) {
+    if (tpl && tpl.productUrl) return tpl.productUrl;
     return resolveProductPageUrl(tpl);
   }
 
@@ -264,48 +216,35 @@
     );
   }
 
-  function renderSaveTheDateCard(tpl) {
-    var thumbUrl = getSaveTheDateThumbnail(tpl);
-    return (
-      '<article class="tpl-card card std-card" data-id="' + tpl.id + '" data-demo-url="' + tpl.url + '" data-preview="' + thumbUrl + '" data-title="' + tpl.title + '" data-category="' + tpl.category + '" data-description="' + tpl.description.replace(/"/g, "&quot;") + '" data-amount-paise="' + (SAVE_THE_DATE_PRICE * 100) + '" data-old-price="' + SAVE_THE_DATE_OLD_PRICE + '">' +
-        '<div class="tpl-card-inner">' +
-          '<div class="tpl-preview-wrap">' +
-            renderCatalogPhoneMockup(thumbUrl, tpl.title, "catalog-thumb--" + tpl.id) +
-          '</div>' +
-          '<div class="tpl-body">' +
-            '<h3 class="tpl-name">' + tpl.title + '</h3>' +
-            '<p class="tpl-category">' + tpl.description + '</p>' +
-            '<div class="tpl-pricing">' +
-              '<span class="old-price">' + formatRupee(SAVE_THE_DATE_OLD_PRICE) + '</span>' +
-              '<span class="tpl-price-now">' +
-                '<span class="current-price">' + formatRupee(SAVE_THE_DATE_PRICE) + '</span>' +
-                '<span class="save-badge">Save 50%</span>' +
-              '</span>' +
-            '</div>' +
-            '<div class="tpl-actions card-actions">' +
-              '<button type="button" class="btn btn-primary btn-customize">Customize</button>' +
-              '<button type="button" class="btn btn-ghost btn-watch demo-btn">Watch Demo</button>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-      '</article>'
-    );
+  function renderSaveTheDateCatalog(container) {
+    if (!container) return;
+    var list = buildSaveTheDateCatalogRecords();
+    container.innerHTML = list.map(renderCard).join("");
+    equalizeCardHeights(container);
+    bindProductNavigation(container);
+    if (typeof global.DvitesRebindModal === "function") global.DvitesRebindModal();
   }
 
   function renderCatalog(container, filterFeatured) {
     if (!container) return;
-    var list = filterFeatured
-      ? TEMPLATES.filter(function (t) { return t.featured; }).slice(0, 6)
-      : TEMPLATES;
+    var list;
+    if (filterFeatured) {
+      var featured = TEMPLATES.filter(function (t) { return t.featured; });
+      var homeLimit = 6;
+      if (featured.length >= homeLimit) {
+        list = featured.slice(0, homeLimit);
+      } else {
+        var featuredIds = {};
+        featured.forEach(function (t) { featuredIds[t.id] = true; });
+        var rest = TEMPLATES.filter(function (t) { return !featuredIds[t.id]; });
+        list = featured.concat(rest).slice(0, homeLimit);
+      }
+    } else {
+      list = TEMPLATES;
+    }
     container.innerHTML = list.map(renderCard).join("");
     equalizeCardHeights(container);
     bindProductNavigation(container);
-  }
-
-  function renderSaveTheDateCatalog(container) {
-    if (!container) return;
-    container.innerHTML = SAVE_THE_DATE_TEMPLATES.map(renderSaveTheDateCard).join("");
-    equalizeCardHeights(container);
   }
 
   function equalizeCardHeights(container) {
@@ -983,7 +922,7 @@
   global.Dvites = {
     TEMPLATES: TEMPLATES,
     WEDDING_TEMPLATES: global.DvitesWeddingTemplates ? global.DvitesWeddingTemplates.list : [],
-    SAVE_THE_DATE_TEMPLATES: SAVE_THE_DATE_TEMPLATES,
+    SAVE_THE_DATE_TEMPLATES: buildSaveTheDateCatalogRecords(),
     EMAIL: EMAIL,
     PRICE: PRICE,
     SAVE_THE_DATE_PRICE: SAVE_THE_DATE_PRICE,

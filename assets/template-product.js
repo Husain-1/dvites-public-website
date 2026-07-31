@@ -26,13 +26,27 @@
     if (fromHtml) return fromHtml.trim().toLowerCase();
     var fromBody = document.body && document.body.getAttribute("data-template-slug");
     if (fromBody) return fromBody.trim().toLowerCase();
-    var match = global.location.pathname.match(/\/(?:templates|wedding)\/([^/.]+)\.html$/i);
+    var match = global.location.pathname.match(/\/(?:templates|wedding|save-the-date)\/([^/.]+)\.html$/i);
     return match ? match[1].toLowerCase() : "";
   }
 
   function getTemplate() {
-    if (!global.DvitesWeddingTemplates) return null;
-    return global.DvitesWeddingTemplates.getBySlug(getSlug());
+    var slug = getSlug();
+    if (global.DvitesWeddingTemplates) {
+      var wedding = global.DvitesWeddingTemplates.getBySlug(slug);
+      if (wedding) return wedding;
+    }
+    if (global.DvitesSaveTheDateTemplates) {
+      return global.DvitesSaveTheDateTemplates.getBySlug(slug);
+    }
+    return null;
+  }
+
+  function getTemplateCatalogApi(tpl) {
+    if (tpl && tpl.productType === "save-the-date" && global.DvitesSaveTheDateTemplates) {
+      return global.DvitesSaveTheDateTemplates;
+    }
+    return global.DvitesWeddingTemplates || null;
   }
 
   function openFullPageDemo(tpl) {
@@ -216,9 +230,10 @@
     return word || "Template";
   }
 
-  function pickBrowseSwatches(currentSlug, limit) {
-    if (!global.DvitesWeddingTemplates || !global.DvitesWeddingTemplates.list) return [];
-    var list = global.DvitesWeddingTemplates.list.filter(function (item) {
+  function pickBrowseSwatches(currentSlug, limit, catalogApi) {
+    var api = catalogApi || global.DvitesWeddingTemplates;
+    if (!api || !api.list) return [];
+    var list = api.list.filter(function (item) {
       return item.slug !== currentSlug;
     });
     for (var i = list.length - 1; i > 0; i -= 1) {
@@ -234,7 +249,11 @@
     var root = $("tp-browse-swatches");
     if (!root) return;
 
-    var picks = pickBrowseSwatches(tpl.slug, 4);
+    var catalogApi = getTemplateCatalogApi(tpl);
+    var picks = pickBrowseSwatches(tpl.slug, 4, catalogApi);
+    var isSaveTheDate = tpl.productType === "save-the-date";
+    var browseHref = isSaveTheDate ? "/save-the-date.html" : "/templates.html";
+    var browseText = isSaveTheDate ? "Browse more Save the Date designs" : "Browse more template";
     var swatchHtml = picks.map(function (item) {
       return (
         '<a class="tp-swatch" href="' + escapeHtml(item.productUrl) + '" data-swatch-slug="' + escapeHtml(item.slug) + '" title="' + escapeHtml(item.name) + '">' +
@@ -247,9 +266,9 @@
     }).join("");
 
     var browseHtml =
-      '<a class="tp-swatch tp-swatch--browse" href="/templates.html" data-swatch-slug="browse-all" title="Browse more templates">' +
+      '<a class="tp-swatch tp-swatch--browse" href="' + escapeHtml(browseHref) + '" data-swatch-slug="browse-all" title="' + escapeHtml(browseText) + '">' +
         '<span class="tp-swatch-frame tp-swatch-frame--browse">' +
-          '<span class="tp-swatch-browse-text">Browse more template</span>' +
+          '<span class="tp-swatch-browse-text">' + escapeHtml(browseText) + '</span>' +
         '</span>' +
         '<span class="tp-swatch-label tp-swatch-label--spacer" aria-hidden="true"></span>' +
       '</a>';
@@ -270,8 +289,9 @@
 
   function populateRelated(tpl) {
     var grid = $("tp-related-grid");
-    if (!grid || !global.DvitesWeddingTemplates) return;
-    var related = global.DvitesWeddingTemplates.getRelated(tpl.slug, 3);
+    var catalogApi = getTemplateCatalogApi(tpl);
+    if (!grid || !catalogApi) return;
+    var related = catalogApi.getRelated(tpl.slug, 3);
     grid.innerHTML = related.map(function (item) {
       return (
         '<article class="tp-related-card">' +
@@ -531,8 +551,13 @@
   }
 
   function init() {
+    var slug = getSlug();
     var tpl = getTemplate();
     if (!tpl) {
+      if (global.DvitesWeddingTemplates && global.DvitesWeddingTemplates.isHiddenSlug(slug)) {
+        global.location.replace("/templates.html");
+        return;
+      }
       showNotFound();
       return;
     }

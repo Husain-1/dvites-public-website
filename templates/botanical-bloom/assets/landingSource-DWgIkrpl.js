@@ -1,0 +1,1 @@
+const e="landing_source",r="src",o=t=>{if(!(!t||typeof window>"u"))try{localStorage.setItem(e,t),sessionStorage.setItem(e,t)}catch{}},a=()=>{if(typeof window>"u")return null;try{const n=new URL(window.location.href).searchParams.get(r);return n?(o(n),n):sessionStorage.getItem(e)||localStorage.getItem(e)||null}catch{return null}};export{o as c,a as g};

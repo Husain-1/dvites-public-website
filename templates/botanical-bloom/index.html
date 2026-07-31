@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Jeff &amp; Maria — Botanical Bloom Wedding Invitation</title>
+    <meta name="description" content="Botanical Bloom — elegant floral wedding invitation with scroll animations, music, and multilingual support." />
+    <link rel="icon" type="image/png" href="/templates/botanical-bloom/assets/images/favicon.png" />
+    <link rel="apple-touch-icon" href="/templates/botanical-bloom/assets/images/favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Raleway:wght@300;400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Dancing+Script:wght@400;500;600&family=Great+Vibes&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Meddon&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Dancing+Script:wght@400;500;600&family=Great+Vibes&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Meddon&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"></noscript>
+
+    <script src="/templates/botanical-bloom/assets/data/client-config.js"></script>
+    <script src="/templates/botanical-bloom/assets/data/local-runtime.js"></script>
+    <script type="module" crossorigin src="/templates/botanical-bloom/assets/index-D_9lpNSl.js"></script>
+    <link rel="stylesheet" crossorigin href="/templates/botanical-bloom/assets/index-F8wOvwgW.css">
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <div class="dvites-buy-bar" id="dvites-buy-bar" hidden>
+      <div class="dvites-brand">
+        <img src="/templates/botanical-bloom/assets/images/dvites-logo.png" alt="Dvites">
+      </div>
+      <span class="dvites-text">Personalize this invitation in minutes.</span>
+      <a href="/wedding/botanical-bloom.html" id="buyNowBtn">Buy Now</a>
+    </div>
+
+    <style>
+.dvites-buy-bar{position:fixed;top:0;left:0;width:100%;height:68px;background:rgba(35,20,26,.88);backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:999999;border-bottom:1px solid rgba(255,255,255,.08);pointer-events:auto}
+.dvites-brand{display:flex;align-items:center}
+.dvites-brand img{height:40px;width:auto;display:block}
+.dvites-text{flex:1;text-align:center;color:#fff;font-size:16px;font-weight:500;font-family:Inter,sans-serif;padding:0 24px}
+.dvites-buy-bar a{text-decoration:none;background:#EF6B96;color:#fff;padding:12px 28px;border-radius:999px;font-weight:700;transition:.25s;white-space:nowrap}
+.dvites-buy-bar a:hover{transform:translateY(-2px);background:#F57EA5}
+html.dvites-preview-mode .dvites-buy-bar{display:none!important}
+@media(max-width:768px){
+  .dvites-buy-bar{padding:10px 16px;height:auto;flex-wrap:wrap;justify-content:center;gap:10px}
+  .dvites-brand{width:100%;justify-content:center}
+  .dvites-brand img{height:34px}
+  .dvites-text{width:100%;text-align:center;font-size:14px;padding:0}
+  .dvites-buy-bar a{width:100%;text-align:center}
+}
+    </style>
+    <script>
+      (function () {
+        var bar = document.getElementById("dvites-buy-bar");
+        if (!bar) return;
+        var embedded = window.parent !== window;
+        var preview = /(?:^|[?&])preview=1(?:&|$)/.test(location.search);
+        if (!embedded && !preview) {
+          bar.hidden = false;
+        }
+      })();
+    </script>
+  </body>
+</html>

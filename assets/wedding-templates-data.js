@@ -8,6 +8,17 @@
   var DEFAULT_DELIVERY = "Delivered within 24 hours";
   var DEFAULT_HOSTING = "Hosted until after your wedding";
 
+  /** Temporarily hidden from catalog, partner studio, swatches, and product pages. Clear to re-publish. */
+  var TEMPORARILY_HIDDEN_SLUGS = ["mountains", "laavan"];
+
+  function isHiddenSlug(slug) {
+    return TEMPORARILY_HIDDEN_SLUGS.indexOf(String(slug || "").trim().toLowerCase()) !== -1;
+  }
+
+  function isPublicRecord(record) {
+    return !isHiddenSlug(record.id);
+  }
+
   var SHARED_FEATURES = [
     "Couple names and photographs",
     "Event schedule",
@@ -196,6 +207,16 @@
       featured: false
     },
     {
+      id: "botanical-bloom",
+      url: "/templates/botanical-bloom/",
+      title: "Botanical Bloom",
+      category: "Minimal Floral",
+      tags: ["christian", "minimal", "floral", "botanical"],
+      preview: "/templates/botanical-bloom/assets/images/thumbnail.png",
+      description: "A serene botanical wedding invitation with hand-drawn florals, cream tones, scroll reveals, music, and multilingual support — perfect for intimate Christian and garden ceremonies.",
+      featured: false
+    },
+    {
       id: "rajkamal-palace",
       url: "/templates/rajkamal-palace/",
       title: "Rajkamal Palace",
@@ -207,10 +228,11 @@
     }
   ];
 
-  var LIST = RAW.map(baseRecord);
+  var LIST = RAW.filter(isPublicRecord).map(baseRecord);
 
   function getBySlug(slug) {
     if (!slug) return null;
+    if (isHiddenSlug(slug)) return null;
     var normalized = String(slug).trim().toLowerCase();
     for (var i = 0; i < LIST.length; i += 1) {
       if (LIST[i].slug === normalized || LIST[i].id === normalized) return LIST[i];
@@ -252,6 +274,8 @@
     SITE_ORIGIN: SITE_ORIGIN,
     DEFAULT_PRICE: DEFAULT_PRICE,
     DEFAULT_OLD_PRICE: DEFAULT_OLD_PRICE,
+    TEMPORARILY_HIDDEN_SLUGS: TEMPORARILY_HIDDEN_SLUGS,
+    isHiddenSlug: isHiddenSlug,
     list: LIST,
     getBySlug: getBySlug,
     getRelated: getRelated,
