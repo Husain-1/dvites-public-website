@@ -34,7 +34,18 @@ body{padding-top:68px!important}
   .dvites-text{width:100%;text-align:center;font-size:14px;padding:0}
   .dvites-buy-bar a{width:100%;text-align:center}
 }
+html.dvites-embedded-preview .dvites-buy-bar{display:none!important}
+html.dvites-embedded-preview body{padding-top:0!important;margin-top:0!important}
 </style>`;
+
+const EMBEDDED_PREVIEW_HEAD = `<script>
+(function () {
+  var p = new URLSearchParams(location.search);
+  if (p.get("preview") === "1" || p.get("preview") === "true" || window.self !== window.top) {
+    document.documentElement.classList.add("dvites-embedded-preview");
+  }
+})();
+</script>`;
 
 let html = fs.readFileSync(SOURCE, "utf8");
 
@@ -106,6 +117,10 @@ html = html.replace(
   <p style="margin:0;"><a href="https://www.dvites.com/" target="_blank" rel="noopener" style="color:#d8a957;text-decoration:none;border-bottom:1px solid rgba(216,169,87,.4);">Dvites</a></p>
 </footer>\n\n`
 );
+
+if (!html.includes("dvites-embedded-preview")) {
+  html = html.replace("</head>", `${EMBEDDED_PREVIEW_HEAD}\n</head>`);
+}
 
 // Add buy bar after body open
 if (!html.includes("dvites-buy-bar")) {

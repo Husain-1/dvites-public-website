@@ -1563,6 +1563,11 @@ button { font-family: inherit; cursor: pointer; }
   margin: 0 auto;
 }
 
+.page-hero .hero-actions {
+  justify-content: center;
+  margin-top: 24px;
+}
+
 .page-hero-trust {
   margin: 14px auto 0;
   max-width: 560px;

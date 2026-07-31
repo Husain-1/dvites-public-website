@@ -7,11 +7,47 @@
   var DEFAULT_SAVE_LABEL = "Save 50%";
   var DEFAULT_DELIVERY = "Delivered within 24 hours";
   var DEFAULT_HOSTING = "Hosted until after your wedding";
-  var THUMBNAILS_DIR = "/save-the-date-thumbnails/";
 
-  function thumbnailUrl(filename) {
+  var STD_THUMBNAILS_DIR = "/save-the-date-thumbnails/";
+
+  var SHARED_FEATURES = [
+    "Couple names and wedding date",
+    "Interactive reveal experience",
+    "Background music",
+    "Google Calendar ready",
+    "Venue and event details",
+    "Shareable website link",
+    "Mobile and desktop compatibility",
+    "Hosted until after your wedding"
+  ];
+
+  var SHARED_PERSONALIZABLE = [
+    "Couple names",
+    "Wedding date",
+    "Venue name and city",
+    "Preferred wording",
+    "Calendar link details where supported"
+  ];
+
+  var SHARED_FIXED = [
+    "Core layout and visual structure",
+    "Animation style and motion design",
+    "Typography system",
+    "Theme composition and colour palette",
+    "Section arrangement as shown in the demo"
+  ];
+
+  var SHARED_PROOF = [
+    { icon: "✨", label: "Interactive reveal", desc: "A memorable opening moment your guests will love" },
+    { icon: "📅", label: "Save the date fast", desc: "Google Calendar action on supported designs" },
+    { icon: "🎵", label: "Music included", desc: "Atmospheric background music on supported designs" },
+    { icon: "🔗", label: "One link sharing", desc: "Share instantly on WhatsApp with unlimited guests" },
+    { icon: "📱", label: "Mobile-first", desc: "Looks beautiful on every phone, tablet and desktop" }
+  ];
+
+  function stdThumbnailUrl(filename) {
     if (!filename) return "";
-    return THUMBNAILS_DIR + encodeURIComponent(filename);
+    return STD_THUMBNAILS_DIR + encodeURIComponent(filename);
   }
 
   function productUrl(slug) {
@@ -25,50 +61,16 @@
   function seoDescription(name, shortDescription) {
     return (
       name +
-      " — premium animated Save the Date invitation by Dvites. " +
+      " — premium digital Save the Date invitation by Dvites. " +
       shortDescription +
       " Customised in 24 hours. From ₹999."
     );
   }
 
-  var SHARED_FEATURES = [
-    "Couple names and wedding date",
-    "Interactive reveal experience",
-    "Countdown timer",
-    "Background music",
-    "Google Calendar save action",
-    "Shareable website link",
-    "Mobile and desktop compatibility"
-  ];
-
-  var SHARED_PERSONALIZABLE = [
-    "Couple names",
-    "Wedding date",
-    "Venue and city",
-    "Preferred wording",
-    "Calendar link details"
-  ];
-
-  var SHARED_FIXED = [
-    "Core layout and visual structure",
-    "Animation style and motion design",
-    "Typography system",
-    "Theme composition and colour palette"
-  ];
-
-  var SHARED_PROOF = [
-    { icon: "✨", label: "Elegant reveal", desc: "A memorable first impression when guests open your link" },
-    { icon: "📅", label: "Save the date", desc: "One-tap Google Calendar for your guests" },
-    { icon: "⏳", label: "Countdown", desc: "Build excitement before the big day" },
-    { icon: "🎵", label: "Music included", desc: "Atmospheric background music on supported designs" },
-    { icon: "🔗", label: "Easy sharing", desc: "One link for WhatsApp and all your guests" }
-  ];
-
   function baseRecord(record) {
     var slug = record.id;
     var price = record.price != null ? record.price : DEFAULT_PRICE;
-    var oldPrice = record.oldPrice != null ? record.oldPrice : DEFAULT_OLD_PRICE;
-    var preview = record.preview || thumbnailUrl(record.thumbnailFile);
+    var preview = record.preview || stdThumbnailUrl(record.thumbnailFile);
     return {
       id: record.id,
       slug: slug,
@@ -79,7 +81,7 @@
       shortDescription: record.description,
       fullDescription: record.fullDescription || record.description,
       price: price,
-      oldPrice: oldPrice,
+      oldPrice: record.oldPrice != null ? record.oldPrice : DEFAULT_OLD_PRICE,
       saveLabel: record.saveLabel || DEFAULT_SAVE_LABEL,
       thumbnail: preview,
       heroImage: record.heroImage || preview,
@@ -87,7 +89,8 @@
       preview: preview,
       demoUrl: record.url,
       url: record.url,
-      featured: false,
+      thumbnailFile: record.thumbnailFile || "",
+      featured: !!record.featured,
       features: record.features || SHARED_FEATURES.slice(),
       personalizable: record.personalizable || SHARED_PERSONALIZABLE.slice(),
       fixedElements: record.fixedElements || SHARED_FIXED.slice(),
@@ -99,7 +102,7 @@
       seoTitle: record.seoTitle || seoTitle(record.title, record.category),
       seoDescription: record.seoDescription || seoDescription(record.title, record.description),
       canonicalUrl: SITE_ORIGIN + productUrl(slug),
-      ogImage: SITE_ORIGIN + (record.heroImage || preview),
+      ogImage: SITE_ORIGIN + preview,
       productUrl: productUrl(slug)
     };
   }
@@ -128,7 +131,7 @@
       url: "/templates/enchanted-mirror/",
       title: "Enchanted Mirror",
       category: "Luxury Save the Date",
-      tags: ["luxury", "magical"],
+      tags: ["luxury", "romantic"],
       thumbnailFile: "enchanted mirror template.webp",
       description: "A dreamy mirror-inspired invitation with a luxurious and magical reveal."
     },
@@ -136,8 +139,8 @@
       id: "moonlit-lotus",
       url: "/templates/moonlit-lotus/",
       title: "Moonlit Lotus",
-      category: "Lotus Save the Date",
-      tags: ["lotus", "elegant"],
+      category: "Elegant Save the Date",
+      tags: ["floral", "minimal"],
       thumbnailFile: "moonlit lotus thumbnail.webp",
       description: "A refined lotus-themed design with calm night tones and elegant movement."
     },
@@ -146,7 +149,7 @@
       url: "/templates/royal-radiance/",
       title: "Royal Radiance",
       category: "Royal Save the Date",
-      tags: ["royal", "luxury"],
+      tags: ["luxury", "royal"],
       thumbnailFile: "royal radiance thumbnail'.webp",
       description: "A grand chandelier-inspired Save the Date invitation with rich royal styling."
     }
@@ -189,7 +192,8 @@
       price: tpl.price,
       oldPrice: tpl.oldPrice,
       saveLabel: tpl.saveLabel,
-      productUrl: tpl.productUrl
+      productUrl: tpl.productUrl,
+      thumbnailFile: tpl.thumbnailFile
     };
   }
 
@@ -202,6 +206,6 @@
     getRelated: getRelated,
     productUrl: productUrl,
     toCatalogRecord: toCatalogRecord,
-    thumbnailUrl: thumbnailUrl
+    stdThumbnailUrl: stdThumbnailUrl
   };
 })(window);

@@ -33,7 +33,18 @@ body{padding-top:68px!important}
   .dvites-text{width:100%;text-align:center;font-size:14px;padding:0}
   .dvites-buy-bar a{width:100%;text-align:center}
 }
+html.dvites-embedded-preview .dvites-buy-bar{display:none!important}
+html.dvites-embedded-preview body,html.dvites-embedded-preview body.t-body{padding-top:0!important;margin-top:0!important}
 </style>`;
+
+const EMBEDDED_PREVIEW_HEAD = `<script>
+(function () {
+  var p = new URLSearchParams(location.search);
+  if (p.get("preview") === "1" || p.get("preview") === "true" || window.self !== window.top) {
+    document.documentElement.classList.add("dvites-embedded-preview");
+  }
+})();
+</script>`;
 
 const TITLE_OVERRIDE = `
 <script defer>
@@ -93,6 +104,10 @@ html = html.replace(/https:\/\/webgency\.tilda\.ws\/[^\s"'<>]*/g, CANONICAL);
 html = html.replace(/webgency\.tilda\.ws/g, "www.dvites.com");
 html = html.replace(/Blossom &amp; Oud/g, "Oud Blossom Majlis");
 html = html.replace(/Blossom & Oud/g, "Oud Blossom Majlis");
+
+if (!html.includes("dvites-embedded-preview")) {
+  html = html.replace("</head>", `${EMBEDDED_PREVIEW_HEAD}\n</head>`);
+}
 
 if (!html.includes("dvites-buy-bar")) {
   html = html.replace(/<body([^>]*)>/, `<body$1>${BUY_BAR}\n`);

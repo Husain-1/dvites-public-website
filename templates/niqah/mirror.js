@@ -373,6 +373,13 @@ function finalizeHtml(html) {
     );
   }
 
+  if (!out.includes("dvites-embedded-preview")) {
+    out = out.replace(
+      /<meta name="viewport" content="width=device-width">/,
+      `$&\n  <script>(function(){var p=new URLSearchParams(location.search);if(p.get("preview")==="1"||p.get("preview")==="true"||window.self!==window.top){document.documentElement.classList.add("dvites-embedded-preview");}})();</script>`
+    );
+  }
+
   out = hidePreviewOverlays(applyDvitesBranding(out));
 
   if (!out.includes('name="framer-html-plugin"')) {
@@ -413,6 +420,19 @@ body{padding-top:68px!important}
   .dvites-brand img{height:34px}
   .dvites-text{width:100%;text-align:center;font-size:14px;padding:0}
   .dvites-buy-bar a{width:100%;text-align:center}
+}
+html.dvites-embedded-preview .dvites-buy-bar{display:none!important}
+html.dvites-embedded-preview body{padding-top:0!important;margin-top:0!important;overflow-x:hidden!important}
+html.dvites-embedded-preview,html.dvites-embedded-preview body,html.dvites-embedded-preview #main{width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important}
+html.dvites-embedded-preview [data-framer-name="Desktop"],
+html.dvites-embedded-preview [data-framer-name="Phone"],
+html.dvites-embedded-preview .framer-11idw7e-container,
+html.dvites-embedded-preview .framer-gv8am9-container{display:none!important}
+@media (max-width:1439.98px){
+  html.dvites-embedded-preview [data-framer-root],
+  html.dvites-embedded-preview .framer-UoDsP.framer-72rtr7{width:100%!important;max-width:none!important;margin:0!important}
+  html.dvites-embedded-preview .framer-UoDsP .framer-11zp5db,
+  html.dvites-embedded-preview .framer-UoDsP .framer-1tg1g6f{width:100%!important;max-width:none!important;left:0!important;right:0!important}
 }
     </style>
   </body>`

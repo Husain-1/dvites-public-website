@@ -30,8 +30,17 @@
     return match ? match[1].toLowerCase() : "";
   }
 
+  function getTemplateCatalog() {
+    var slug = getSlug();
+    if (slug && global.DvitesSaveTheDateTemplates && global.DvitesSaveTheDateTemplates.getBySlug(slug)) {
+      return global.DvitesSaveTheDateTemplates;
+    }
+    return global.DvitesWeddingTemplates || null;
+  }
+
   function getTemplate() {
     var slug = getSlug();
+    if (!slug) return null;
     if (global.DvitesWeddingTemplates) {
       var wedding = global.DvitesWeddingTemplates.getBySlug(slug);
       if (wedding) return wedding;
@@ -40,13 +49,6 @@
       return global.DvitesSaveTheDateTemplates.getBySlug(slug);
     }
     return null;
-  }
-
-  function getTemplateCatalogApi(tpl) {
-    if (tpl && tpl.productType === "save-the-date" && global.DvitesSaveTheDateTemplates) {
-      return global.DvitesSaveTheDateTemplates;
-    }
-    return global.DvitesWeddingTemplates || null;
   }
 
   function openFullPageDemo(tpl) {
@@ -95,7 +97,7 @@
           '</div>' +
           '<p class="tp-hero-live-loading is-hidden" id="tp-hero-live-loading" aria-live="polite">Loading invitation…</p>' +
           '<div class="phone-iframe-scaler tp-hero-live-iframe is-hidden" id="tp-hero-live-wrap">' +
-            '<iframe id="tp-hero-live-iframe" class="is-modal-demo" title="' + escapeHtml(title) + ' live demo" loading="lazy"></iframe>' +
+            '<iframe id="tp-hero-live-iframe" class="is-modal-demo" title="' + escapeHtml(title) + ' live demo" loading="lazy" allow="autoplay; fullscreen"></iframe>' +
           '</div>' +
         '</div>' +
         '<img class="catalog-phone-frame" src="/assets/save-the-date-phone-frame.png" alt="" aria-hidden="true" />' +
@@ -230,10 +232,10 @@
     return word || "Template";
   }
 
-  function pickBrowseSwatches(currentSlug, limit, catalogApi) {
-    var api = catalogApi || global.DvitesWeddingTemplates;
-    if (!api || !api.list) return [];
-    var list = api.list.filter(function (item) {
+  function pickBrowseSwatches(currentSlug, limit, catalog) {
+    catalog = catalog || getTemplateCatalog() || global.DvitesWeddingTemplates;
+    if (!catalog || !catalog.list) return [];
+    var list = catalog.list.filter(function (item) {
       return item.slug !== currentSlug;
     });
     for (var i = list.length - 1; i > 0; i -= 1) {
@@ -249,11 +251,10 @@
     var root = $("tp-browse-swatches");
     if (!root) return;
 
-    var catalogApi = getTemplateCatalogApi(tpl);
-    var picks = pickBrowseSwatches(tpl.slug, 4, catalogApi);
-    var isSaveTheDate = tpl.productType === "save-the-date";
-    var browseHref = isSaveTheDate ? "/save-the-date.html" : "/templates.html";
-    var browseText = isSaveTheDate ? "Browse more Save the Date designs" : "Browse more template";
+    var catalog = tpl.productType === "save-the-date"
+      ? global.DvitesSaveTheDateTemplates
+      : global.DvitesWeddingTemplates;
+    var picks = pickBrowseSwatches(tpl.slug, 4, catalog);
     var swatchHtml = picks.map(function (item) {
       return (
         '<a class="tp-swatch" href="' + escapeHtml(item.productUrl) + '" data-swatch-slug="' + escapeHtml(item.slug) + '" title="' + escapeHtml(item.name) + '">' +
@@ -265,10 +266,12 @@
       );
     }).join("");
 
+    var browseHref = tpl.productType === "save-the-date" ? "/save-the-date.html" : "/templates.html";
+    var browseLabel = tpl.productType === "save-the-date" ? "Browse more Save the Date" : "Browse more template";
     var browseHtml =
-      '<a class="tp-swatch tp-swatch--browse" href="' + escapeHtml(browseHref) + '" data-swatch-slug="browse-all" title="' + escapeHtml(browseText) + '">' +
+      '<a class="tp-swatch tp-swatch--browse" href="' + browseHref + '" data-swatch-slug="browse-all" title="' + escapeHtml(browseLabel) + '">' +
         '<span class="tp-swatch-frame tp-swatch-frame--browse">' +
-          '<span class="tp-swatch-browse-text">' + escapeHtml(browseText) + '</span>' +
+          '<span class="tp-swatch-browse-text">' + escapeHtml(browseLabel) + '</span>' +
         '</span>' +
         '<span class="tp-swatch-label tp-swatch-label--spacer" aria-hidden="true"></span>' +
       '</a>';
@@ -289,9 +292,11 @@
 
   function populateRelated(tpl) {
     var grid = $("tp-related-grid");
-    var catalogApi = getTemplateCatalogApi(tpl);
-    if (!grid || !catalogApi) return;
-    var related = catalogApi.getRelated(tpl.slug, 3);
+    var catalog = tpl.productType === "save-the-date"
+      ? global.DvitesSaveTheDateTemplates
+      : global.DvitesWeddingTemplates;
+    if (!grid || !catalog) return;
+    var related = catalog.getRelated(tpl.slug, 3);
     grid.innerHTML = related.map(function (item) {
       return (
         '<article class="tp-related-card">' +
@@ -440,6 +445,7 @@
       }, { once: true });
 
       iframe.title = tpl.name + " live demo";
+      iframe.setAttribute("allow", "autoplay; fullscreen");
       iframe.src = getLiveUrl(tpl);
     }
 
@@ -551,13 +557,8 @@
   }
 
   function init() {
-    var slug = getSlug();
     var tpl = getTemplate();
     if (!tpl) {
-      if (global.DvitesWeddingTemplates && global.DvitesWeddingTemplates.isHiddenSlug(slug)) {
-        global.location.replace("/templates.html");
-        return;
-      }
       showNotFound();
       return;
     }

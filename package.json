@@ -1,6 +1,7 @@
 {
   "scripts": {
     "generate:template-pages": "node scripts/generate-template-pages.js",
+    "generate:std-template-pages": "node scripts/generate-std-template-pages.js",
     "test:meta-capi": "node tests/meta-capi.test.mjs",
     "dev": "wrangler pages dev . --port 8788"
   },

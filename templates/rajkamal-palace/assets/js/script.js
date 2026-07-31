@@ -2463,3 +2463,23 @@ if (document.readyState !== "loading") initRSVP();
     // Music toggle always visible — template always has a song (default or custom)
   }
 })();
+
+(function initEmbeddedPreview() {
+  var params = new URLSearchParams(location.search);
+  var embedded =
+    params.get("preview") === "1" ||
+    params.get("preview") === "true" ||
+    window.self !== window.top;
+  if (!embedded) return;
+
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  function resetScroll() {
+    window.scrollTo(0, 0);
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+  }
+  resetScroll();
+  window.addEventListener("load", resetScroll, { once: true });
+  setTimeout(resetScroll, 0);
+  setTimeout(resetScroll, 300);
+})();

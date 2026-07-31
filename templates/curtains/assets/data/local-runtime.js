@@ -3,17 +3,36 @@
   const INVITE_PATH = "/invite/" + INVITE_SLUG;
   const INVITE_SERVE_URL = INVITE_PATH + "/";
   const TEMPLATE_INDEX = "/templates/curtains/index.html";
-  const isPreview = new URLSearchParams(location.search).get("preview") === "1";
+  const previewParams = new URLSearchParams(location.search);
+  const isPreview =
+    previewParams.get("preview") === "1" ||
+    previewParams.get("preview") === "true" ||
+    window.self !== window.top;
   let invitePayload = null;
 
   if (isPreview) {
     window.__DVITES_PREVIEW__ = true;
-    document.documentElement.classList.add("dvites-preview-mode");
+    document.documentElement.classList.add("dvites-preview-mode", "dvites-embedded-preview");
+
+    if (previewParams.get("skipEnvelope") === "true") {
+      previewParams.delete("skipEnvelope");
+      history.replaceState(
+        null,
+        "",
+        location.pathname + (previewParams.toString() ? "?" + previewParams.toString() : "") + location.hash
+      );
+    }
 
     const previewStyle = document.createElement("style");
+    previewStyle.id = "dvites-template-preview-fix";
     previewStyle.textContent =
       "html.dvites-preview-mode .dvites-buy-bar{display:none!important}" +
-      "html.dvites-preview-mode .fixed.inset-0.z-50{display:none!important}";
+      "html.dvites-preview-mode body{padding-top:0!important;margin-top:0!important}" +
+      "html.dvites-preview-mode .fixed.inset-0.z-50{display:none!important}" +
+      "html.dvites-preview-mode button[aria-label*='music' i]," +
+      "html.dvites-preview-mode button[aria-label*='Mute' i]," +
+      "html.dvites-preview-mode button[aria-label*='Unmute' i]" +
+      "{display:flex!important;visibility:visible!important;pointer-events:auto!important;opacity:1!important}";
     (document.head || document.documentElement).appendChild(previewStyle);
 
     function autoSkipOpening() {

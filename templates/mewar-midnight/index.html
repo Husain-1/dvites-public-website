@@ -90,6 +90,14 @@
     var WEDDING_CONFIG = window.__WEDDING_CONFIG__;
   }
 </script>
+<script>
+(function () {
+  var p = new URLSearchParams(location.search);
+  if (p.get("preview") === "1" || p.get("preview") === "true" || window.self !== window.top) {
+    document.documentElement.classList.add("dvites-embedded-preview");
+  }
+})();
+</script>
 </head>
 <body>
     <div class="dvites-buy-bar">
@@ -115,6 +123,10 @@ body{padding-top:68px!important}
   .dvites-text{width:100%;text-align:center;font-size:14px;padding:0}
   .dvites-buy-bar a{width:100%;text-align:center}
 }
+html.dvites-embedded-preview .dvites-buy-bar{display:none!important}
+html.dvites-embedded-preview body{padding-top:0!important;margin-top:0!important}
+html.dvites-embedded-preview .hero-wrap{height:100svh!important}
+html.dvites-embedded-preview .hero-pin{position:relative!important}
 </style>
 
 

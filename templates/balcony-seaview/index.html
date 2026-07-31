@@ -3,6 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script>
+    (function () {
+      var p = new URLSearchParams(location.search);
+      if (p.get("preview") === "1" || p.get("preview") === "true" || window.self !== window.top) {
+        document.documentElement.classList.add("dvites-embedded-preview");
+      }
+    })();
+    </script>
     <title>Josephine &amp; Calendra — Seaview Balcony Invitation</title>
     <meta name="description" content="Digital wedding invitation — Seaview Balcony theme" />
     <link rel="icon" href="/assets/favicon.png" type="image/png" />
@@ -46,6 +54,8 @@ body{padding-top:68px}
   .dvites-text{width:100%;text-align:center;font-size:14px;padding:0}
   .dvites-buy-bar a{width:100%;text-align:center}
 }
+html.dvites-embedded-preview .dvites-buy-bar{display:none!important}
+html.dvites-embedded-preview body{padding-top:0!important;margin-top:0!important}
     </style>
   </body>
 </html>

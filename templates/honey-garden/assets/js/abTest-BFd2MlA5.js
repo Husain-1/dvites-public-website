@@ -1,0 +1,1 @@
+import"/templates/honey-garden/assets/js/index-GSm4sk4W.js";const n="ab_home_variant",e="v",o="a",a=()=>{try{const r=new URL(window.location.href).searchParams.get(e);if(r==="a"||r==="b")return r}catch{}return null},i=()=>{if(typeof window>"u")return null;const t=a();if(t)return t;try{const r=localStorage.getItem(n);if(r==="a"||r==="b")return r}catch{}return o};export{i as g};

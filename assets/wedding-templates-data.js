@@ -117,6 +117,46 @@
 
   var RAW = [
     {
+      id: "maison-doree",
+      url: "/templates/maison-doree/",
+      title: "Maison Dorée",
+      category: "Luxury European",
+      tags: ["luxury"],
+      preview: "/templates/maison-doree/assets/images/maison.png",
+      description: "European luxury meets wedding romance — golden accents, cinematic motion, and a sophisticated invite for couples who want something extraordinary.",
+      featured: true
+    },
+    {
+      id: "pichwai-royal",
+      url: "/templates/pichwai-royal/",
+      title: "Pichwai Royal",
+      category: "Royal Wedding",
+      tags: ["hinduism", "royal"],
+      preview: "/templates/pichwai-royal/assets/images/pichwai.png",
+      description: "A luxurious Pichwai-inspired royal wedding invitation with cinematic animations.",
+      featured: false
+    },
+    {
+      id: "honey-garden",
+      url: "/templates/honey-garden/",
+      title: "Honey Garden",
+      category: "Botanical Floral",
+      tags: ["luxury", "floral", "minimal", "christian"],
+      preview: "/templates/honey-garden/assets/images/thumbnail.png",
+      description: "A romantic botanical garden invitation with hand-drawn florals, butterflies, honeybees, and an elegant cinematic opening.",
+      featured: false
+    },
+    {
+      id: "animated-flowers",
+      url: "/templates/animated-flowers/",
+      title: "Animated Flowers",
+      category: "Botanical Floral",
+      tags: ["luxury", "floral", "minimal", "christian"],
+      preview: "/templates/animated-flowers/assets/images/thumbnail-anim.png",
+      description: "A lush animated floral invitation with blooming sides, elegant typography, and a cinematic envelope opening.",
+      featured: false
+    },
+    {
       id: "mountains",
       url: "/templates/Mountains/",
       title: "Mountain Royal",
@@ -131,7 +171,7 @@
       url: "/templates/balcony-seaview/",
       title: "Balcony Seaview",
       category: "Coastal Destination",
-      tags: ["destination", "luxury"],
+      tags: ["destination", "luxury", "christian"],
       preview: "/templates/balcony-seaview/assets/images/balcony.png",
       description: "A dreamy destination-style invite with ocean views, elegant typography, and a romantic coastal atmosphere perfect for beach weddings.",
       featured: false
@@ -141,20 +181,10 @@
       url: "/templates/curtains/",
       title: "Curtains",
       category: "Classic Elegance",
-      tags: ["luxury", "minimal"],
+      tags: ["luxury", "minimal", "christian"],
       preview: "/templates/curtains/assets/images/curtains-theme-poster-BhK08iq7.jpg",
       description: "Grand curtains reveal a timeless wedding story — refined animations, soft luxury tones, and an unforgettable first impression.",
       featured: true
-    },
-    {
-      id: "pichwai-royal",
-      url: "/templates/pichwai-royal/",
-      title: "Pichwai Royal",
-      category: "Royal Wedding",
-      tags: ["hinduism", "royal"],
-      preview: "/templates/pichwai-royal/assets/images/pichwai.png",
-      description: "A luxurious Pichwai-inspired royal wedding invitation with cinematic animations.",
-      featured: false
     },
     {
       id: "laavan",
@@ -164,16 +194,6 @@
       tags: ["sikh", "royal"],
       preview: "/templates/laavan/assets/images/laavan.png",
       description: "A serene Anand Karaj invitation with sacred symbolism, elegant blue tones, and every ceremony beautifully laid out for your guests.",
-      featured: true
-    },
-    {
-      id: "maison-doree",
-      url: "/templates/maison-doree/",
-      title: "Maison Dorée",
-      category: "Luxury European",
-      tags: ["luxury"],
-      preview: "/templates/maison-doree/assets/images/maison.png",
-      description: "European luxury meets wedding romance — golden accents, cinematic motion, and a sophisticated invite for couples who want something extraordinary.",
       featured: true
     },
     {

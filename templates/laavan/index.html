@@ -6,6 +6,30 @@
 	<meta charset="utf-8">
     <meta name="framer-html-plugin" content="disable">
 	<meta name="viewport" content="width=device-width">
+	<script>
+	(function () {
+	  var p = new URLSearchParams(location.search);
+	  var embedded = p.get("preview") === "1" || p.get("preview") === "true" || window.self !== window.top;
+	  if (!embedded) return;
+	  document.documentElement.classList.add("dvites-embedded-preview");
+	  var DESIGN_W = 420;
+	  function scaleLaavanCanvas() {
+	    if (window.matchMedia("(min-width: 1440px)").matches) return;
+	    var canvas = document.querySelector(".framer-11d47n4");
+	    if (!canvas) return;
+	    var scale = window.innerWidth / DESIGN_W;
+	    var baseHeight = canvas.offsetHeight;
+	    canvas.style.transform = "scale(" + scale + ")";
+	    canvas.style.marginBottom = (baseHeight * (scale - 1)) + "px";
+	  }
+	  window.addEventListener("resize", scaleLaavanCanvas);
+	  window.addEventListener("load", scaleLaavanCanvas);
+	  if (document.readyState === "complete") scaleLaavanCanvas();
+	  else document.addEventListener("DOMContentLoaded", scaleLaavanCanvas);
+	  setTimeout(scaleLaavanCanvas, 0);
+	  setTimeout(scaleLaavanCanvas, 500);
+	})();
+	</script>
 	<meta name="generator" content="Framer 34801f9">
 	<title>Harpreet weds Ritika — Laavan Invitation</title>
     <meta name="description" content="Come celebrate love, laughter &amp; happily ever after with us!">
@@ -386,6 +410,17 @@ body{padding-top:68px!important}
   .dvites-brand img{height:34px}
   .dvites-text{width:100%;text-align:center;font-size:14px;padding:0}
   .dvites-buy-bar a{width:100%;text-align:center}
+}
+html.dvites-embedded-preview .dvites-buy-bar{display:none!important}
+html.dvites-embedded-preview body{padding-top:0!important;margin-top:0!important}
+html.dvites-embedded-preview,
+html.dvites-embedded-preview body,
+html.dvites-embedded-preview #main{width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important;overflow-x:hidden!important}
+@media (max-width:1439.98px){
+  html.dvites-embedded-preview [data-framer-root],
+  html.dvites-embedded-preview .framer-WzHdt.framer-1ohez0u{width:100%!important;max-width:none!important;margin:0!important;left:0!important;right:0!important;overflow-x:hidden!important}
+  html.dvites-embedded-preview .framer-WzHdt .ssr-variant{width:100%!important;max-width:none!important;overflow-x:hidden!important}
+  html.dvites-embedded-preview .framer-WzHdt .framer-11d47n4{width:420px!important;max-width:420px!important;margin:0!important;left:0!important;right:auto!important;transform-origin:top left!important}
 }
     </style>
   </body>

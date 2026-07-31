@@ -96,7 +96,7 @@ function buildHeroMockupHtml(tpl) {
         '</div>' +
         '<p class="tp-hero-live-loading is-hidden" id="tp-hero-live-loading" aria-live="polite">Loading invitation…</p>' +
         '<div class="phone-iframe-scaler tp-hero-live-iframe is-hidden" id="tp-hero-live-wrap">' +
-          '<iframe id="tp-hero-live-iframe" class="is-modal-demo" title="' + title + ' live demo" loading="lazy"></iframe>' +
+          '<iframe id="tp-hero-live-iframe" class="is-modal-demo" title="' + title + ' live demo" loading="lazy" allow="autoplay; fullscreen"></iframe>' +
         '</div>' +
       '</div>' +
       '<img class="catalog-phone-frame" src="/assets/save-the-date-phone-frame.png" alt="" aria-hidden="true" />' +
