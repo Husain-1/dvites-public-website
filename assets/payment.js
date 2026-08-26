@@ -326,9 +326,10 @@
     document.addEventListener("click", function (event) {
       var button = event.target.closest(".btn-customize");
       if (!button) return;
+      var card = button.closest(".card[data-title]");
+      if (card && card.classList.contains("card--navigates-product")) return;
       event.preventDefault();
       event.stopPropagation();
-      var card = button.closest(".card[data-title]");
       startCheckout({
         templateName: (card && card.getAttribute("data-title")) || "Dvites Wedding Invitation",
         templateSlug: (card && card.getAttribute("data-id")) || "",

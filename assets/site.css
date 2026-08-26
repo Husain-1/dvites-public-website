@@ -1227,9 +1227,20 @@ button { font-family: inherit; cursor: pointer; }
   cursor: pointer;
 }
 
-.card--opens-preview .tpl-actions .btn,
-.card--opens-preview .tpl-name-link {
+.card--navigates-product {
   cursor: pointer;
+}
+
+.card--opens-preview .tpl-actions .btn,
+.card--opens-preview .tpl-name-link,
+.card--navigates-product .tpl-actions .btn,
+.card--navigates-product .tpl-name-link {
+  cursor: pointer;
+}
+
+.card--navigates-product:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 3px;
 }
 
 .modal-view-details-btn {
@@ -1849,6 +1860,13 @@ a.btn-view-details {
   white-space: nowrap;
   line-height: 1.2;
   text-align: center;
+}
+
+.card-actions--single .btn,
+.tpl-actions.card-actions--single .btn {
+  flex: 1 1 100%;
+  width: 100%;
+  max-width: 100%;
 }
 
 @media (max-width: 520px) {

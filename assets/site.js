@@ -235,11 +235,6 @@
       link.dataset.productNavBound = "1";
       link.addEventListener("click", function (event) {
         event.stopPropagation();
-        var card = link.closest(".card[data-id]");
-        var url = resolveProductPageUrl(card || link);
-        if (!url) return;
-        event.preventDefault();
-        global.location.assign(url);
       });
     });
   }
@@ -272,13 +267,11 @@
                 '<span class="save-badge">' + saveLabel + '</span>' +
               '</span>' +
             '</div>' +
-            '<div class="tpl-actions card-actions">' +
+            '<div class="tpl-actions card-actions' + (isWeddingProduct ? ' card-actions--single' : '') + '">' +
               (isWeddingProduct
                 ? '<a class="btn btn-primary btn-view-details"' + detailsAttrs + '>View Details</a>'
-                : '<button type="button" class="btn btn-primary btn-customize">Customize</button>') +
-              (isWeddingProduct
-                ? '<button type="button" class="btn btn-ghost btn-customize">Buy Now</button>'
-                : '<button type="button" class="btn btn-ghost btn-watch demo-btn">Watch Demo</button>') +
+                : '<button type="button" class="btn btn-primary btn-customize">Customize</button>' +
+                  '<button type="button" class="btn btn-ghost btn-watch demo-btn">Watch Demo</button>') +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -313,13 +306,11 @@
                 '<span class="save-badge">' + saveLabel + '</span>' +
               '</span>' +
             '</div>' +
-            '<div class="tpl-actions card-actions">' +
+            '<div class="tpl-actions card-actions' + (isProductPage ? ' card-actions--single' : '') + '">' +
               (isProductPage
                 ? '<a class="btn btn-primary btn-view-details" href="' + detailsHref + '">View Details</a>'
-                : '<button type="button" class="btn btn-primary btn-customize">Customize</button>') +
-              (isProductPage
-                ? '<button type="button" class="btn btn-ghost btn-customize">Buy Now</button>'
-                : '<button type="button" class="btn btn-ghost btn-watch demo-btn">Watch Demo</button>') +
+                : '<button type="button" class="btn btn-primary btn-customize">Customize</button>' +
+                  '<button type="button" class="btn btn-ghost btn-watch demo-btn">Watch Demo</button>') +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -561,19 +552,45 @@
       document.querySelectorAll(".card[data-demo-url]").forEach(function (card) {
         if (card.dataset.modalBound === "1") return;
         card.dataset.modalBound = "1";
+
+        var productUrl = resolveProductPageUrl(card);
+        if (productUrl) {
+          card.classList.add("card--navigates-product");
+          card.setAttribute("tabindex", "0");
+          card.setAttribute("role", "link");
+          card.setAttribute("aria-label", "View " + (card.getAttribute("data-title") || "template") + " details");
+
+          function navigateToProduct(event) {
+            if (event.target.closest("a[href]")) return;
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            if (typeof event.button === "number" && event.button !== 0) return;
+            event.preventDefault();
+            global.location.assign(productUrl);
+          }
+
+          card.addEventListener("click", navigateToProduct);
+          card.addEventListener("keydown", function (event) {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            if (event.target.closest("a[href]")) return;
+            event.preventDefault();
+            global.location.assign(productUrl);
+          });
+          return;
+        }
+
         card.classList.add("card--opens-preview");
         card.setAttribute("tabindex", "0");
         card.setAttribute("role", "button");
         card.setAttribute("aria-label", "Preview " + (card.getAttribute("data-title") || "template"));
 
         card.addEventListener("click", function (event) {
-          if (event.target.closest(".btn-view-details, .tpl-name-link, .btn-customize, .tpl-actions, a[href]")) return;
+          if (event.target.closest(".btn-view-details, .tpl-name-link, .btn-customize, .btn-watch, .demo-btn, .tpl-actions, a[href]")) return;
           openModal(card);
         });
 
         card.addEventListener("keydown", function (event) {
           if (event.key === "Enter" || event.key === " ") {
-            if (event.target.closest(".btn-view-details, .tpl-name-link, .btn-customize, .tpl-actions, a[href]")) return;
+            if (event.target.closest(".btn-view-details, .tpl-name-link, .btn-customize, .btn-watch, .demo-btn, .tpl-actions, a[href]")) return;
             event.preventDefault();
             openModal(card);
           }
