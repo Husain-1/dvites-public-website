@@ -121,7 +121,7 @@
       url: "/templates/maison-doree/",
       title: "Maison Dorée",
       category: "Luxury European",
-      tags: ["luxury"],
+      tags: ["luxury", "elegant", "modern"],
       preview: "/templates/maison-doree/assets/images/maison.png",
       description: "European luxury meets wedding romance — golden accents, cinematic motion, and a sophisticated invite for couples who want something extraordinary.",
       featured: true
@@ -131,7 +131,7 @@
       url: "/templates/pichwai-royal/",
       title: "Pichwai Royal",
       category: "Royal Wedding",
-      tags: ["hinduism", "royal"],
+      tags: ["traditional", "royal", "floral"],
       preview: "/templates/pichwai-royal/assets/images/pichwai.png",
       description: "A luxurious Pichwai-inspired royal wedding invitation with cinematic animations.",
       featured: false
@@ -141,7 +141,7 @@
       url: "/templates/honey-garden/",
       title: "Honey Garden",
       category: "Botanical Floral",
-      tags: ["luxury", "floral", "minimal", "christian"],
+      tags: ["floral", "elegant", "classic"],
       preview: "/templates/honey-garden/assets/images/thumbnail.png",
       description: "A romantic botanical garden invitation with hand-drawn florals, butterflies, honeybees, and an elegant cinematic opening.",
       featured: false
@@ -151,7 +151,7 @@
       url: "/templates/animated-flowers/",
       title: "Animated Flowers",
       category: "Botanical Floral",
-      tags: ["luxury", "floral", "minimal", "christian"],
+      tags: ["floral", "luxury", "elegant"],
       preview: "/templates/animated-flowers/assets/images/thumbnail-anim.png",
       description: "A lush animated floral invitation with blooming sides, elegant typography, and a cinematic envelope opening.",
       featured: false
@@ -161,7 +161,7 @@
       url: "/templates/Mountains/",
       title: "Mountain Royal",
       category: "Royal Hindu Wedding",
-      tags: ["hinduism", "royal", "south-indian"],
+      tags: ["royal", "traditional", "destination"],
       preview: "/templates/Mountains/assets/images/Mountains.png",
       description: "A graceful Hindu royal wedding website with ceremony details, family blessings, and a warm traditional feel your guests will love.",
       featured: true
@@ -171,7 +171,7 @@
       url: "/templates/balcony-seaview/",
       title: "Balcony Seaview",
       category: "Coastal Destination",
-      tags: ["destination", "luxury", "christian"],
+      tags: ["destination", "elegant", "luxury"],
       preview: "/templates/balcony-seaview/assets/images/balcony.png",
       description: "A dreamy destination-style invite with ocean views, elegant typography, and a romantic coastal atmosphere perfect for beach weddings.",
       featured: false
@@ -181,7 +181,7 @@
       url: "/templates/curtains/",
       title: "Curtains",
       category: "Classic Elegance",
-      tags: ["luxury", "minimal", "christian"],
+      tags: ["classic", "elegant", "luxury"],
       preview: "/templates/curtains/assets/images/curtains-theme-poster-BhK08iq7.jpg",
       description: "Grand curtains reveal a timeless wedding story — refined animations, soft luxury tones, and an unforgettable first impression.",
       featured: true
@@ -191,7 +191,7 @@
       url: "/templates/laavan/",
       title: "Laavan",
       category: "Anand Karaj / Sikh Wedding",
-      tags: ["sikh", "royal"],
+      tags: ["traditional", "royal", "elegant"],
       preview: "/templates/laavan/assets/images/laavan.png",
       description: "A serene Anand Karaj invitation with sacred symbolism, elegant blue tones, and every ceremony beautifully laid out for your guests.",
       featured: true
@@ -201,7 +201,7 @@
       url: "/templates/mewar-midnight/",
       title: "Mewar Midnight",
       category: "Royal Rajasthani",
-      tags: ["hinduism", "royal"],
+      tags: ["royal", "traditional", "luxury"],
       preview: "/templates/mewar-midnight/assets/images/mewar.png",
       description: "Royal Rajasthani grandeur with palace imagery, rich maroon tones, and a regal experience worthy of your most special celebration.",
       featured: false
@@ -211,7 +211,7 @@
       url: "/templates/niqah/",
       title: "Niqah",
       category: "Islamic Nikah",
-      tags: ["muslim", "luxury"],
+      tags: ["elegant", "floral", "traditional"],
       preview: "/templates/niqah/assets/images/niqah.png",
       description: "An elegant Nikah invitation with refined typography, soft florals, and a warm welcome for your walima and nikah celebrations.",
       featured: true
@@ -221,7 +221,7 @@
       url: "/templates/oud-blossom-majlis/",
       title: "Oud Blossom Majlis",
       category: "Arabic Majlis",
-      tags: ["muslim", "luxury"],
+      tags: ["traditional", "luxury", "elegant"],
       preview: "/templates/oud-blossom-majlis/assets/images/oudblossom.png",
       description: "Arabic majlis elegance with oud-inspired aesthetics, rich cultural details, and a luxurious invite for your wedding festivities.",
       featured: false
@@ -231,7 +231,7 @@
       url: "/templates/botanical-bloom/",
       title: "Botanical Bloom",
       category: "Minimal Floral",
-      tags: ["christian", "minimal", "floral", "botanical"],
+      tags: ["minimal", "floral", "classic"],
       preview: "/templates/botanical-bloom/assets/images/thumbnail.png",
       description: "A serene botanical wedding invitation with hand-drawn florals, cream tones, scroll reveals, music, and multilingual support — perfect for intimate Christian and garden ceremonies.",
       featured: false
@@ -241,7 +241,7 @@
       url: "/templates/rajkamal-palace/",
       title: "Rajkamal Palace",
       category: "Royal Palace Indian",
-      tags: ["hinduism", "royal"],
+      tags: ["royal", "traditional", "luxury"],
       preview: "/templates/rajkamal-palace/assets/images/rajkamal.png",
       description: "Palace-inspired Indian royalty with arch motifs, golden details, and a majestic wedding website that feels truly grand.",
       featured: true
@@ -264,13 +264,19 @@
     var max = limit || 3;
     var current = getBySlug(currentSlug);
     if (!current) return LIST.slice(0, max);
-    var sameCategory = LIST.filter(function (tpl) {
-      return tpl.slug !== current.slug && tpl.category === current.category;
+    var currentTags = current.tags || [];
+    function sharesTag(tpl) {
+      return (tpl.tags || []).some(function (tag) {
+        return currentTags.indexOf(tag) !== -1;
+      });
+    }
+    var sameTags = LIST.filter(function (tpl) {
+      return tpl.slug !== current.slug && sharesTag(tpl);
     });
     var others = LIST.filter(function (tpl) {
-      return tpl.slug !== current.slug && tpl.category !== current.category;
+      return tpl.slug !== current.slug && !sharesTag(tpl);
     });
-    return sameCategory.concat(others).slice(0, max);
+    return sameTags.concat(others).slice(0, max);
   }
 
   function toCatalogRecord(tpl) {

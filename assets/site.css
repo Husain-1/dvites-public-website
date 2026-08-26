@@ -1676,6 +1676,26 @@ button { font-family: inherit; cursor: pointer; }
   margin-bottom: 32px;
 }
 
+@media (max-width: 767px) {
+  .filters {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+    margin-bottom: 28px;
+  }
+
+  .filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-chip {
+    flex-shrink: 0;
+  }
+}
+
 .filter-chip {
   padding: 9px 16px;
   border-radius: 999px;

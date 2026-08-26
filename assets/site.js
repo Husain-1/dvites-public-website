@@ -15,7 +15,7 @@
     url: "/templates/desert-sand/",
     title: "Desert Sand",
     category: "Hindu Save the Date",
-    tags: ["hinduism", "minimal"],
+    tags: ["minimal", "classic", "elegant"],
     preview: "/templates/desert-sand/assets/images/poster.webp",
     description: "A warm, elegant Save the Date design inspired by desert tones and timeless minimalism.",
     featured: false,
@@ -110,7 +110,7 @@
       url: "/templates/desert-sand/",
       title: "Desert Sand",
       category: "Save the Date",
-      tags: ["hinduism", "minimal"],
+      tags: ["minimal", "classic", "elegant"],
       thumbnailFile: "dessert sand thumbnail.webp",
       description: "A warm, elegant Save the Date design inspired by desert tones and timeless minimalism."
     },
