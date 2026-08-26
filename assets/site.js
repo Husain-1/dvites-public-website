@@ -64,7 +64,10 @@
   }
 
   function templateUnitPrice(tpl) {
-    return tpl && tpl.price != null ? tpl.price : PRICE;
+    if (tpl && tpl.productType === "save-the-date") {
+      return getStdPricing().price;
+    }
+    return getWeddingPricing().price;
   }
 
   function getSaveTheDateTemplatesList() {
@@ -156,8 +159,25 @@
     return stdThumbnailUrl(tpl && tpl.thumbnailFile);
   }
 
-  function formatRupee(n) {
-    return "₹" + n.toLocaleString("en-IN");
+  function formatPrice(n) {
+    if (global.DvitesMarket && typeof global.DvitesMarket.formatPrice === "function") {
+      return global.DvitesMarket.formatPrice(n);
+    }
+    return "₹" + Number(n).toLocaleString("en-IN");
+  }
+
+  function getWeddingPricing() {
+    if (global.DvitesMarket && typeof global.DvitesMarket.getPricing === "function") {
+      return global.DvitesMarket.getPricing("wedding");
+    }
+    return { price: PRICE, oldPrice: OLD_PRICE };
+  }
+
+  function getStdPricing() {
+    if (global.DvitesMarket && typeof global.DvitesMarket.getPricing === "function") {
+      return global.DvitesMarket.getPricing("save-the-date");
+    }
+    return { price: SAVE_THE_DATE_PRICE, oldPrice: SAVE_THE_DATE_OLD_PRICE };
   }
 
   function mailto(subject, body) {
@@ -174,7 +194,7 @@
   function buyMail(title) {
     return mailto(
       "Buy Now — " + title + " Wedding Invitation",
-      "Hi Dvites,\n\nI'd like to purchase the " + title + " template (" + formatRupee(PRICE) + ").\n\nPlease confirm availability and payment details.\n\nThank you."
+      "Hi Dvites,\n\nI'd like to purchase the " + title + " template (" + formatPrice(getWeddingPricing().price) + ").\n\nPlease confirm availability and payment details.\n\nThank you."
     );
   }
 
@@ -240,8 +260,9 @@
   }
 
   function renderCard(tpl) {
-    var price = tpl.price != null ? tpl.price : PRICE;
-    var oldPrice = tpl.oldPrice != null ? tpl.oldPrice : OLD_PRICE;
+    var pricing = getWeddingPricing();
+    var price = pricing.price;
+    var oldPrice = pricing.oldPrice;
     var saveLabel = tpl.saveLabel || "Save 40%";
     var productUrl = getProductPageUrl(tpl);
     var isWeddingProduct = !!productUrl;
@@ -250,7 +271,7 @@
       ? ' href="' + detailsHref + '"'
       : ' href="#" data-std-card="1"';
     return (
-      '<article class="tpl-card card" data-id="' + tpl.id + '" data-demo-url="' + tpl.url + '" data-preview="' + tpl.preview + '" data-title="' + tpl.title + '" data-category="' + tpl.category + '" data-tags="' + tpl.tags.join(" ") + '" data-description="' + tpl.description.replace(/"/g, "&quot;") + '" data-amount-paise="' + (price * 100) + '"' + (productUrl ? ' data-product-url="' + productUrl + '"' : '') + '>' +
+      '<article class="tpl-card card" data-id="' + tpl.id + '" data-product-type="wedding" data-demo-url="' + tpl.url + '" data-preview="' + tpl.preview + '" data-title="' + tpl.title + '" data-category="' + tpl.category + '" data-tags="' + tpl.tags.join(" ") + '" data-description="' + tpl.description.replace(/"/g, "&quot;") + '"' + (productUrl ? ' data-product-url="' + productUrl + '"' : '') + '>' +
         '<div class="tpl-card-inner">' +
           '<div class="tpl-preview-wrap">' +
             renderCatalogPhoneMockup(tpl.preview, tpl.title, "catalog-thumb--" + tpl.id) +
@@ -261,9 +282,9 @@
               : '<h3 class="tpl-name">' + tpl.title + '</h3>') +
             '<p class="tpl-category">' + tpl.category + '</p>' +
             '<div class="tpl-pricing">' +
-              '<span class="old-price">' + formatRupee(oldPrice) + '</span>' +
+              '<span class="old-price">' + formatPrice(oldPrice) + '</span>' +
               '<span class="tpl-price-now">' +
-                '<span class="current-price">' + formatRupee(price) + '</span>' +
+                '<span class="current-price">' + formatPrice(price) + '</span>' +
                 '<span class="save-badge">' + saveLabel + '</span>' +
               '</span>' +
             '</div>' +
@@ -281,15 +302,16 @@
 
   function renderSaveTheDateCard(tpl) {
     var thumbUrl = tpl.preview || getSaveTheDateThumbnail(tpl);
-    var price = tpl.price != null ? tpl.price : SAVE_THE_DATE_PRICE;
-    var oldPrice = tpl.oldPrice != null ? tpl.oldPrice : SAVE_THE_DATE_OLD_PRICE;
+    var pricing = getStdPricing();
+    var price = pricing.price;
+    var oldPrice = pricing.oldPrice;
     var saveLabel = tpl.saveLabel || "Save 50%";
     var productUrl = getProductPageUrl(tpl);
     var isProductPage = !!productUrl;
     var detailsHref = productUrl || "#";
     var tags = (tpl.tags || []).join(" ");
     return (
-      '<article class="tpl-card card std-card" data-id="' + tpl.id + '" data-demo-url="' + tpl.url + '" data-preview="' + thumbUrl + '" data-title="' + tpl.title + '" data-category="' + tpl.category + '" data-tags="' + tags + '" data-description="' + tpl.description.replace(/"/g, "&quot;") + '" data-amount-paise="' + (price * 100) + '" data-old-price="' + oldPrice + '"' + (productUrl ? ' data-product-url="' + productUrl + '"' : '') + '>' +
+      '<article class="tpl-card card std-card" data-id="' + tpl.id + '" data-product-type="save-the-date" data-demo-url="' + tpl.url + '" data-preview="' + thumbUrl + '" data-title="' + tpl.title + '" data-category="' + tpl.category + '" data-tags="' + tags + '" data-description="' + tpl.description.replace(/"/g, "&quot;") + '"' + (productUrl ? ' data-product-url="' + productUrl + '"' : '') + '>' +
         '<div class="tpl-card-inner">' +
           '<div class="tpl-preview-wrap">' +
             renderCatalogPhoneMockup(thumbUrl, tpl.title, "catalog-thumb--" + tpl.id) +
@@ -300,9 +322,9 @@
               : '<h3 class="tpl-name">' + tpl.title + '</h3>') +
             '<p class="tpl-category">' + tpl.description + '</p>' +
             '<div class="tpl-pricing">' +
-              '<span class="old-price">' + formatRupee(oldPrice) + '</span>' +
+              '<span class="old-price">' + formatPrice(oldPrice) + '</span>' +
               '<span class="tpl-price-now">' +
-                '<span class="current-price">' + formatRupee(price) + '</span>' +
+                '<span class="current-price">' + formatPrice(price) + '</span>' +
                 '<span class="save-badge">' + saveLabel + '</span>' +
               '</span>' +
             '</div>' +
@@ -599,56 +621,54 @@
     }
 
     function setModalPricing(card) {
-      var amountPaise = card.getAttribute("data-amount-paise") || String(PRICE * 100);
+      var productType =
+        card.getAttribute("data-product-type") === "save-the-date"
+          ? "save-the-date"
+          : "wedding";
+      var pricing =
+        productType === "save-the-date" ? getStdPricing() : getWeddingPricing();
       if (modalBuy) {
-        modalBuy.dataset.amountPaise = amountPaise;
         modalBuy.dataset.templateSlug = card.getAttribute("data-id") || "";
       }
       var modalPricing = document.querySelector("#demo-modal .modal-pricing");
       if (!modalPricing) return;
-      var oldPriceAttr = card.getAttribute("data-old-price");
-      if (oldPriceAttr) {
-        modalPricing.innerHTML = '<span class="old-price">' + formatRupee(Number(oldPriceAttr)) + '</span><span class="current-price">' + formatRupee(Number(amountPaise) / 100) + '</span>';
-      } else if (card.getAttribute("data-amount-paise") && Number(card.getAttribute("data-amount-paise")) !== PRICE * 100) {
-        modalPricing.innerHTML = '<span class="current-price">' + formatRupee(Number(amountPaise) / 100) + '</span>';
-      } else {
-        modalPricing.innerHTML = '<span class="old-price">' + formatRupee(OLD_PRICE) + '</span><span class="current-price">' + formatRupee(PRICE) + '</span>';
-      }
+      modalPricing.innerHTML =
+        '<span class="old-price">' + formatPrice(pricing.oldPrice) + '</span>' +
+        '<span class="current-price">' + formatPrice(pricing.price) + '</span>';
     }
 
-    function trackModalViewContent(title, category, pricePaise) {
+    function trackModalViewContent(title, category, productType) {
       if (typeof global.dvitesTrackViewContent !== "function") return;
+      var pricing =
+        productType === "save-the-date" ? getStdPricing() : getWeddingPricing();
       global.dvitesTrackViewContent(
         title || "Dvites Template",
         category || "Wedding Invitation",
-        (Number(pricePaise) || PRICE * 100) / 100
+        pricing.price,
+        null
       );
     }
 
     function openModalFromTemplate(tpl) {
       if (!tpl) return;
+      var productType = tpl.productType || "wedding";
+      var pricing =
+        productType === "save-the-date" ? getStdPricing() : getWeddingPricing();
       lastFocused = document.activeElement;
       modalTitle.textContent = tpl.title || "";
       modalCategory.textContent = tpl.category || "";
       modalDesc.textContent = tpl.description || "";
       openModalPreview(tpl.preview, tpl.url);
-      trackModalViewContent(
-        tpl.title,
-        tpl.category,
-        tpl.pricePaise != null ? tpl.pricePaise : PRICE * 100
-      );
+      trackModalViewContent(tpl.title, tpl.category, productType);
       if (modalBuy) {
-        modalBuy.dataset.amountPaise = String(tpl.pricePaise != null ? tpl.pricePaise : PRICE * 100);
         modalBuy.dataset.templateSlug = tpl.id || "";
       }
       setModalProductLink(tpl.id || "");
       var modalPricing = document.querySelector("#demo-modal .modal-pricing");
       if (modalPricing) {
-        if (tpl.pricePaise != null && tpl.pricePaise !== PRICE * 100) {
-          modalPricing.innerHTML = '<span class="current-price">' + formatRupee(tpl.pricePaise / 100) + '</span>';
-        } else {
-          modalPricing.innerHTML = '<span class="old-price">' + formatRupee(OLD_PRICE) + '</span><span class="current-price">' + formatRupee(PRICE) + '</span>';
-        }
+        modalPricing.innerHTML =
+          '<span class="old-price">' + formatPrice(pricing.oldPrice) + '</span>' +
+          '<span class="current-price">' + formatPrice(pricing.price) + '</span>';
       }
       modal.classList.add("is-open");
       modal.setAttribute("aria-hidden", "false");
@@ -669,7 +689,11 @@
       modalCategory.textContent = category || "";
       modalDesc.textContent = desc;
       openModalPreview(preview, url);
-      trackModalViewContent(title, category, card.getAttribute("data-amount-paise"));
+      trackModalViewContent(
+        title,
+        category,
+        card.getAttribute("data-product-type") || "wedding"
+      );
       setModalPricing(card);
       setModalProductLink(card);
       modal.classList.add("is-open");
@@ -813,7 +837,7 @@
           '<div class="partner-item-thumb" style="background-image:url(\'' + tpl.preview + '\')"></div>' +
           '<div class="partner-item-info">' +
             '<strong>' + tpl.title + '</strong>' +
-            '<span>' + tpl.category + ' · ' + formatRupee(templateUnitPrice(tpl)) + '</span>' +
+            '<span>' + tpl.category + ' · ' + formatPrice(templateUnitPrice(tpl)) + '</span>' +
           '</div>' +
         '</label>'
       );
@@ -851,9 +875,9 @@
       var total = subtotal - discount;
 
       countEl.textContent = count;
-      subtotalEl.textContent = formatRupee(subtotal);
-      discountEl.textContent = discount ? "−" + formatRupee(discount) : formatRupee(0);
-      totalEl.textContent = formatRupee(total);
+      subtotalEl.textContent = formatPrice(subtotal);
+      discountEl.textContent = discount ? "−" + formatPrice(discount) : formatPrice(0);
+      totalEl.textContent = formatPrice(total);
       badge.classList.toggle("is-visible", qualifies);
       updateCartHint(count);
 
@@ -884,26 +908,32 @@
     updateCart();
 
     orderBtn.addEventListener("click", function () {
-      var selected = [];
-      var subtotal = 0;
+      var selectedSlugs = [];
+      var selectedTitles = [];
       grid.querySelectorAll("input:checked").forEach(function (input) {
         var tpl = partnerTemplates.find(function (t) { return t.id === input.value; });
         if (tpl) {
-          selected.push(tpl.title);
-          subtotal += templateUnitPrice(tpl);
+          selectedSlugs.push(tpl.id);
+          selectedTitles.push(tpl.title);
         }
       });
-      if (selected.length < PARTNER_MIN || selected.length > PARTNER_MAX) return;
+      if (selectedSlugs.length < PARTNER_MIN || selectedSlugs.length > PARTNER_MAX) return;
       if (!global.DvitesPayment) return;
 
-      var templateName = "Partner Studio (" + selected.length + " templates): " + selected.join(", ");
-      var amountPaise = global.DvitesPayment.calculatePartnerTotalPaise(Math.round(subtotal * 100));
+      var unitPrice = getWeddingPricing().price;
+      var totalMajor = global.DvitesPayment.calculatePartnerTotalMajor(
+        unitPrice,
+        selectedSlugs.length
+      );
+      var templateName =
+        "Partner Studio (" + selectedSlugs.length + " templates): " + selectedTitles.join(", ");
 
       global.DvitesPayment.startCheckout({
         templateName: templateName,
         templateSlug: "partner-studio",
-        amountPaise: amountPaise,
-        notes: "Partner Studio templates: " + selected.join(", "),
+        partnerTemplateSlugs: selectedSlugs,
+        displayAmountMajor: totalMajor,
+        notes: "Partner Studio templates: " + selectedTitles.join(", "),
       });
     });
   }
@@ -1046,30 +1076,49 @@
     enquiryMail: enquiryMail,
     buyMail: buyMail,
     init: function () {
-      initAnnouncementBar();
-      initHeaderScroll();
-      initHeroEventRotator();
-      initHeroScroll();
-      initHeroMarquees();
-      whenHeroMarqueeReady(initHeroMarquees);
-      initModal();
-      initModalExtras();
-      initFilters();
-      initMobileNav();
-      initFaq();
-      initProtection();
+      var boot = function () {
+        initAnnouncementBar();
+        initHeaderScroll();
+        initHeroEventRotator();
+        initHeroScroll();
+        initHeroMarquees();
+        whenHeroMarqueeReady(initHeroMarquees);
+        initModal();
+        initModalExtras();
+        initFilters();
+        initMobileNav();
+        initFaq();
+        initProtection();
+        initPartnerStudio();
+        initPageRecovery();
+        global.addEventListener("resize", function () {
+          var featured = document.getElementById("featured-catalog");
+          var full = document.getElementById("full-catalog");
+          var std = document.getElementById("std-catalog");
+          if (featured) equalizeCardHeights(featured);
+          if (full) equalizeCardHeights(full);
+          if (std) equalizeCardHeights(std);
+          scheduleHeroMarqueeSync();
+        });
+      };
+      if (global.DvitesMarket && typeof global.DvitesMarket.ready === "function") {
+        global.DvitesMarket.ready().then(boot);
+      } else {
+        boot();
+      }
+    },
+    refreshMarketPricing: function () {
+      if (global.DvitesMarket && global.DvitesMarket.applyStaticPrices) {
+        global.DvitesMarket.applyStaticPrices();
+      }
+      var featured = document.getElementById("featured-catalog");
+      var full = document.getElementById("full-catalog");
+      var std = document.getElementById("std-catalog");
+      if (featured) renderCatalog(featured, true);
+      if (full) renderCatalog(full, false);
+      if (std) renderSaveTheDateCatalog(std);
       initPartnerStudio();
-      initPageRecovery();
-      global.addEventListener("resize", function () {
-        var featured = document.getElementById("featured-catalog");
-        var full = document.getElementById("full-catalog");
-        var std = document.getElementById("std-catalog");
-        if (featured) equalizeCardHeights(featured);
-        if (full) equalizeCardHeights(full);
-        if (std) equalizeCardHeights(std);
-        scheduleHeroMarqueeSync();
-      });
-    }
+    },
   };
 
   if (document.readyState === "loading") {

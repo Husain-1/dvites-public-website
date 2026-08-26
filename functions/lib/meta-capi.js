@@ -42,9 +42,24 @@ export function normalizeEmail(email) {
   return value;
 }
 
-export function normalizePhone(phone) {
+export function normalizePhone(phone, market) {
   let digits = String(phone || "").replace(/\D/g, "");
   if (!digits) return null;
+
+  const marketCode = String(market || "")
+    .trim()
+    .toUpperCase();
+
+  if (marketCode === "AE") {
+    if (digits.length === 9 && digits.startsWith("5")) {
+      digits = "971" + digits;
+    } else if (digits.length === 10 && digits.startsWith("0")) {
+      digits = "971" + digits.slice(1);
+    }
+    if (digits.length < 11 || digits.length > 15) return null;
+    return digits.replace(/^0+/, "") || null;
+  }
+
   if (digits.length === 10) digits = "91" + digits;
   if (digits.length === 12 && digits.startsWith("91")) {
     // valid IN E.164 without plus
@@ -80,20 +95,39 @@ export function normalizeCountry(country) {
   return value;
 }
 
-export function paiseToRupees(paise) {
-  const value = Number(paise);
+export function subunitsToMajor(amountSubunits) {
+  const value = Number(amountSubunits);
   if (!Number.isFinite(value) || value <= 0) return null;
   return Math.round(value) / 100;
 }
 
-export function rupeesFromTrustedSources({ paymentAmountPaise, orderAmountPaise }) {
-  if (Number.isFinite(Number(paymentAmountPaise)) && Number(paymentAmountPaise) > 0) {
-    return paiseToRupees(paymentAmountPaise);
+/** @deprecated Use subunitsToMajor */
+export function paiseToRupees(paise) {
+  return subunitsToMajor(paise);
+}
+
+export function majorFromTrustedSources({ paymentAmountSubunits, orderAmountSubunits }) {
+  if (
+    Number.isFinite(Number(paymentAmountSubunits)) &&
+    Number(paymentAmountSubunits) > 0
+  ) {
+    return subunitsToMajor(paymentAmountSubunits);
   }
-  if (Number.isFinite(Number(orderAmountPaise)) && Number(orderAmountPaise) > 0) {
-    return paiseToRupees(orderAmountPaise);
+  if (
+    Number.isFinite(Number(orderAmountSubunits)) &&
+    Number(orderAmountSubunits) > 0
+  ) {
+    return subunitsToMajor(orderAmountSubunits);
   }
   return null;
+}
+
+/** @deprecated Use majorFromTrustedSources */
+export function rupeesFromTrustedSources({ paymentAmountPaise, orderAmountPaise }) {
+  return majorFromTrustedSources({
+    paymentAmountSubunits: paymentAmountPaise,
+    orderAmountSubunits: orderAmountPaise,
+  });
 }
 
 export async function sha256Hex(value) {
@@ -143,7 +177,7 @@ export async function buildMetaUserData(input) {
     const email = normalizeEmail(customer.email);
     if (email) userData.em = [await sha256Hex(email)];
 
-    const phone = normalizePhone(customer.phone);
+    const phone = normalizePhone(customer.phone, input.market || customer.market);
     if (phone) userData.ph = [await sha256Hex(phone)];
 
     const firstName = normalizeName(customer.firstName);
@@ -235,7 +269,7 @@ export async function sendMetaPurchase(input) {
   }
 
   const currency = cleanText(input.currency || "INR", 8).toUpperCase();
-  if (currency !== "INR") {
+  if (currency !== "INR" && currency !== "AED") {
     logMetaCapi("warn", {
       event_name: "Purchase",
       event: "purchase_skipped",

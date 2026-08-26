@@ -592,8 +592,27 @@
     }
   }
 
-  function formatMoney(value) {
-    return "₹" + Number(value || 0).toLocaleString("en-IN");
+  function formatMoney(value, currency) {
+    var amount = Number(value || 0);
+    var code = String(currency || "INR").toUpperCase();
+    if (code === "AED") {
+      return "AED " + amount.toLocaleString("en-AE");
+    }
+    return "₹" + amount.toLocaleString("en-IN");
+  }
+
+  function formatRevenueByCurrency(revenueByCurrency) {
+    if (!revenueByCurrency || typeof revenueByCurrency !== "object") {
+      return formatMoney(0, "INR");
+    }
+    var parts = [];
+    if (revenueByCurrency.INR) {
+      parts.push(formatMoney(revenueByCurrency.INR, "INR"));
+    }
+    if (revenueByCurrency.AED) {
+      parts.push(formatMoney(revenueByCurrency.AED, "AED"));
+    }
+    return parts.length ? parts.join(" · ") : formatMoney(0, "INR");
   }
 
   function formatDate(value) {
@@ -612,6 +631,7 @@
     adminFetch: adminFetch,
     ensureAuthShell: ensureAuthShell,
     formatMoney: formatMoney,
+    formatRevenueByCurrency: formatRevenueByCurrency,
     formatDate: formatDate,
     showToast: showToast,
     confirmDialog: confirmDialog,

@@ -67,7 +67,7 @@
       return (
         '<li>' +
           '<strong>' + (order.template_name || "—") + '</strong> · ' +
-          global.DvitesAdmin.formatMoney(order.amount) + ' · ' +
+          global.DvitesAdmin.formatMoney(order.amount, order.currency) + ' · ' +
           global.DvitesAdmin.formatDate(order.created_at) +
           (order.display_id ? ' · #' + order.display_id : "") +
         '</li>'

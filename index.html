@@ -14,6 +14,7 @@
   <link rel="preload" href="/assets/hero/phone-showcase.mp4" as="video" type="video/mp4" />
   <link rel="stylesheet" href="/assets/site.css" />
   <link rel="stylesheet" href="/assets/full-demo.css" />
+  <script src="/assets/market.js"></script>
   <script src="/assets/meta-pixel.js"></script>
   <script src="/assets/google-tag.js"></script>
   <script src="/assets/clarity.js"></script>
@@ -25,7 +26,7 @@
       <p class="announce-bar-copy">
         <span>Launch Offer</span>
         <span class="announce-bar-sep" aria-hidden="true">•</span>
-        <span><span class="hero-event-rotator" data-rotator="label" aria-live="polite"><span class="hero-event-rotator-inner">Wedding</span></span> Websites from <strong>₹799</strong></span>
+        <span><span class="hero-event-rotator" data-rotator="label" aria-live="polite"><span class="hero-event-rotator-inner">Wedding</span></span> Websites from <strong data-dvites-price="wedding" data-dvites-price-kind="price">₹799</strong></span>
         <span class="announce-bar-sep" aria-hidden="true">•</span>
         <span>Delivered within 24 Hours</span>
       </p>
@@ -70,7 +71,7 @@
         <p class="hero-v2-lead">Premium digital <span class="hero-event-rotator" data-rotator="type" aria-live="polite"><span class="hero-event-rotator-inner">wedding</span></span> invitations with RSVP, music, countdown, gallery and Google Maps.</p>
         <p class="hero-v2-sub">Choose your favourite design, personalise it and receive it within 24 hours.</p>
         <p class="hero-v2-trust">
-          <span>From ₹799</span>
+          <span>From <strong data-dvites-price="wedding" data-dvites-price-kind="price">₹799</strong></span>
           <span class="hero-v2-trust-sep" aria-hidden="true">·</span>
           <span>Secure Checkout</span>
           <span class="hero-v2-trust-sep" aria-hidden="true">·</span>
@@ -378,8 +379,15 @@
   <script src="/assets/site.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      Dvites.renderCatalog(document.getElementById("featured-catalog"), true);
-      if (typeof DvitesRebindModal === "function") DvitesRebindModal();
+      var render = function () {
+        Dvites.renderCatalog(document.getElementById("featured-catalog"), true);
+        if (typeof DvitesRebindModal === "function") DvitesRebindModal();
+      };
+      if (window.DvitesMarket && typeof window.DvitesMarket.ready === "function") {
+        window.DvitesMarket.ready().then(render);
+      } else {
+        render();
+      }
     });
   </script>
 </body>

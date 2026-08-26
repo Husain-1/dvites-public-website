@@ -68,14 +68,19 @@ async function ordersRevenue(env, start, end) {
   const result = await supabaseSelect(
     env,
     "orders",
-    "select=amount,created_at" +
+    "select=amount,currency,created_at" +
       "&payment_status=eq.paid" +
       "&created_at=gte." + enc(start) +
       "&created_at=lte." + enc(end)
   );
-  if (!result.ok) return { count: 0, revenue: 0 };
-  const revenue = result.data.reduce((sum, row) => sum + Number(row.amount || 0), 0);
-  return { count: result.data.length, revenue };
+  if (!result.ok) return { count: 0, revenue_by_currency: {} };
+  const revenueByCurrency = {};
+  result.data.forEach(function (row) {
+    const currency = String(row.currency || "INR").toUpperCase();
+    revenueByCurrency[currency] =
+      (revenueByCurrency[currency] || 0) + Number(row.amount || 0);
+  });
+  return { count: result.data.length, revenue_by_currency: revenueByCurrency };
 }
 
 export async function onRequestGet(context) {
@@ -156,7 +161,8 @@ export async function onRequestGet(context) {
     payment_successes: paymentSuccesses,
     conversion_rate: conversionRate,
     orders_count: orders.count,
-    revenue: orders.revenue,
+    revenue_by_currency: orders.revenue_by_currency,
+    revenue: orders.revenue_by_currency.INR || 0,
     page_breakdown: pageBreakdown.slice(0, 20),
     template_breakdown: templateBreakdown.slice(0, 20),
   });

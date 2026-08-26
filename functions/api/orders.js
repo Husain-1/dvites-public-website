@@ -27,6 +27,17 @@ async function buildDisplayIdMap(env) {
   return map;
 }
 
+function sumRevenueByCurrency(orders) {
+  const revenueByCurrency = {};
+  orders.forEach(function (order) {
+    if (order.payment_status !== "paid") return;
+    const currency = String(order.currency || "INR").toUpperCase();
+    revenueByCurrency[currency] =
+      (revenueByCurrency[currency] || 0) + Number(order.amount || 0);
+  });
+  return revenueByCurrency;
+}
+
 function attachDisplayId(order, displayIdMap) {
   if (!order) return order;
   return Object.assign({}, order, {
@@ -130,7 +141,7 @@ export async function onRequestGet(context) {
   }
 
   const paid = orders.filter((o) => o.payment_status === "paid");
-  const revenue = paid.reduce((sum, o) => sum + Number(o.amount || 0), 0);
+  const revenueByCurrency = sumRevenueByCurrency(paid);
 
   const todayBounds = rangeToBounds("today");
   const weekBounds = rangeToBounds("week");
@@ -150,7 +161,8 @@ export async function onRequestGet(context) {
     orders,
     summary: {
       total_orders: orders.length,
-      total_revenue: revenue,
+      revenue_by_currency: revenueByCurrency,
+      total_revenue: revenueByCurrency.INR || 0,
       today_orders: todayOrders.length,
       week_orders: weekOrders.length,
       month_orders: monthOrders.length,

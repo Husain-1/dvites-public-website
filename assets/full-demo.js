@@ -165,7 +165,6 @@
     global.DvitesPayment.startCheckout({
       templateName: state.templateName,
       templateSlug: state.templateSlug,
-      amountPaise: state.amountPaise
     }).finally(function () {
       if (buyBtn) {
         buyBtn.disabled = false;
@@ -187,7 +186,6 @@
       demoUrl: opts.demoUrl,
       templateSlug: opts.templateSlug || "",
       templateName: opts.templateName || "Dvites Template",
-      amountPaise: Number(opts.amountPaise) || 79900,
       productUrl: opts.productUrl || "",
       exitUrl: opts.exitUrl || global.location.href
     };

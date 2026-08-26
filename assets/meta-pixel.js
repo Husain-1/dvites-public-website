@@ -38,6 +38,14 @@
     return text || fallback;
   }
 
+  function getCurrency(explicitCurrency) {
+    if (explicitCurrency) return String(explicitCurrency).toUpperCase();
+    if (global.DvitesMarket && typeof global.DvitesMarket.getCurrency === "function") {
+      return global.DvitesMarket.getCurrency();
+    }
+    return "INR";
+  }
+
   global.dvitesTrackViewContent = function (templateName, category, price, contentId) {
     if (!canTrack()) return;
     var payload = {
@@ -45,7 +53,7 @@
       content_category: asText(category, "Wedding Invitation"),
       content_type: "product",
       value: asNumber(price, 0),
-      currency: "INR",
+      currency: getCurrency(),
     };
     if (contentId) payload.content_ids = [asText(contentId, "")];
     global.fbq("track", "ViewContent", payload);
@@ -79,7 +87,7 @@
       content_name: asText(templateName, "Dvites Template"),
       content_type: "product",
       value: asNumber(price, 0),
-      currency: "INR",
+      currency: getCurrency(),
     });
   };
 
@@ -100,7 +108,7 @@
     }
   }
 
-  global.dvitesTrackPurchase = function (templateName, price, orderId) {
+  global.dvitesTrackPurchase = function (templateName, price, orderId, currency) {
     if (!canTrack()) return;
     var eventId = asText(orderId, "");
     if (eventId && !markPurchaseTracked(eventId)) return;
@@ -108,7 +116,7 @@
       content_name: asText(templateName, "Dvites Template"),
       content_type: "product",
       value: asNumber(price, 0),
-      currency: "INR",
+      currency: getCurrency(currency),
       order_id: eventId,
     };
     var options = eventId ? { eventID: eventId } : {};

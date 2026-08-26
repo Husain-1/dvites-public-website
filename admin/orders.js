@@ -122,7 +122,7 @@
           '</div>' +
         '</div>' +
         '<h3 class="admin-order-card-title">' + (order.template_name || "—") + '</h3>' +
-        '<p class="admin-order-card-amount">' + global.DvitesAdmin.formatMoney(order.amount) + '</p>' +
+        '<p class="admin-order-card-amount">' + global.DvitesAdmin.formatMoney(order.amount, order.currency) + '</p>' +
         '<p class="admin-order-card-customer">' + customerLine(order) + '</p>' +
         (order.customer_email && customerLine(order) !== order.customer_email
           ? '<p class="admin-order-card-sub">' + order.customer_email + '</p>' : "") +
@@ -158,7 +158,7 @@
           '<div class="admin-detail-row"><dt>Order ID</dt><dd><span class="admin-pill admin-pill-id">' + orderRef(order) + '</span></dd></div>' +
           '<div class="admin-detail-row"><dt>Created</dt><dd>' + global.DvitesAdmin.formatDate(order.created_at) + '</dd></div>' +
           '<div class="admin-detail-row"><dt>Template</dt><dd>' + (order.template_name || "—") + '</dd></div>' +
-          '<div class="admin-detail-row"><dt>Amount</dt><dd>' + global.DvitesAdmin.formatMoney(order.amount) + '</dd></div>' +
+          '<div class="admin-detail-row"><dt>Amount</dt><dd>' + global.DvitesAdmin.formatMoney(order.amount, order.currency) + '</dd></div>' +
           '<div class="admin-detail-row"><dt>Payment Status</dt><dd>' + (order.payment_status || "—") + '</dd></div>' +
           '<div class="admin-detail-row"><dt>Customization</dt><dd>' + (order.customization_status || "—") + '</dd></div>' +
           '<div class="admin-detail-row"><dt>Customer</dt><dd>' + (order.customer_name || "—") + '</dd></div>' +
@@ -225,10 +225,15 @@
     var el = contentEl();
     if (!el) return;
 
+    var revenueByCurrency = summary.revenue_by_currency || {};
+    var indiaRevenue = revenueByCurrency.INR || summary.total_revenue || 0;
+    var uaeRevenue = revenueByCurrency.AED || 0;
+
     el.innerHTML =
       '<div class="admin-grid">' +
         '<div class="admin-card"><div class="admin-card-label">Total orders</div><div class="admin-card-value">' + (summary.total_orders || 0) + '</div></div>' +
-        '<div class="admin-card"><div class="admin-card-label">Total revenue</div><div class="admin-card-value admin-card-value-gold">' + global.DvitesAdmin.formatMoney(summary.total_revenue) + '</div></div>' +
+        '<div class="admin-card"><div class="admin-card-label">India revenue</div><div class="admin-card-value admin-card-value-gold">' + global.DvitesAdmin.formatMoney(indiaRevenue, "INR") + '</div></div>' +
+        '<div class="admin-card"><div class="admin-card-label">UAE revenue</div><div class="admin-card-value admin-card-value-gold">' + global.DvitesAdmin.formatMoney(uaeRevenue, "AED") + '</div></div>' +
         '<div class="admin-card"><div class="admin-card-label">Today</div><div class="admin-card-value">' + (summary.today_orders || 0) + '</div></div>' +
         '<div class="admin-card"><div class="admin-card-label">This week</div><div class="admin-card-value">' + (summary.week_orders || 0) + '</div></div>' +
         '<div class="admin-card"><div class="admin-card-label">This month</div><div class="admin-card-value">' + (summary.month_orders || 0) + '</div></div>' +
@@ -279,7 +284,7 @@
               '<td>' + global.DvitesAdmin.formatDate(order.created_at) + '</td>' +
               '<td>' + (order.template_name || "—") + '</td>' +
               '<td>' + customerLine(order) + '</td>' +
-              '<td>' + global.DvitesAdmin.formatMoney(order.amount) + '</td>' +
+              '<td>' + global.DvitesAdmin.formatMoney(order.amount, order.currency) + '</td>' +
               '<td><span class="admin-pill admin-pill-paid">' + paymentLabel(order) + '</span> · ' + (order.customization_status || "New") + '</td>' +
               '<td class="admin-table-actions">' +
                 '<a class="admin-icon-btn" href="' + buildCustomerWhatsApp(order) + '" target="_blank" rel="noopener" title="WhatsApp">' + global.DvitesAdmin.iconSvg("whatsapp") + '</a>' +

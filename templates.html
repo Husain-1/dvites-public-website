@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/site.css" />
   <link rel="stylesheet" href="/assets/full-demo.css" />
+  <script src="/assets/market.js"></script>
   <script src="/assets/meta-pixel.js"></script>
   <script src="/assets/google-tag.js"></script>
   <script src="/assets/clarity.js"></script>
@@ -22,7 +23,7 @@
     <div class="container announce-bar-inner">
       <p class="announce-bar-copy">
         <span class="announce-bar-badge">Save 40%</span>
-        <span>Premium invites at <strong>₹799</strong> <s class="announce-bar-was">₹2,499</s></span>
+        <span>Premium invites at <strong data-dvites-price="wedding" data-dvites-price-kind="price">₹799</strong> <s class="announce-bar-was">₹2,499</s></span>
       </p>
       <div class="announce-bar-timer" aria-live="polite">
         <span class="announce-timer-label">Ends in</span>
@@ -249,8 +250,15 @@
   <script src="/assets/site.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      Dvites.renderCatalog(document.getElementById("full-catalog"), false);
-      if (typeof DvitesRebindModal === "function") DvitesRebindModal();
+      var render = function () {
+        Dvites.renderCatalog(document.getElementById("full-catalog"), false);
+        if (typeof DvitesRebindModal === "function") DvitesRebindModal();
+      };
+      if (window.DvitesMarket && typeof window.DvitesMarket.ready === "function") {
+        window.DvitesMarket.ready().then(render);
+      } else {
+        render();
+      }
     });
   </script>
 </body>

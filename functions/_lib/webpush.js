@@ -168,12 +168,16 @@ export async function notifyAdminsOfOrder(env, order) {
     return { sent: 0, skipped: true, reason: "No push subscriptions." };
   }
 
+  const currency = String(order.currency || "INR").toUpperCase();
+  const amount = Number(order.amount || 0);
+  const amountLabel =
+    currency === "AED"
+      ? "AED " + amount.toLocaleString("en-AE")
+      : "₹" + amount.toLocaleString("en-IN");
+
   const payload = {
     title: "New Dvites Order",
-    body:
-      (order.template_name || "Wedding Invitation") +
-      " — ₹" +
-      Number(order.amount || 0).toLocaleString("en-IN"),
+    body: (order.template_name || "Wedding Invitation") + " — " + amountLabel,
     url: "/admin/orders.html",
     order_id: order.id || null,
     tag: "dvites-new-order-" + (order.id || Date.now()),

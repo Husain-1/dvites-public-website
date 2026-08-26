@@ -1,8 +1,9 @@
 import { notifyAdminsOfOrder } from "../_lib/webpush.js";
+import { metaCountryForMarket } from "../_lib/market-pricing.js";
 import {
   extractClientIp,
   extractUserAgent,
-  rupeesFromTrustedSources,
+  majorFromTrustedSources,
   sendMetaPurchase,
   splitCustomerName,
 } from "../lib/meta-capi.js";
@@ -39,9 +40,12 @@ function cleanText(value, maxLength) {
 
 async function fetchRazorpayPayment(paymentId, keyId, keySecret) {
   const auth = btoa(keyId + ":" + keySecret);
-  const response = await fetch("https://api.razorpay.com/v1/payments/" + encodeURIComponent(paymentId), {
-    headers: { Authorization: "Basic " + auth },
-  });
+  const response = await fetch(
+    "https://api.razorpay.com/v1/payments/" + encodeURIComponent(paymentId),
+    {
+      headers: { Authorization: "Basic " + auth },
+    }
+  );
   if (!response.ok) return null;
   try {
     return await response.json();
@@ -52,9 +56,12 @@ async function fetchRazorpayPayment(paymentId, keyId, keySecret) {
 
 async function fetchRazorpayOrder(orderId, keyId, keySecret) {
   const auth = btoa(keyId + ":" + keySecret);
-  const response = await fetch("https://api.razorpay.com/v1/orders/" + encodeURIComponent(orderId), {
-    headers: { Authorization: "Basic " + auth },
-  });
+  const response = await fetch(
+    "https://api.razorpay.com/v1/orders/" + encodeURIComponent(orderId),
+    {
+      headers: { Authorization: "Basic " + auth },
+    }
+  );
   if (!response.ok) return null;
   try {
     return await response.json();
@@ -153,6 +160,10 @@ export async function onRequestPost(context) {
     paymentRecord = payment;
     orderRecord = order;
 
+    if (payment && payment.order_id && payment.order_id !== orderId) {
+      return jsonResponse({ success: false, error: "Payment does not match order." }, 400);
+    }
+
     if (payment) {
       if (!customerEmail && payment.email) customerEmail = cleanText(payment.email, 200);
       if (!customerPhone && payment.contact) customerPhone = cleanText(payment.contact, 40);
@@ -174,29 +185,32 @@ export async function onRequestPost(context) {
   const verifiedCurrency = cleanText(
     (paymentRecord && paymentRecord.currency) ||
       (orderRecord && orderRecord.currency) ||
-      body.currency ||
-      "INR",
+      "",
     8
   ).toUpperCase();
 
-  const verifiedAmountRupees = rupeesFromTrustedSources({
-    paymentAmountPaise: paymentRecord && paymentRecord.amount,
-    orderAmountPaise: orderRecord && orderRecord.amount,
+  if (verifiedCurrency !== "INR" && verifiedCurrency !== "AED") {
+    return jsonResponse(
+      { success: false, error: "Unsupported payment currency." },
+      400
+    );
+  }
+
+  const verifiedAmountMajor = majorFromTrustedSources({
+    paymentAmountSubunits: paymentRecord && paymentRecord.amount,
+    orderAmountSubunits: orderRecord && orderRecord.amount,
   });
 
-  let amount = verifiedAmountRupees;
-  if (!amount) {
-    const clientAmount = Number(body.amount);
-    if (Number.isFinite(clientAmount) && clientAmount > 0) {
-      amount = clientAmount;
-    }
-  }
-  if (!amount) {
-    amount = 799;
+  if (!verifiedAmountMajor) {
+    return jsonResponse(
+      { success: false, error: "Unable to verify payment amount." },
+      400
+    );
   }
 
-  const metaAmountRupees =
-    verifiedCurrency === "INR" && verifiedAmountRupees ? verifiedAmountRupees : null;
+  const market =
+    (orderRecord && orderRecord.notes && cleanText(orderRecord.notes.market, 4)) ||
+    (verifiedCurrency === "AED" ? "AE" : "IN");
 
   const orderRow = {
     razorpay_order_id: orderId,
@@ -207,8 +221,8 @@ export async function onRequestPost(context) {
     customer_phone: customerPhone || null,
     template_slug: templateSlug || null,
     template_name: templateName || "Dvites Wedding Invitation",
-    amount: amount,
-    currency: verifiedCurrency || "INR",
+    amount: verifiedAmountMajor,
+    currency: verifiedCurrency,
     payment_status: "paid",
     customization_status: "New",
     notes: notes || null,
@@ -222,6 +236,7 @@ export async function onRequestPost(context) {
       id: saveResult.orderId,
       template_name: orderRow.template_name,
       amount: orderRow.amount,
+      currency: orderRow.currency,
     });
 
     const nameParts = splitCustomerName(customerName);
@@ -231,31 +246,30 @@ export async function onRequestPost(context) {
       null;
 
     try {
-      if (metaAmountRupees) {
-        await sendMetaPurchase({
-          env: env,
-          eventId: paymentId,
-          eventTime: Math.floor(Date.now() / 1000),
-          eventSourceUrl: eventSourceUrl,
-          value: metaAmountRupees,
-          currency: "INR",
-          orderId: saveResult.orderId || orderId,
-          contentId: templateSlug || null,
-          contentName: orderRow.template_name,
-          fbp: cleanText(body.meta_fbp, 256) || null,
-          fbc: cleanText(body.meta_fbc, 256) || null,
-          clientIpAddress: extractClientIp(request),
-          clientUserAgent: extractUserAgent(request),
-          customer: {
-            email: customerEmail || null,
-            phone: customerPhone || null,
-            firstName: nameParts.firstName,
-            lastName: nameParts.lastName,
-            country: "in",
-            externalId: saveResult.orderId || paymentId,
-          },
-        });
-      }
+      await sendMetaPurchase({
+        env: env,
+        eventId: paymentId,
+        eventTime: Math.floor(Date.now() / 1000),
+        eventSourceUrl: eventSourceUrl,
+        value: verifiedAmountMajor,
+        currency: verifiedCurrency,
+        orderId: saveResult.orderId || orderId,
+        contentId: templateSlug || null,
+        contentName: orderRow.template_name,
+        fbp: cleanText(body.meta_fbp, 256) || null,
+        fbc: cleanText(body.meta_fbc, 256) || null,
+        clientIpAddress: extractClientIp(request),
+        clientUserAgent: extractUserAgent(request),
+        customer: {
+          email: customerEmail || null,
+          phone: customerPhone || null,
+          firstName: nameParts.firstName,
+          lastName: nameParts.lastName,
+          country: metaCountryForMarket(market),
+          externalId: saveResult.orderId || paymentId,
+        },
+        market: market,
+      });
     } catch {
       console.log(
         JSON.stringify({
@@ -271,6 +285,9 @@ export async function onRequestPost(context) {
 
   return jsonResponse({
     success: true,
+    amount: verifiedAmountMajor,
+    currency: verifiedCurrency,
+    market: market,
     order_saved: saveResult.saved,
     order_id: saveResult.orderId || null,
     order_save_error: saveResult.saved ? null : saveResult.error || "Unable to save order.",

@@ -9,8 +9,33 @@
     return document.getElementById(id);
   }
 
-  function formatRupee(n) {
+  function formatPrice(n) {
+    if (global.DvitesMarket && typeof global.DvitesMarket.formatPrice === "function") {
+      return global.DvitesMarket.formatPrice(n);
+    }
     return "₹" + Number(n).toLocaleString("en-IN");
+  }
+
+  function getProductType(tpl) {
+    if (tpl && tpl.productType === "save-the-date") return "save-the-date";
+    if (
+      global.DvitesSaveTheDateTemplates &&
+      global.DvitesSaveTheDateTemplates.getBySlug(tpl && tpl.slug)
+    ) {
+      return "save-the-date";
+    }
+    return "wedding";
+  }
+
+  function getMarketPricing(tpl) {
+    var productType = getProductType(tpl);
+    if (global.DvitesMarket && typeof global.DvitesMarket.getPricing === "function") {
+      return global.DvitesMarket.getPricing(productType);
+    }
+    return {
+      price: tpl.price,
+      oldPrice: tpl.oldPrice,
+    };
   }
 
   function escapeHtml(str) {
@@ -59,7 +84,6 @@
       demoUrl: tpl.demoUrl,
       templateSlug: tpl.slug,
       templateName: tpl.name,
-      amountPaise: tpl.amountPaise,
       productUrl: tpl.productUrl || global.location.pathname,
       exitUrl: global.location.href
     });
@@ -297,7 +321,15 @@
       : global.DvitesWeddingTemplates;
     if (!grid || !catalog) return;
     var related = catalog.getRelated(tpl.slug, 3);
+    var weddingPricing = global.DvitesMarket
+      ? global.DvitesMarket.getPricing("wedding")
+      : { price: 799 };
+    var stdPricing = global.DvitesMarket
+      ? global.DvitesMarket.getPricing("save-the-date")
+      : { price: 999 };
     grid.innerHTML = related.map(function (item) {
+      var relatedPricing =
+        item.productType === "save-the-date" ? stdPricing : weddingPricing;
       return (
         '<article class="tp-related-card">' +
           '<a href="' + escapeHtml(item.productUrl) + '" class="tp-related-link" data-related-slug="' + escapeHtml(item.slug) + '">' +
@@ -306,7 +338,7 @@
             '</div>' +
             '<h3>' + escapeHtml(item.name) + '</h3>' +
             '<p>' + escapeHtml(item.category) + '</p>' +
-            '<span class="tp-related-price">' + formatRupee(item.price) + '</span>' +
+            '<span class="tp-related-price">' + formatPrice(relatedPricing.price) + '</span>' +
             '<span class="tp-related-cta">View Details →</span>' +
           '</a>' +
         '</article>'
@@ -348,7 +380,6 @@
         global.DvitesPayment.startCheckout({
           templateName: tpl.name,
           templateSlug: tpl.slug,
-          amountPaise: tpl.amountPaise
         }).finally(function () {
           btn.disabled = false;
           btn.removeAttribute("aria-busy");
@@ -376,7 +407,6 @@
       global.DvitesPayment.startCheckout({
         templateName: tpl.name,
         templateSlug: tpl.slug,
-        amountPaise: tpl.amountPaise
       }).finally(reset);
       event.preventDefault();
       event.stopPropagation();
@@ -393,7 +423,8 @@
       viewContentFired = true;
     }
     if (typeof global.dvitesTrackViewContent === "function") {
-      global.dvitesTrackViewContent(tpl.name, tpl.category, tpl.price, tpl.slug);
+      var pricing = getMarketPricing(tpl);
+      global.dvitesTrackViewContent(tpl.name, tpl.category, pricing.price, tpl.slug);
     }
     if (typeof global.dvitesTrack === "function") {
       global.dvitesTrack("template_product_view", {
@@ -508,18 +539,20 @@
     if (content) content.hidden = false;
     if (notFound) notFound.hidden = true;
 
+    var pricing = getMarketPricing(tpl);
+
     setText("tp-breadcrumb-name", tpl.name);
     setText("tp-category", tpl.category);
     setText("tp-name", tpl.name);
     setText("tp-short-desc", tpl.shortDescription);
-    setText("tp-old-price", formatRupee(tpl.oldPrice));
-    setText("tp-price", formatRupee(tpl.price));
+    setText("tp-old-price", formatPrice(pricing.oldPrice));
+    setText("tp-price", formatPrice(pricing.price));
     setText("tp-save-badge", tpl.saveLabel);
     setText("tp-delivery", tpl.deliveryTime);
     setText("tp-order-name", tpl.name);
-    setText("tp-order-price", formatRupee(tpl.price));
+    setText("tp-order-price", formatPrice(pricing.price));
     setText("tp-sticky-name", tpl.name);
-    setText("tp-sticky-price", formatRupee(tpl.price));
+    setText("tp-sticky-price", formatPrice(pricing.price));
 
     var phone = $("tp-hero-phone");
     if (phone) {
@@ -562,7 +595,14 @@
       showNotFound();
       return;
     }
-    populatePage(tpl);
+    var boot = function () {
+      populatePage(tpl);
+    };
+    if (global.DvitesMarket && typeof global.DvitesMarket.ready === "function") {
+      global.DvitesMarket.ready().then(boot);
+    } else {
+      boot();
+    }
   }
 
   if (document.readyState === "loading") {

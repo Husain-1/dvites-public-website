@@ -79,7 +79,7 @@
         '<div class="admin-card"><div class="admin-card-label">Payment successes</div><div class="admin-card-value">' + data.payment_successes + '</div></div>' +
         '<div class="admin-card"><div class="admin-card-label">Conversion rate</div><div class="admin-card-value">' + data.conversion_rate + '%</div><div class="admin-card-note">Payments / checkout opens</div></div>' +
         '<div class="admin-card"><div class="admin-card-label">Orders in range</div><div class="admin-card-value">' + data.orders_count + '</div></div>' +
-        '<div class="admin-card"><div class="admin-card-label">Revenue in range</div><div class="admin-card-value admin-card-value-gold">' + global.DvitesAdmin.formatMoney(data.revenue) + '</div></div>' +
+        '<div class="admin-card"><div class="admin-card-label">Revenue in range</div><div class="admin-card-value admin-card-value-gold">' + global.DvitesAdmin.formatRevenueByCurrency(data.revenue_by_currency || { INR: data.revenue }) + '</div></div>' +
       '</div>' +
       renderBarChart('Page-wise visits', data.page_breakdown) +
       renderBarChart('Template-wise views', data.template_breakdown);

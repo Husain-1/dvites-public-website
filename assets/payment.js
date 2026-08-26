@@ -5,7 +5,6 @@
   var API_CREATE_ORDER = "/api/create-order";
   var API_VERIFY_PAYMENT = "/api/verify-payment";
   var THANK_YOU_PATH = "/thank-you.html";
-  var PRICE_PAISE = 79900;
   var PARTNER_MIN = 3;
   var PARTNER_MAX = 5;
   var PARTNER_DISCOUNT = 0.05;
@@ -14,10 +13,30 @@
     "Payment verification failed. Please contact infodvites@gmail.com.";
   /* END PAYMENT CONFIG */
 
-  function calculatePartnerTotalPaise(subtotalPaise) {
-    var subtotal = subtotalPaise / 100;
+  var STD_SLUGS = [
+    "desert-sand",
+    "blossom-touch",
+    "enchanted-mirror",
+    "moonlit-lotus",
+    "royal-radiance",
+  ];
+
+  function getMarket() {
+    return global.DvitesMarket && typeof global.DvitesMarket.getMarket === "function"
+      ? global.DvitesMarket.getMarket()
+      : "IN";
+  }
+
+  function inferProductType(templateSlug) {
+    var slug = String(templateSlug || "").trim().toLowerCase();
+    if (STD_SLUGS.indexOf(slug) >= 0) return "save-the-date";
+    return "wedding";
+  }
+
+  function calculatePartnerTotalMajor(unitPriceMajor, count) {
+    var subtotal = unitPriceMajor * count;
     var discount = Math.round(subtotal * PARTNER_DISCOUNT);
-    return Math.round((subtotal - discount) * 100);
+    return subtotal - discount;
   }
 
   function ensureRazorpayLoaded() {
@@ -179,13 +198,12 @@
   /* RAZORPAY CHECKOUT */
   function openRazorpayCheckout(orderData, checkoutContext) {
     var templateName = checkoutContext.templateName;
-    var priceInRupees = checkoutContext.amountRupees;
 
     return new Promise(function (resolve, reject) {
       var options = {
         key: orderData.key_id,
         amount: orderData.amount,
-        currency: "INR",
+        currency: orderData.currency,
         name: "Dvites",
         description: templateName,
         order_id: orderData.order_id,
@@ -199,8 +217,6 @@
             razorpay_signature: response.razorpay_signature,
             template_slug: checkoutContext.templateSlug || "",
             template_name: checkoutContext.templateName || "",
-            amount: checkoutContext.amountRupees,
-            currency: "INR",
             customer_name: checkoutContext.customerName || "",
             customer_email: checkoutContext.customerEmail || "",
             customer_phone: checkoutContext.customerPhone || "",
@@ -210,8 +226,9 @@
               if (typeof global.dvitesTrackPurchase === "function") {
                 global.dvitesTrackPurchase(
                   templateName,
-                  priceInRupees,
-                  response.razorpay_payment_id
+                  result.amount,
+                  response.razorpay_payment_id,
+                  result.currency
                 );
               }
               if (typeof global.dvitesTrack === "function") {
@@ -255,34 +272,53 @@
   /* END RAZORPAY CHECKOUT */
 
   function normalizeCheckoutContext(options) {
-    var amountPaise = (options && options.amountPaise) || PRICE_PAISE;
     return {
       templateName: (options && options.templateName) || "Dvites Wedding Invitation",
       templateSlug: (options && options.templateSlug) || "",
-      amountPaise: amountPaise,
-      amountRupees: amountPaise / 100,
+      partnerTemplateSlugs: (options && options.partnerTemplateSlugs) || null,
       customerName: (options && options.customerName) || "",
       customerEmail: (options && options.customerEmail) || "",
       customerPhone: (options && options.customerPhone) || "",
       notes: (options && options.notes) || "",
+      displayAmountMajor: (options && options.displayAmountMajor) || null,
     };
+  }
+
+  function buildCreateOrderPayload(checkoutContext) {
+    var payload = {
+      templateSlug: checkoutContext.templateSlug,
+      market: getMarket(),
+    };
+    if (checkoutContext.partnerTemplateSlugs && checkoutContext.partnerTemplateSlugs.length) {
+      payload.partnerTemplateSlugs = checkoutContext.partnerTemplateSlugs;
+    }
+    return payload;
   }
 
   function startCheckout(options) {
     var checkoutContext = normalizeCheckoutContext(options);
 
+    if (!checkoutContext.templateSlug) {
+      window.alert("Unable to start payment. Please try again.");
+      return Promise.resolve();
+    }
+
+    var productType = inferProductType(checkoutContext.templateSlug);
+    var trackPrice =
+      checkoutContext.displayAmountMajor != null
+        ? checkoutContext.displayAmountMajor
+        : (global.DvitesMarket && global.DvitesMarket.getPrice
+            ? global.DvitesMarket.getPrice(productType)
+            : (productType === "save-the-date" ? 999 : 799));
+
     if (typeof global.dvitesTrackInitiateCheckout === "function") {
       global.dvitesTrackInitiateCheckout(
         checkoutContext.templateName,
-        checkoutContext.amountRupees
+        trackPrice
       );
     }
 
-    return createOrder({
-      templateName: checkoutContext.templateName,
-      templateSlug: checkoutContext.templateSlug,
-      amount: checkoutContext.amountPaise,
-    }).then(function (orderData) {
+    return createOrder(buildCreateOrderPayload(checkoutContext)).then(function (orderData) {
       return ensureRazorpayLoaded().then(function () {
         return openRazorpayCheckout(orderData, checkoutContext);
       });
@@ -309,7 +345,6 @@
       return {
         templateName: (titleEl && titleEl.textContent.trim()) || "Dvites Wedding Invitation",
         templateSlug: (buyBtn && buyBtn.dataset.templateSlug) || "",
-        amountPaise: Number(buyBtn && buyBtn.dataset.amountPaise) || PRICE_PAISE,
       };
     });
 
@@ -318,7 +353,6 @@
         return {
           templateName: element.getAttribute("data-template-name") || "Dvites Wedding Invitation",
           templateSlug: element.getAttribute("data-template-slug") || "general",
-          amountPaise: Number(element.getAttribute("data-amount-paise")) || PRICE_PAISE,
         };
       });
     });
@@ -333,16 +367,15 @@
       startCheckout({
         templateName: (card && card.getAttribute("data-title")) || "Dvites Wedding Invitation",
         templateSlug: (card && card.getAttribute("data-id")) || "",
-        amountPaise: Number(card && card.getAttribute("data-amount-paise")) || PRICE_PAISE,
       });
     });
   }
 
   global.DvitesPayment = {
-    PRICE_PAISE: PRICE_PAISE,
     PARTNER_MIN: PARTNER_MIN,
     PARTNER_MAX: PARTNER_MAX,
-    calculatePartnerTotalPaise: calculatePartnerTotalPaise,
+    PARTNER_DISCOUNT: PARTNER_DISCOUNT,
+    calculatePartnerTotalMajor: calculatePartnerTotalMajor,
     startCheckout: startCheckout,
     init: initPayment,
   };
