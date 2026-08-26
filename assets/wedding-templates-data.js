@@ -71,7 +71,7 @@
       name +
       " — premium animated wedding website by Dvites. " +
       shortDescription +
-      " Customised in 24 hours. From ₹799."
+      " Customised in 24 hours."
     );
   }
 

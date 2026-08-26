@@ -52,7 +52,7 @@
     state.currency = "INR";
     state.locale = "en-IN";
     state.prices = {
-      wedding: { price: 799, oldPrice: 2499 },
+      wedding: { price: 799, oldPrice: 1332 },
       "save-the-date": { price: 999, oldPrice: 1999 },
     };
     state.ready = true;
@@ -83,6 +83,57 @@
     });
   }
 
+  function formatStartingAt(productType) {
+    return "Starting at " + formatPrice(getPrice(productType || "wedding")) + ".";
+  }
+
+  function formatFromPrice(productType) {
+    return "From " + formatPrice(getPrice(productType || "wedding"));
+  }
+
+  function applyMarketingCopy() {
+    applyStaticPrices();
+
+    document.querySelectorAll("[data-dvites-starting-at]").forEach(function (el) {
+      var productType = el.getAttribute("data-dvites-starting-at") || "wedding";
+      el.textContent = formatStartingAt(productType);
+    });
+
+    document.querySelectorAll("[data-dvites-from-price]").forEach(function (el) {
+      var productType = el.getAttribute("data-dvites-from-price") || "wedding";
+      el.textContent = formatFromPrice(productType);
+    });
+
+    document.querySelectorAll("[data-dvites-faq-price-q]").forEach(function (el) {
+      var productType = el.getAttribute("data-dvites-faq-price-q") || "wedding";
+      el.textContent =
+        "What is included in " + formatPrice(getPrice(productType)) + "?";
+    });
+
+    document.querySelectorAll("[data-dvites-zero-price]").forEach(function (el) {
+      el.textContent = formatPrice(0);
+    });
+  }
+
+  function updateProductJsonLd(productType) {
+    var type = productType || "wedding";
+    var pricing = getPricing(type);
+    var currency = getCurrency();
+    document.querySelectorAll('script[type="application/ld+json"]').forEach(function (script) {
+      try {
+        var data = JSON.parse(script.textContent);
+        var nodes = data["@graph"] || [data];
+        nodes.forEach(function (node) {
+          if (node && node["@type"] === "Product" && node.offers) {
+            node.offers.price = String(pricing.price);
+            node.offers.priceCurrency = currency;
+          }
+        });
+        script.textContent = JSON.stringify(data);
+      } catch (e) { /* noop */ }
+    });
+  }
+
   function resolve() {
     var urlMarket = readUrlMarket();
     if (urlMarket) persistMarket(urlMarket);
@@ -103,7 +154,7 @@
         applyFallback();
       }
       state.ready = true;
-      applyStaticPrices();
+      applyMarketingCopy();
       return state;
     });
   }
@@ -123,7 +174,7 @@
       return Number(entry.oldPrice);
     }
     if (type === "save-the-date") return 1999;
-    return 2499;
+    return 1332;
   }
 
   function getPricing(productType) {
@@ -170,6 +221,10 @@
     getOldPrice: getOldPrice,
     getPricing: getPricing,
     formatPrice: formatPrice,
+    formatStartingAt: formatStartingAt,
+    formatFromPrice: formatFromPrice,
     applyStaticPrices: applyStaticPrices,
+    applyMarketingCopy: applyMarketingCopy,
+    updateProductJsonLd: updateProductJsonLd,
   };
 })(window);

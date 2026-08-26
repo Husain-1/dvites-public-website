@@ -63,7 +63,7 @@
       name +
       " — premium digital Save the Date invitation by Dvites. " +
       shortDescription +
-      " Customised in 24 hours. From ₹999."
+      " Customised in 24 hours."
     );
   }
 

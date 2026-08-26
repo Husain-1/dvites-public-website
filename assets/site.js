@@ -3,7 +3,7 @@
 
   var EMAIL = "infodvites@gmail.com";
   var PRICE = 799;
-  var OLD_PRICE = 2499;
+  var OLD_PRICE = 1332;
   var SAVE_THE_DATE_PRICE = 999;
   var SAVE_THE_DATE_OLD_PRICE = 1999;
   var PARTNER_MIN = 3;
@@ -1108,8 +1108,8 @@
       }
     },
     refreshMarketPricing: function () {
-      if (global.DvitesMarket && global.DvitesMarket.applyStaticPrices) {
-        global.DvitesMarket.applyStaticPrices();
+      if (global.DvitesMarket && global.DvitesMarket.applyMarketingCopy) {
+        global.DvitesMarket.applyMarketingCopy();
       }
       var featured = document.getElementById("featured-catalog");
       var full = document.getElementById("full-catalog");

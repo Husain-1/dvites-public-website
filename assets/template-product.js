@@ -27,14 +27,46 @@
     return "wedding";
   }
 
+  function updateProductMeta(tpl) {
+    if (!global.DvitesMarket) return;
+    var productType = getProductType(tpl);
+    var prefix =
+      productType === "save-the-date"
+        ? tpl.name + " — premium digital Save the Date invitation by Dvites. "
+        : tpl.name + " — premium animated wedding website by Dvites. ";
+    var content =
+      prefix +
+      String(tpl.shortDescription || "").trim() +
+      " Customised in 24 hours. From " +
+      global.DvitesMarket.formatPrice(global.DvitesMarket.getPrice(productType)) +
+      ".";
+    document
+      .querySelectorAll(
+        'meta[name="description"], meta[property="og:description"], meta[name="twitter:description"]'
+      )
+      .forEach(function (el) {
+        el.setAttribute("content", content);
+      });
+  }
+
+  function buildProductLead(tpl) {
+    var desc = String(tpl.shortDescription || tpl.fullDescription || "").trim();
+    desc = desc.replace(/\s*(From|Starting at)\s+(₹|AED\s*)?[\d,.]+\.?\s*$/i, "").trim();
+    var productType = getProductType(tpl);
+    var priceText = global.DvitesMarket
+      ? global.DvitesMarket.formatPrice(global.DvitesMarket.getPrice(productType))
+      : formatPrice(productType === "save-the-date" ? 999 : 799);
+    return desc + " Customised in 24 hours. From " + priceText + ".";
+  }
+
   function getMarketPricing(tpl) {
     var productType = getProductType(tpl);
     if (global.DvitesMarket && typeof global.DvitesMarket.getPricing === "function") {
       return global.DvitesMarket.getPricing(productType);
     }
     return {
-      price: tpl.price,
-      oldPrice: tpl.oldPrice,
+      price: productType === "save-the-date" ? 999 : 799,
+      oldPrice: productType === "save-the-date" ? 1999 : 1332,
     };
   }
 
@@ -544,7 +576,7 @@
     setText("tp-breadcrumb-name", tpl.name);
     setText("tp-category", tpl.category);
     setText("tp-name", tpl.name);
-    setText("tp-short-desc", tpl.shortDescription);
+    setText("tp-short-desc", buildProductLead(tpl));
     setText("tp-old-price", formatPrice(pricing.oldPrice));
     setText("tp-price", formatPrice(pricing.price));
     setText("tp-save-badge", tpl.saveLabel);
@@ -583,6 +615,11 @@
     initHeroLivePreview(tpl);
     initStickyBar(tpl);
     trackViewContentOnce(tpl);
+
+    if (global.DvitesMarket && typeof global.DvitesMarket.updateProductJsonLd === "function") {
+      global.DvitesMarket.updateProductJsonLd(getProductType(tpl));
+    }
+    updateProductMeta(tpl);
 
     if (global.Dvites && typeof global.Dvites.initMobileNav === "function") {
       // site.js init already runs; ensure mobile nav on product pages

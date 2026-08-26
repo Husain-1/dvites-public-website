@@ -14,7 +14,7 @@ export const MARKET_PRICES = {
     currency: "INR",
     locale: "en-IN",
     products: {
-      wedding: { price: 799, oldPrice: 2499 },
+      wedding: { price: 799, oldPrice: 1332 },
       "save-the-date": { price: 999, oldPrice: 1999 },
     },
   },
@@ -22,7 +22,7 @@ export const MARKET_PRICES = {
     currency: "AED",
     locale: "en-AE",
     products: {
-      wedding: { price: 79, oldPrice: 79 },
+      wedding: { price: 79, oldPrice: 132 },
       "save-the-date": { price: 79, oldPrice: 79 },
     },
   },
