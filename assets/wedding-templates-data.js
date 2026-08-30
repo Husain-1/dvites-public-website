@@ -117,6 +117,16 @@
 
   var RAW = [
     {
+      id: "heavens-alight",
+      url: "/templates/heavens-alight/",
+      title: "Heavens Alight",
+      category: "Classic Elegance",
+      tags: ["classic", "elegant", "luxury", "destination"],
+      preview: "/templates/heavens-alight/thumbnail.png",
+      description: "A cinematic champagne-opening wedding invitation with hero video, 3D stationery reveal, scroll-driven gallery, and elegant faith-inspired details.",
+      featured: false
+    },
+    {
       id: "maison-doree",
       url: "/templates/maison-doree/",
       title: "Maison Dorée",
