@@ -42,6 +42,7 @@ const WEDDING_TEMPLATES = [
   { slug: "oud-blossom-majlis", name: "Oud Blossom Majlis", productType: "wedding" },
   { slug: "botanical-bloom", name: "Botanical Bloom", productType: "wedding" },
   { slug: "rajkamal-palace", name: "Rajkamal Palace", productType: "wedding" },
+  { slug: "heavens-alight", name: "Heavens Alight", productType: "wedding" },
 ];
 
 const SAVE_THE_DATE_TEMPLATES = [
