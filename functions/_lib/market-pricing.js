@@ -7,7 +7,14 @@ export const PARTNER_MAX = 5;
 export const PARTNER_DISCOUNT = 0.05;
 
 /** Wedding templates hidden from catalog/partner studio but still valid slugs. */
-export const HIDDEN_WEDDING_SLUGS = ["mountains", "laavan"];
+export const HIDDEN_WEDDING_SLUGS = [
+  "mountains",
+  "laavan",
+  "heavens-alight",
+  "rajkamal-palace",
+  "mewar-midnight",
+  "pichwai-royal",
+];
 
 export const MARKET_PRICES = {
   IN: {

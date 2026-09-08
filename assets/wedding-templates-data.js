@@ -9,7 +9,14 @@
   var DEFAULT_HOSTING = "Hosted until after your wedding";
 
   /** Temporarily hidden from catalog, partner studio, swatches, and product pages. Clear to re-publish. */
-  var TEMPORARILY_HIDDEN_SLUGS = ["mountains", "laavan"];
+  var TEMPORARILY_HIDDEN_SLUGS = [
+    "mountains",
+    "laavan",
+    "heavens-alight",
+    "rajkamal-palace",
+    "mewar-midnight",
+    "pichwai-royal"
+  ];
 
   function isHiddenSlug(slug) {
     return TEMPORARILY_HIDDEN_SLUGS.indexOf(String(slug || "").trim().toLowerCase()) !== -1;
@@ -59,7 +66,7 @@
   ];
 
   function productUrl(slug) {
-    return "/wedding/" + slug;
+    return "/wedding/" + slug + ".html";
   }
 
   function seoTitle(name, category) {

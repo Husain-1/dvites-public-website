@@ -8,7 +8,14 @@
   var DEFAULT_DELIVERY = "Delivered within 24 hours";
   var DEFAULT_HOSTING = "Hosted until after your wedding";
 
+  /** Set false to hide all Save the Date templates from the main website storefront. */
+  var STOREFRONT_ENABLED = false;
+
   var STD_THUMBNAILS_DIR = "/save-the-date-thumbnails/";
+
+  function isStorefrontEnabled() {
+    return STOREFRONT_ENABLED;
+  }
 
   var SHARED_FEATURES = [
     "Couple names and wedding date",
@@ -155,10 +162,10 @@
     }
   ];
 
-  var LIST = RAW.map(baseRecord);
+  var LIST = STOREFRONT_ENABLED ? RAW.map(baseRecord) : [];
 
   function getBySlug(slug) {
-    if (!slug) return null;
+    if (!STOREFRONT_ENABLED || !slug) return null;
     var normalized = String(slug).trim().toLowerCase();
     for (var i = 0; i < LIST.length; i += 1) {
       if (LIST[i].slug === normalized || LIST[i].id === normalized) return LIST[i];
@@ -167,6 +174,7 @@
   }
 
   function getRelated(currentSlug, limit) {
+    if (!STOREFRONT_ENABLED) return [];
     var max = limit || 3;
     var current = getBySlug(currentSlug);
     if (!current) return LIST.slice(0, max);
@@ -201,6 +209,8 @@
     SITE_ORIGIN: SITE_ORIGIN,
     DEFAULT_PRICE: DEFAULT_PRICE,
     DEFAULT_OLD_PRICE: DEFAULT_OLD_PRICE,
+    STOREFRONT_ENABLED: STOREFRONT_ENABLED,
+    isStorefrontEnabled: isStorefrontEnabled,
     list: LIST,
     getBySlug: getBySlug,
     getRelated: getRelated,

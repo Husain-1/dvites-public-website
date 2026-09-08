@@ -33,7 +33,13 @@
     return [];
   }
 
+  function isSaveTheDateStorefrontEnabled() {
+    return !global.DvitesSaveTheDateTemplates ||
+      global.DvitesSaveTheDateTemplates.isStorefrontEnabled();
+  }
+
   function buildSaveTheDateCatalogRecords() {
+    if (!isSaveTheDateStorefrontEnabled()) return [];
     return getSaveTheDateTemplatesList();
   }
 
@@ -71,6 +77,7 @@
   }
 
   function getSaveTheDateTemplatesList() {
+    if (!isSaveTheDateStorefrontEnabled()) return [];
     if (global.DvitesSaveTheDateTemplates && global.DvitesSaveTheDateTemplates.list) {
       return global.DvitesSaveTheDateTemplates.list.map(function (tpl) {
         return global.DvitesSaveTheDateTemplates.toCatalogRecord(tpl);
@@ -95,6 +102,7 @@
   }
 
   function buildDesertSandCatalogEntry() {
+    if (!isSaveTheDateStorefrontEnabled()) return null;
     if (global.DvitesSaveTheDateTemplates) {
       var tpl = global.DvitesSaveTheDateTemplates.getBySlug("desert-sand");
       if (tpl) return global.DvitesSaveTheDateTemplates.toCatalogRecord(tpl);
@@ -102,7 +110,14 @@
     return DESERT_SAND_CATALOG;
   }
 
-  var TEMPLATES = buildWeddingCatalogTemplates().concat([buildDesertSandCatalogEntry()]);
+  function getCatalogTemplates() {
+    var list = buildWeddingCatalogTemplates();
+    var desertSand = buildDesertSandCatalogEntry();
+    if (desertSand) list.push(desertSand);
+    return list;
+  }
+
+  var TEMPLATES = getCatalogTemplates();
 
   var SAVE_THE_DATE_TEMPLATES = [
     {
@@ -214,6 +229,56 @@
     return typeof url === "string" && /^\/templates\/[^/?#]+\/$/.test(url);
   }
 
+  function extractWeddingProductSlug(path) {
+    var match = String(path || "").match(/^\/wedding\/([a-z0-9-]+?)(?:\.html)?$/i);
+    return match ? match[1].toLowerCase() : "";
+  }
+
+  function extractSaveTheDateProductSlug(path) {
+    var match = String(path || "").match(/^\/save-the-date\/([a-z0-9-]+)\.html$/i);
+    return match ? match[1].toLowerCase() : "";
+  }
+
+  function isHiddenWeddingProductSlug(slug) {
+    return !!(
+      slug &&
+      global.DvitesWeddingTemplates &&
+      global.DvitesWeddingTemplates.isHiddenSlug &&
+      global.DvitesWeddingTemplates.isHiddenSlug(slug)
+    );
+  }
+
+  function isSaveTheDateProductAvailable(slug) {
+    return !!(
+      slug &&
+      global.DvitesSaveTheDateTemplates &&
+      global.DvitesSaveTheDateTemplates.isStorefrontEnabled &&
+      global.DvitesSaveTheDateTemplates.isStorefrontEnabled() &&
+      global.DvitesSaveTheDateTemplates.getBySlug(slug)
+    );
+  }
+
+  function normalizeProductPageUrl(url) {
+    if (!url || isDemoTemplateUrl(url)) return "";
+    var path = String(url).split("#")[0].split("?")[0];
+
+    var weddingSlug = extractWeddingProductSlug(path);
+    if (weddingSlug) {
+      if (isHiddenWeddingProductSlug(weddingSlug)) return "";
+      return global.DvitesWeddingTemplates
+        ? global.DvitesWeddingTemplates.productUrl(weddingSlug)
+        : "/wedding/" + weddingSlug + ".html";
+    }
+
+    var stdSlug = extractSaveTheDateProductSlug(path);
+    if (stdSlug) {
+      if (!isSaveTheDateProductAvailable(stdSlug)) return "";
+      return global.DvitesSaveTheDateTemplates.productUrl(stdSlug);
+    }
+
+    return "";
+  }
+
   function resolveProductPageUrl(source) {
     var slug = "";
     var candidate = "";
@@ -228,9 +293,8 @@
       candidate = source.productUrl || "";
     }
 
-    if (candidate && candidate.indexOf(".html") !== -1 && !isDemoTemplateUrl(candidate)) {
-      return candidate;
-    }
+    var fromCandidate = normalizeProductPageUrl(candidate);
+    if (fromCandidate) return fromCandidate;
 
     if (slug && global.DvitesWeddingTemplates && global.DvitesWeddingTemplates.getBySlug(slug)) {
       return global.DvitesWeddingTemplates.productUrl(slug);
@@ -255,6 +319,17 @@
       link.dataset.productNavBound = "1";
       link.addEventListener("click", function (event) {
         event.stopPropagation();
+        var url =
+          normalizeProductPageUrl(link.getAttribute("href") || "") ||
+          resolveProductPageUrl(link.closest(".card[data-id]") || link);
+        if (!url || url === "#") {
+          event.preventDefault();
+          return;
+        }
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        if (typeof event.button === "number" && event.button !== 0) return;
+        event.preventDefault();
+        global.location.assign(url);
       });
     });
   }
@@ -342,9 +417,10 @@
 
   function renderCatalog(container, filterFeatured) {
     if (!container) return;
+    var catalog = getCatalogTemplates();
     var list = filterFeatured
-      ? TEMPLATES.filter(function (t) { return t.featured; }).slice(0, 6)
-      : TEMPLATES;
+      ? catalog.filter(function (t) { return t.featured; }).slice(0, 6)
+      : catalog;
     container.innerHTML = list.map(renderCard).join("");
     equalizeCardHeights(container);
     bindProductNavigation(container);
@@ -743,7 +819,7 @@
         openModal(card);
         return;
       }
-      var tpl = TEMPLATES.find(function (t) { return t.id === id; });
+      var tpl = getCatalogTemplates().find(function (t) { return t.id === id; });
       if (tpl) {
         openModalFromTemplate(tpl);
       }
@@ -992,6 +1068,21 @@
     global.addEventListener("scroll", onScroll, { passive: true });
   }
 
+  function initStorefrontVisibility() {
+    if (isSaveTheDateStorefrontEnabled()) return;
+
+    document.querySelectorAll('a[href="/save-the-date.html"]').forEach(function (link) {
+      link.style.display = "none";
+      link.setAttribute("aria-hidden", "true");
+      link.tabIndex = -1;
+    });
+
+    var path = global.location.pathname.replace(/\/$/, "");
+    if (path === "/save-the-date.html" || path.indexOf("/save-the-date/") === 0) {
+      global.location.replace("/templates.html");
+    }
+  }
+
   function initPageRecovery() {
     global.addEventListener("pageshow", function (e) {
       if (!e.persisted) return;
@@ -1066,6 +1157,8 @@
 
   global.Dvites = {
     TEMPLATES: TEMPLATES,
+    getCatalogTemplates: getCatalogTemplates,
+    isSaveTheDateStorefrontEnabled: isSaveTheDateStorefrontEnabled,
     WEDDING_TEMPLATES: global.DvitesWeddingTemplates ? global.DvitesWeddingTemplates.list : [],
     SAVE_THE_DATE_TEMPLATES: SAVE_THE_DATE_TEMPLATES,
     EMAIL: EMAIL,
@@ -1090,6 +1183,7 @@
         initFaq();
         initProtection();
         initPartnerStudio();
+        initStorefrontVisibility();
         initPageRecovery();
         global.addEventListener("resize", function () {
           var featured = document.getElementById("featured-catalog");
@@ -1111,6 +1205,7 @@
       if (global.DvitesMarket && global.DvitesMarket.applyMarketingCopy) {
         global.DvitesMarket.applyMarketingCopy();
       }
+      TEMPLATES = getCatalogTemplates();
       var featured = document.getElementById("featured-catalog");
       var full = document.getElementById("full-catalog");
       var std = document.getElementById("std-catalog");
